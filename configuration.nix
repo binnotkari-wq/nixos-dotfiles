@@ -3,7 +3,7 @@
 let
   user_name = "benoit"; # modifiable (faire concorder la valeur dans bootstrap.sh)
   host = "vm"; # modifiable selon la machine (faire concorder la valeur dans bootstrap.sh)
-  nixos_release = "25.11"
+  nixos_release = "25.11";
 in
 
 {
@@ -16,11 +16,11 @@ in
     ./OS/plasma_base.nix # modifiable
 
     # --- UTILISATEUR ---
-    (./. + "/users/${user_name}.nix") # ne pas modififier
-    (./. + "/users/${user_name}_settings.nix") # ne pas modififier
+    ./users/${user_name}.nix # ne pas modififier
+    ./users/${user_name}_settings.nix # ne pas modififier
 
     # --- SOCLE COMMUN ---
-    (./. + "/hosts/${host}/hardware-configuration.nix") # ne pas modififier
+    ./hosts/${host}/hardware-configuration.nix # ne pas modififier
     ./OS/system_settings.nix # ne pas modififier
     ./OS/impermanence-config.nix # ne pas modififier
 
