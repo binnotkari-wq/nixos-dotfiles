@@ -23,8 +23,9 @@
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true; # Pour le copier-coller et le redimensionnement auto
 
-  # Accélération vidéo VirtIO (essentiel pour la fluidité de l'interface)
+  # Configuration spécifique de X11
   services.xserver.videoDrivers = [ "virtio" ];
+  services.xserver.enable = true;
 
   # Montage automatique de dossiers partagés (avec 9P : ne necessitepas de module kernel contrairement au partage virtio)
   fileSystems."/mnt/shared" = {
