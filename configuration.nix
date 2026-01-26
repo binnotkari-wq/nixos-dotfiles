@@ -21,9 +21,11 @@ in
 
     # --- SOCLE COMMUN ---
     (./. + "/hosts/${host}/hardware-configuration.nix") # ne pas modififier
-    ./external_modules/impermanence.nix # ne pas modififier
     ./OS/system_settings.nix # ne pas modififier
     ./OS/impermanence-config.nix # ne pas modififier
+
+    # --- MODULE EXTERNE IMPERMANENCE ---
+  (builtins.fetchTarball { url = "https://github.com/nix-community/impermanence/archive/master.tar.gz";} + "/nixos.nix") # ne pas modififier
   ];
 
   networking.hostName = "${host}"; # ne pas modififier
