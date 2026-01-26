@@ -28,14 +28,6 @@
   };
 
 
-  # 2. Le sous-volume /nix : CRUCIAL pour l'impermanence
-    "/nix" = {
-      # On ne ré-écrit pas l'UUID, Nix le récupère du hardware-configuration.nix
-      options = [ "subvol=@nix" "noatime" "compress=zstd" "ssd" "discard=async" ];
-      neededForBoot = true; # Autorise le montage AVANT que le système ne cherche les fichiers persistés
-    };
-
-
   # --- ACTIVATION DU SWAP EN RAM COMPRESSEE (sera utilisé en priorité avant le swap sur disque) ---
   zramSwap.enable = true;
   zramSwap.priority = 100;

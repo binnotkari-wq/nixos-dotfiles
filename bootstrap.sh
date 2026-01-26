@@ -3,12 +3,12 @@ set -e
 
 # --- DEBUT DE LA DEFINITION DES VARIABLES ---
 echo "--- Configuration de l'installation NixOS ---"
-echo "--- Au préalable, les variables doivent avoir été édités ---"
-echo "- Ce script va effacer le disk choisi, créer une partition EFI de 512Mo, et une partition BTRFS dans un conteneur chiffré LUKS 2.
+echo "--- Au préalable, les variables doivent avoir été éditées, ainsi que user_name, host et choix de l'environnement logiciel dans configuration.nix ---"
+echo "- Ce script va effacer le disque choisi, créer une partition EFI de 512Mo, et une partition BTRFS dans un conteneur chiffré LUKS 2 sur tout le reste de l'espace disponible.
 - Les sous-volumes BTRFS /nix, /swap et /home seront créés.
-- Le swap sera un swapfile.
+- Le swap sera un swapfile, + un zram qui est configuré dans les .nix.
 - / est monté en tmpfs qui sera vidé à chaqué redémarrage, avec quelques éléments persistés grâce au module impermanence configuré dans les .nix.
-- Les sous-volumes /nix, /home et swap étant distinct de /, il seront persistants.
+- Les sous-volumes /nix, /home et /swap étant distinct de /, il seront persistants.
 - Ces partitions sont montés dans /mnt/, qui est la cible de l'installation.
 - Système sans Flakes ni Home Manager"
 echo
@@ -81,6 +81,7 @@ sudo umount $TARGET_MOUNT
 echo "🧠 Montage du Root en RAM..."
 sudo mount -t tmpfs none $TARGET_MOUNT -o size=2G,mode=755
 sudo mkdir -p $TARGET_MOUNT/{boot,nix/persist,home,swap}
+sudo mkdir -p $TARGET_MOUNT/nix/persist
 
 # 7. MONTAGES FINAUX
 echo "🔗 Montages des volumes..."
