@@ -3,12 +3,14 @@ set -e
 
 # --- DEBUT DE LA DEFINITION DES VARIABLES ---
 echo "--- Configuration de l'installation NixOS ---"
+echo "--- Au préalable, les variables doivent avoir été édités ---"
 echo "- Ce script va effacer le disk choisi, créer une partition EFI de 512Mo, et une partition BTRFS dans un conteneur chiffré LUKS 2.
 - Les sous-volumes BTRFS /nix, /swap et /home seront créés.
 - Le swap sera un swapfile.
 - / est monté en tmpfs qui sera vidé à chaqué redémarrage, avec quelques éléments persistés grâce au module impermanence configuré dans les .nix.
 - Les sous-volumes /nix, /home et swap étant distinct de /, il seront persistants.
-- Ces partitions sont montés dans /mnt/, qui est la cible de l'installation."
+- Ces partitions sont montés dans /mnt/, qui est la cible de l'installation.
+- Système sans Flakes ni Home Manager"
 echo
 
 # 3. les valeurs de ces variables n'ont pas de raison d'être différentes. Laisser tel quel.
@@ -16,7 +18,7 @@ DISK="sda" # parmis les disques listés avec la commande lsblk -dn -o NAME,SIZE,
 TARGET_HOSTNAME="vm" # machine sur laquelle on fait l'installation, sont nom doit correspondre à la valeur de HOST dans les .nix
 TARGET_MOUNT="/mnt" # laisser par défaut
 TARGET_USER="benoit" # doit être déclaré dans les .nix
-DOTFILES_PATH="$TARGET_MOUNT/home/$TARGET_USER/Mes-Donnees/Git/nixos-dotfiles/" # on peut personnaliser le dossier dans lequel les .nix vont être copiés pour l'nsstallation.
+DOTFILES_PATH="$TARGET_MOUNT/home/$TARGET_USER/Mes-Donnees/Git/nixos-dotfiles" # on peut personnaliser le dossier dans lequel les .nix vont être copiés pour l'nsstallation.
 
 
 
@@ -78,7 +80,7 @@ sudo umount $TARGET_MOUNT
 # 5. ARCHITECTURE STATELESS (RAM)
 echo "🧠 Montage du Root en RAM..."
 sudo mount -t tmpfs none $TARGET_MOUNT -o size=2G,mode=755
-sudo mkdir -p $TARGET_MOUNT/{boot,nix,home,swap}
+sudo mkdir -p $TARGET_MOUNT/{boot,nix/persist,home,swap}
 
 # 7. MONTAGES FINAUX
 echo "🔗 Montages des volumes..."
@@ -115,7 +117,7 @@ echo "Fichiers .nix mis en place dans $DOTFILES_PATH/"
 # 11. INSTALLATION
 # echo "❄️  Déploiement du système...sudo nixos-install --flake $DOTFILES_PATH#$TARGET_HOSTNAME"
 # read -p "Confirmer ? (y/N) : " CONFIRM
-# sudo nixos-install --flake $DOTFILES_PATH#$TARGET_HOSTNAME
+# sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/configuration.nix # sans flakes
 
 echo "✅ Installation terminée avec succès !"
 echo "🚀 Vous pouvez redémarrer."
