@@ -3,6 +3,7 @@
 let
   user_name = "benoit"; # modifiable (faire concorder la valeur dans bootstrap.sh)
   host = "vm"; # modifiable selon la machine (faire concorder la valeur dans bootstrap.sh)
+  nixos_release = "25.11"
 in
 
 {
@@ -26,4 +27,5 @@ in
   ];
 
   networking.hostName = "${host}"; # ne pas modififier
+  system.stateVersion = "${nixos_release}"; # ne pas modififier
 }
