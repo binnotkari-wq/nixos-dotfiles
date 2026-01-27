@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# --- DEBUT DE LA DEFINITION DES VARIABLES ---
+# --- EXPLICATIONS ---
 echo "--- Configuration de l'installation NixOS ---"
 echo "--- Au préalable, les variables doivent avoir été éditées, ainsi que user_name, host et choix de l'environnement logiciel dans configuration.nix ---"
 echo "- Ce script va effacer le disque choisi, créer une partition EFI de 512Mo, et une partition BTRFS dans un conteneur chiffré LUKS 2 sur tout le reste de l'espace disponible.
@@ -13,16 +13,14 @@ echo "- Ce script va effacer le disque choisi, créer une partition EFI de 512Mo
 - Système sans Flakes ni Home Manager"
 echo
 
-# 3. les valeurs de ces variables n'ont pas de raison d'être différentes. Laisser tel quel.
+# --- DEBUT DE LA DEFINITION DES VARIABLES ---
 DISK="sda" # parmis les disques listés avec la commande lsblk -dn -o NAME,SIZE,MODEL
 TARGET_HOSTNAME="vm" # machine sur laquelle on fait l'installation, sont nom doit correspondre à la valeur de HOST dans les .nix
-TARGET_MOUNT="/mnt" # laisser par défaut
 TARGET_USER="benoit" # doit être déclaré dans les .nix
-DOTFILES_PATH="$TARGET_MOUNT/home/$TARGET_USER/Mes-Donnees/Git/nixos-dotfiles" # on peut personnaliser le dossier dans lequel les .nix vont être copiés pour l'nsstallation.
+TARGET_MOUNT="/mnt" # laisser par défaut
+DOTFILES_PATH="$TARGET_MOUNT/home/$TARGET_USER/Mes-Donnees/Git/nixos-dotfiles" # on peut personnaliser le dossier dans lequel les .nix vont être copiés pour l'installation.
 
 
-
-# --- RAPPEL DES SELECTIONS ---
 echo ""
 echo -e "\e[36m==========================================================\e[0m"
 echo "RÉCAPITULATIF DE L'INSTALLATION :"
@@ -37,12 +35,12 @@ if [[ $CONFIRM != "y" && $CONFIRM != "Y" ]]; then
     echo "❌ Installation annulée."
     exit 1
 fi
-# --- DEBUT DE LA DEFINITION DES VARIABLES ---
+# --- FIN DE LA DEFINITION DES VARIABLES ---
 
 
 # --- DÉBUT DU SCRIPT DE PARTITIONNEMENT ---
 # 1. TABLE DE PARTITIONS
-echo "🏗️  Création de la table de parLe swap sera un swapfile.tition GPT..."
+echo "🏗️  Création de la table de partition GPT..."
 sudo sgdisk --zap-all /dev/$DISK
 sudo sgdisk -n 1:0:+512M -t 1:ef00 -c 1:"BOOT" /dev/$DISK   # EFI
 sudo sgdisk -n 2:0:0      -t 2:8300 -c 2:"SYSTEM" /dev/$DISK # LUKS + BTRFS
@@ -116,9 +114,9 @@ echo "Fichiers .nix mis en place dans $DOTFILES_PATH/"
 
 
 # 11. INSTALLATION
-# echo "❄️  Déploiement du système...sudo nixos-install --flake $DOTFILES_PATH#$TARGET_HOSTNAME"
+# echo "❄️  Déploiement du système...sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/configuration.nix"
 # read -p "Confirmer ? (y/N) : " CONFIRM
-# sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/configuration.nix # sans flakes
+sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/configuration.nix # sans flakes
 
 echo "✅ Installation terminée avec succès !"
 echo "🚀 Vous pouvez redémarrer."

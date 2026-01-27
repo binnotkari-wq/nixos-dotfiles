@@ -9,25 +9,28 @@ in
 {
   imports = [
     # --- SPECIFICITE MACHINE---
-    ./platform_specific/qemu.nix # modifiable selon la machine
+    ./modules/config/qemu.nix # adapter selon la machine. A utiliser seulement pour une VM, en désactivant tous les modules hardware.
+    # ./modules/harware/cpu/CPU_AMD.nix # adapter selon la machine.
+    # ./modules/harware/video/APU_AMD.nix # adapter selon la machine.
 
     # --- ENVIRONNEMENT LOGICIEL ---
-    ./OS/CLI_tools.nix # modifiable
-    ./OS/plasma_base.nix # modifiable
+    ./modules/programs/CLI_tools.nix # modifiable
+    ./modules/programs/plasma_base.nix # modifiable
 
     # --- UTILISATEUR ---
-    ./users/${user_name}.nix # ne pas modififier
-    ./users/${user_name}_settings.nix # ne pas modififier
+    ./modules/users/${user_name}.nix # ne pas modififier
+    ./modules/users/${user_name}_settings.nix # ne pas modififier
 
     # --- SOCLE COMMUN ---
-    ./hosts/${host}/hardware-configuration.nix # ne pas modififier
-    ./OS/system_settings.nix # ne pas modififier
-    ./OS/impermanence-config.nix # ne pas modififier
+    ./modules/hosts/${host}/hardware-configuration.nix # ne pas modififier
+    ./modules/config/system_settings.nix # ne pas modififier
+    ./modules/config/impermanence-config.nix # ne pas modififier
 
     # --- MODULE EXTERNE IMPERMANENCE ---
   (builtins.fetchTarball { url = "https://github.com/nix-community/impermanence/archive/master.tar.gz";} + "/nixos.nix") # ne pas modififier
   ];
 
+    # --- IDENTIFICATION SYSTEME ---
   networking.hostName = "${host}"; # ne pas modififier
   system.stateVersion = "${nixos_release}"; # ne pas modififier
 }

@@ -4,7 +4,6 @@
   environment.systemPackages = with pkgs; [
     gnome-tweaks                 # paramètres Gnome supplémentaires
     gnome-extension-manager      # Très pratique pour gérer les extensions sans passer par le navigateur
-    firefox                      # natif car pour une meilleure intégration système (KDE Connect, gestion des mots de passe, accélération matérielle). Le Flatpak peut parfois briser le sandboxing interne de Firefox.
     fragments                    # Équivalent de KTorrent (Client BitTorrent GTK)
     pika-backup                  # Pour les sauvegardes, s'intègre parfaitement
     loupe                        # Visionneuse d'images moderne
@@ -20,7 +19,7 @@
     pandoc                       # infrasctructure d'interprétation de fichiers textes et conversions
     kiwix                        # Interpréteur de fichiers wikimedia offline
     llama-cpp-vulkan             # moteur LLM pour IA local, avec interface web type Gemini / Chat GPT
-    libreoffice-qt-fresh         # attention, beaucoup de dépendances
+    libreoffice-fresh            # attention, beaucoup de dépendances
     hunspell                     # pour libreoffice
     hunspellDicts.fr-classique   # pour libreoffice
     hunspellDicts.fr-reforme1990 # pour libreoffice
