@@ -1,8 +1,8 @@
 { config, pkgs, ... }:
 
 let
-  user_name = "benoit"; # modifiable (faire concorder la valeur dans bootstrap.sh)
-  host = "vm"; # modifiable selon la machine (faire concorder la valeur dans bootstrap.sh)
+  user_name = "benoit"; # modifiable (faire concorder la valeur dans install.sh)
+  host = "vm"; # modifiable selon la machine (faire concorder la valeur dans install.sh)
   nixos_release = "25.11";
 in
 
@@ -16,6 +16,7 @@ in
     # --- ENVIRONNEMENT LOGICIEL ---
     ./modules/programs/CLI_tools.nix # modifiable
     ./modules/programs/plasma_base.nix # modifiable
+    ./modules/programs/plasma_apps.nix # modifiable
 
     # --- UTILISATEUR ---
     ./modules/users/${user_name}.nix # ne pas modififier
