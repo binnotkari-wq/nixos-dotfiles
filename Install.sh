@@ -21,7 +21,7 @@ TARGET_MOUNT="/mnt" # laisser par défaut
 DOTFILES_PATH="$TARGET_MOUNT/home/$TARGET_USER/Mes-Donnees/Git/nixos-dotfiles" # on peut personnaliser le dossier dans lequel les .nix vont être copiés pour l'installation.
 
 echo -e "\e[36m==========================================================\e[0m"
-echo "🛠️  INSTALLATEUR NIXOS MUTUALISÉ (Dell 5485 / Ryzen 5)"
+echo "🛠️  INSTALLATION NIXOS"
 echo "Au préalable, les variables doivent avoir été éditées dans le script, ainsi que user_name, host et choix de l'environnement logiciel dans configuration.nix"
 echo -e "\e[36m==========================================================\e[0m"
 echo "wipe : 💥 Efface TOUT le disque selectionné, et créé le schéma de partition"
@@ -138,7 +138,7 @@ sudo nixos-generate-config --root $TARGET_MOUNT
 echo "📂 Copie de la configuration..."
 sudo mkdir -p $DOTFILES_PATH/hosts/$TARGET_HOSTNAME # on créé les dossiers des dotfiles dans le répertoire utilisateur
 sudo cp -ra . $DOTFILES_PATH # on ycopie tout le contenu du dossier ou se trouve le script, c'est à dire tous les fichiers nix
-sudo cp $TARGET_MOUNT/etc/nixos/hardware-configuration.nix $DOTFILES_PATH/hosts/$TARGET_HOSTNAME/hardware-configuration.nix ## on y copie le fichier fraîchement généré vers le dossier des dotfiles
+sudo cp $TARGET_MOUNT/etc/nixos/hardware-configuration.nix $DOTFILES_PATH/modules/hosts/$TARGET_HOSTNAME/hardware-configuration.nix ## on y copie le fichier fraîchement généré vers le dossier des dotfiles
 sudo chown -R 1000:1000 "$TARGET_MOUNT/home/$TARGET_USER" # On donne les droits pour le futur système
 cd "$DOTFILES_PATH"
 echo "Fichiers .nix mis en place dans $DOTFILES_PATH/"
