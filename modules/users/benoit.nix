@@ -3,8 +3,9 @@
 {
   users.users.benoit = {
     isNormalUser = true;
+    uid = 1000; # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
     description = "Benoit";
     extraGroups = [ "networkmanager" "wheel" "video" "render" "lp" "scanner" ];
-    hashedPassword = "$y$j9T$Mj35eRqiQeZAF3qCODbuX0$x/QwgdyVj5QmuglgOkukZfb5n/SsLklBn.ipr.gy1YC";
+    passwordFile = "/nix/persist/secrets/benoit-password";
   };
 }
