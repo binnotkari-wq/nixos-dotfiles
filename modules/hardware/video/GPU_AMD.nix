@@ -2,6 +2,9 @@
 
 {
 
+  # Pilotes dès l'initrd
+  boot.initrd.kernelModules = [ "amdgpu" ];
+
   # La nouvelle manière officielle de débloquer l'overclocking/undervolting
   hardware.amdgpu.overdrive.enable = true;
 

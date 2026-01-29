@@ -10,8 +10,8 @@ in
   imports = [
     # --- SPECIFICITE MACHINE---
     # ./modules/config/qemu.nix # adapter selon la machine. A utiliser seulement pour une VM, en désactivant tous les modules hardware.
-    # ./modules/harware/cpu/CPU_AMD.nix # adapter selon la machine.
-    # ./modules/harware/video/APU_AMD.nix # adapter selon la machine.
+    # ./modules/hardware/cpu/CPU_AMD.nix # adapter selon la machine.
+    ./modules/hardware/video/APU_AMD.nix # adapter selon la machine.
 
     # --- ENVIRONNEMENT LOGICIEL ---
     ./modules/programs/CLI_tools.nix # modifiable
