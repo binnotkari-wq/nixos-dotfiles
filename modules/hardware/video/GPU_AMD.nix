@@ -2,8 +2,8 @@
 
 {
 
-  # Pilotes dès l'initrd
-  boot.initrd.kernelModules = [ "amdgpu" ];
+  # Pilotes dès l'initrd, si SDDM n'arrive pas à se lancer
+  # boot.initrd.kernelModules = [ "amdgpu" ];
 
   # La nouvelle manière officielle de débloquer l'overclocking/undervolting
   hardware.amdgpu.overdrive.enable = true;
