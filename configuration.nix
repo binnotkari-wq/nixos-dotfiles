@@ -2,14 +2,14 @@
 
 let
   user_name = "benoit"; # modifiable (faire concorder la valeur dans install.sh)
-  host = "vm"; # modifiable selon la machine (faire concorder la valeur dans install.sh)
+  host = "dell-5485"; # modifiable selon la machine (faire concorder la valeur dans install.sh)
   nixos_release = "25.11";
 in
 
 {
   imports = [
     # --- SPECIFICITE MACHINE---
-    ./modules/config/qemu.nix # adapter selon la machine. A utiliser seulement pour une VM, en désactivant tous les modules hardware.
+    # ./modules/config/qemu.nix # adapter selon la machine. A utiliser seulement pour une VM, en désactivant tous les modules hardware.
     # ./modules/harware/cpu/CPU_AMD.nix # adapter selon la machine.
     # ./modules/harware/video/APU_AMD.nix # adapter selon la machine.
 

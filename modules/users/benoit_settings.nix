@@ -47,7 +47,7 @@
 \e[33msudo nix-env --list-generations --profile /nix/var/nix/profiles/system\e[0m : lister les générations\n\e[33msudo nix-collect-garbage -d\e[0m : gros nettoyage\n" '';
       upd = ''printf "
 \e[33mflatpak update -y\e[0m : mise à jour flatpaks\n
-\e[33mcd ~/Mes-Donnees/Git/nixos-dotfiles && git add . && git commit -m "description du commit" && git pull origin main && git push origin main\e[0m : synchro git\n" '';
+\e[33mcd ~/Mes-Donnees/Git/nixos-dotfiles && git add . && git commit -m description_du_commit && git pull origin main && git push origin main\e[0m : synchro git\n" '';
     };
   };
 
