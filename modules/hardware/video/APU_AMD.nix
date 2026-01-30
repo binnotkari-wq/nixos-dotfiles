@@ -2,7 +2,7 @@
 
 {
 
-  # Pilotes dès l'initrd, si SDDM n'arrive pas à se lancer
+  # Pilotes dès l'initrd, si SDDM n'arrive pas à se lancer  -> c'est le cas pour le dell_5485, donc on active
   boot.initrd.kernelModules = [ "amdgpu" ];
 
   # La nouvelle manière officielle de débloquer l'overclocking/undervolting
