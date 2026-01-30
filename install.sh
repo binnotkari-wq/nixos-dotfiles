@@ -127,16 +127,15 @@ sudo swapon $TARGET_MOUNT/swap/swapfile
 
 # --- FIN DU SCRIPT DE PARTITIONNEMENT ---
 
-echo Déploiement de NixOS
-read -p "Confirmer ? (y/N) : " CONFIRM
 
 # 9. GÉNÉRATION DU MATÉRIEL
-echo "🔍 Détection des composants matériels...sauf les sytèmes de fichier, qui vont être gérés par un .nix distinct"
+echo "🔍 Détection des composants matériels"
 sudo nixos-generate-config --root $TARGET_MOUNT
 
 
 # 10. PRÉPARATION
 echo "📂 Copie de la configuration..."
+sudo mkdir -p $DOTFILES_PATH
 sudo cp -ra . $DOTFILES_PATH # on y copie tout le contenu du dossier ou se trouve le script, c'est à dire tous les fichiers nix
 sudo cp $TARGET_MOUNT/etc/nixos/hardware-configuration.nix $DOTFILES_PATH/hosts/hardware-configuration/$TARGET_HOSTNAME_hardware-configuration.nix ## on y copie le fichier fraîchement généré vers le dossier des dotfiles (tout en le renommant avec le nom de la machine)
 sudo chown -R 1000:1000 "$TARGET_MOUNT/home/$TARGET_USER" # On donne les droits pour le futur système
@@ -154,7 +153,8 @@ unset USER_PASS # Efface la variable de la RAM par sécurité
 
 
 # 11. INSTALLATION
-# echo "❄️  Déploiement du système...sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/configuration.nix"
+echo "❄️  Déploiement du système...sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/configuration.nix"
+read -p "Confirmer ? (y/N) : " CONFIRM
 sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/configuration.nix # sans flakes
 
 
