@@ -16,7 +16,7 @@ echo "
 # --- DEBUT DE LA DEFINITION DES VARIABLES ---
 DISK="nvme0n1" # parmis les disques listés avec la commande lsblk -dn -o NAME,SIZE,MODEL
 TARGET_HOSTNAME="dell-5485" # machine sur laquelle on fait l'installation, sont nom doit correspondre à la valeur de HOST dans les .nix
-TARGET_USER="benoit" # doit être déclaré dans les .nix
+TARGET_USER="benoit" # utilisateur déclaré dans les .nix
 TARGET_MOUNT="/mnt" # laisser par défaut
 DOTFILES_PATH="$TARGET_MOUNT/home/$TARGET_USER/Mes-Donnees/Git/nixos-dotfiles" # on peut personnaliser le dossier dans lequel les .nix vont être copiés pour l'installation.
 
@@ -137,11 +137,9 @@ sudo nixos-generate-config --root $TARGET_MOUNT
 
 # 10. PRÉPARATION
 echo "📂 Copie de la configuration..."
-sudo mkdir -p $DOTFILES_PATH/modules/hosts/$TARGET_HOSTNAME # on créé les dossiers des dotfiles dans le répertoire utilisateur
-sudo cp -ra . $DOTFILES_PATH # on ycopie tout le contenu du dossier ou se trouve le script, c'est à dire tous les fichiers nix
-sudo cp $TARGET_MOUNT/etc/nixos/hardware-configuration.nix $DOTFILES_PATH/modules/hosts/$TARGET_HOSTNAME/hardware-configuration.nix ## on y copie le fichier fraîchement généré vers le dossier des dotfiles
+sudo cp -ra . $DOTFILES_PATH # on y copie tout le contenu du dossier ou se trouve le script, c'est à dire tous les fichiers nix
+sudo cp $TARGET_MOUNT/etc/nixos/hardware-configuration.nix $DOTFILES_PATH/hosts/hardware-configuration/$TARGET_HOSTNAME_hardware-configuration.nix ## on y copie le fichier fraîchement généré vers le dossier des dotfiles (tout en le renommant avec le nom de la machine)
 sudo chown -R 1000:1000 "$TARGET_MOUNT/home/$TARGET_USER" # On donne les droits pour le futur système
-cd "$DOTFILES_PATH"
 echo "Fichiers .nix mis en place dans $DOTFILES_PATH/"
 
 echo "🔐 Configuration du mot de passe pour $TARGET_USER..."

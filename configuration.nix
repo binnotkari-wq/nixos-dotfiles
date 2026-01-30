@@ -1,37 +1,25 @@
 { config, pkgs, ... }:
 
 let
-  user_name = "benoit"; # modifiable (faire concorder la valeur dans install.sh)
   host = "dell-5485"; # modifiable selon la machine (faire concorder la valeur dans install.sh)
-  nixos_release = "25.11";
+  nixos-stable = "25.11"; # modifiable selon la version stable actuelle de Nixos
+  # NE RIEN MODIFIER D'AUTRE ET NE RIEN DESACTIVER DANS CE FICHIER
 in
 
 {
   imports = [
-    # --- SPECIFICITE MACHINE---
-    # ./modules/config/qemu.nix # adapter selon la machine. A utiliser seulement pour une VM, en désactivant tous les modules hardware.
-    # ./modules/hardware/cpu/CPU_AMD.nix # adapter selon la machine.
-    ./modules/hardware/video/APU_AMD.nix # adapter selon la machine.
-
-    # --- ENVIRONNEMENT LOGICIEL ---
-    ./modules/programs/CLI_tools.nix # modifiable
-    ./modules/programs/plasma_base.nix # modifiable
-    ./modules/programs/plasma_apps.nix # modifiable
-
-    # --- UTILISATEUR ---
-    ./modules/users/${user_name}.nix # ne pas modififier
-    ./modules/users/${user_name}_settings.nix # ne pas modififier
-
-    # --- SOCLE COMMUN ---
-    ./modules/hosts/${host}/hardware-configuration.nix # ne pas modififier
-    ./modules/config/system_settings.nix # ne pas modififier
-    ./modules/config/impermanence-config.nix # ne pas modififier
-
-    # --- MODULE EXTERNE IMPERMANENCE ---
-  (builtins.fetchTarball { url = "https://github.com/nix-community/impermanence/archive/master.tar.gz";} + "/nixos.nix") # ne pas modififier
+    ./hosts/${host}.nix # spécificités machine
+    ./users/benoit.nix # définition utilisateur
+    ./users/benoit_settings.nix # réglages utilisateur
+    ./modules/programs/CLI_tools.nix # logiciels supplémentaires interface terminal
+    ./modules/programs/plasma_base.nix # KDE
+    ./modules/programs/plasma_apps.nix # applications Qt
+    ./modules/config/system_settings.nix # réglages sytème (boot, localisation, services ...)
+    ./modules/config/impermanence-config.nix # fichier dédié pour la configuration de l'impermanence
+    (builtins.fetchTarball { url = "https://github.com/nix-community/impermanence/archive/master.tar.gz";} + "/nixos.nix") # module impermanence à intégrer dans le store
   ];
 
     # --- IDENTIFICATION SYSTEME ---
-  networking.hostName = "${host}"; # ne pas modififier
-  system.stateVersion = "${nixos_release}"; # ne pas modififier
+  networking.hostName = "${host}";
+  system.stateVersion = "${nixos-stable}";
 }
