@@ -137,7 +137,7 @@ sudo nixos-generate-config --root $TARGET_MOUNT
 echo "📂 Copie de la configuration..."
 sudo mkdir -p $DOTFILES_PATH
 sudo cp -ra . $DOTFILES_PATH # on y copie tout le contenu du dossier ou se trouve le script, c'est à dire tous les fichiers nix
-sudo cp $TARGET_MOUNT/etc/nixos/hardware-configuration.nix $DOTFILES_PATH/hosts/hardware-configuration/$TARGET_HOSTNAME_hardware-configuration.nix ## on y copie le fichier fraîchement généré vers le dossier des dotfiles (tout en le renommant avec le nom de la machine)
+sudo cp "$TARGET_MOUNT/etc/nixos/hardware-configuration.nix" "$DOTFILES_PATH/hosts/hardware-configuration/${TARGET_HOSTNAME}_hardware-configuration.nix" # on y copie le fichier fraîchement généré vers le dossier des dotfiles (tout en le renommant avec le nom de la machine)
 sudo chown -R 1000:1000 "$TARGET_MOUNT/home/$TARGET_USER" # On donne les droits pour le futur système
 echo "Fichiers .nix mis en place dans $DOTFILES_PATH/"
 
