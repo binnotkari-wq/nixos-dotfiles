@@ -1,37 +1,35 @@
+# 1. Ouvrir le volume LUKS2
 sudo cryptsetup open /dev/vda2 cryptroot
 
 
-# 1. Monter le sous-volume @nix (le store) et @home sur /mnt
-# (Adapte nvme0n1p3 selon le disque de la machine)
-sudo mount /dev/mapper/cryptroot /mnt -o subvol=@nix
-sudo mount /dev/mapper/cryptroot /mnt/home -o subvol=@home
-# Ne pas oublier la partition BOOT
-sudo mount /dev/vda1 /mnt/boot
-
 # 2. Recréer le root en RAM pour le chroot
 sudo mount -t tmpfs none /mnt -o size=2G,mode=755
-# Refaire les montages par-dessus (comme dans ton script)
-sudo mkdir -p /mnt/{nix,home,boot}
+sudo mkdir -p /mnt/{nix,home,boot,swap}
 sudo mount /dev/mapper/cryptroot /mnt/nix -o subvol=@nix
 sudo mount /dev/mapper/cryptroot /mnt/home -o subvol=@home
+sudo mount /dev/mapper/cryptroot /mnt/swap -o subvol=@swap
 sudo mount /dev/vda1 /mnt/boot
 
 
 sudo nixos-enter --root /mnt
 
+# 3. Entrer dans l'installation ciblée
 
-# Le script nixos-enter est un peu "tatillon" : il cherche le fichier /etc/NIXOS (qui est un fichier vide servant de marqueur) pour confirmer que le dossier est bien une racine NixOS. Comme ton dossier /etc est sur un tmpfs qui a été effacé au reboot, le marqueur a disparu.
-🛠️ La solution (Le "Quick Fix")
+# nixos-enter est un peu "tatillon" : il cherche le fichier /etc/NIXOS (qui est un fichier vide servant de marqueur) pour confirmer que le dossier est bien une racine NixOS. Comme ton dossier /etc est sur un tmpfs qui a été effacé au reboot, le marqueur a disparu.
 
+# Solution
 
-# 1. Créer le dossier etc s'il n'existe pas dans ton montage tmpfs
+# Créer le dossier etc s'il n'existe pas dans ton montage tmpfs
 sudo mkdir -p /mnt/etc
 
-# 2. Créer le marqueur magique
+# Créer le marqueur magique
 sudo touch /mnt/etc/NIXOS
 
-# 3. Réessayer l'entrée
+# Entrer
 sudo nixos-enter --root /mnt
 
-Et enfin :
+
+# 4. Rebuild
+
+# En ayant corrigé les .nix au prélable ...
 NIXOS_CONFIG=/home/benoit/Mes-Donnees/Git/nixos-dotfiles/configuration.nix nixos-rebuild boot
