@@ -1,5 +1,8 @@
 { pkgs, ... }:
 
+# infos : si la session steam ne démarre pas, et qu'au bout d'un moment on revient à SSDM....en fait il faut confgurer le client de bureau avant tout (mise à jour, login, langue de l'interface)
+
+
 let
 
 # 1. On définit la session avec les métadonnées exigées par NixOS
@@ -9,7 +12,7 @@ let
     mkdir -p $out/share/wayland-sessions
     cat <<EOF > $out/share/wayland-sessions/steam-custom.desktop
     [Desktop Entry]
-    Name=Steam Custom (Bluetooth+Perfs)
+    Name=Steam
     Comment=Steam (Gamescope et MangoHud)
     Exec=${pkgs.gamescope}/bin/gamescope --mangoapp -e -- ${pkgs.steam}/bin/steam -steamdeck -steamos3 -gamepadui
     Type=Application

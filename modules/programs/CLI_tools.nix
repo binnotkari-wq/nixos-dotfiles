@@ -8,6 +8,7 @@
     duf         # analyse  espace disque
     compsize    # analyse système de fichier btrfs : sudo compsize /nix
     powertop    # gestion d'énèrgie https://commandmasters.com/commands/powertop-linux/
+    stow        # Gestionnaire de dotfiles (gestion automatisée de liens symboliques vers ~/.config/  -> permet de faire un repo github rationnel)
 
     # --- OPTIONNALS ---
     python313   # prend 45 Mo. Préférer à la version 315 qui prend 130 Mo
@@ -21,7 +22,6 @@
     mplayer     # lecteur video, ne prend que 12 Mo
     pyradio     # webradio, prend 39 Mo + MPV ou mplayer
     mdcat       # afficheur de fichiers Markdown, prend 13 Mo
-    amdgpu_top  # Un moniteur de ressources génial pour voir la charge du CPU/GPU AMD. Prends 64 Mo, dont la majorité en commun avec python 313
     # lynx        # navigateur web
     # fzf         # recherche de fichiers
     # vtm         # un desktop, prend 17 Mo

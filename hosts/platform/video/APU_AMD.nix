@@ -8,15 +8,13 @@
   # La nouvelle manière officielle de débloquer l'overclocking/undervolting
   hardware.amdgpu.overdrive.enable = true;
 
-  # CoreCtrl pour la gestion CPU/GPU (Qt/KDE)
-  programs.corectrl.enable = true;
-
-  # Gestion TDP APU (Ryzen 3500U)
+  # Monitoring
   environment.systemPackages = with pkgs; [
-    ryzenadj # Gestion TDP APU (Ryzen 3500U)
     nvtopPackages.amd # nvtopPackages.nvidia" , nvtopPackages.intel
     radeontop
     libva-vdpau-driver
+    amdgpu_top  # Un moniteur de ressources génial pour voir la charge du CPU/GPU AMD. Prends 64 Mo, dont la majorité en commun avec python 313
+    ryzenadj # Gestion TDP APU (Ryzen 3500U)
   ];
 
   # Alias pour le confort

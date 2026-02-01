@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  # CoreCtrl pour la gestion CPU intel / AMD et GPU AMD / Nvidia / intel (Qt/KDE)
+  programs.corectrl.enable = true;
+
+
   environment.systemPackages = with pkgs; [
     firefox                      # natif car pour une meilleure intégration système (KDE Connect, gestion des mots de passe, accélération matérielle). Le Flatpak peut parfois briser le sandboxing interne de Firefox.
     kdePackages.filelight        # analyseur d'espace disque
