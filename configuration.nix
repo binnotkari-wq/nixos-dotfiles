@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  host = "dell-5485"; # modifiable selon la machine (faire concorder la valeur dans install.sh)
+  host = "len-x240"; # modifiable selon la machine (faire concorder la valeur dans install.sh)
   nixos-stable = "25.11"; # modifiable selon la version stable actuelle de Nixos
   # NE RIEN MODIFIER D'AUTRE ET NE RIEN DESACTIVER DANS CE FICHIER
 in

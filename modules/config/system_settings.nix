@@ -6,6 +6,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "quiet" "splash" "loglevel=3" "rd.systemd.show_status=false" ];
+  boot.initrd.systemd.enable = true;
 
 
   # --- BOOT GRAPHIQUE ---
@@ -26,6 +27,13 @@
       neededForBoot = true; # Autorise le montage AVANT que le système ne cherche les fichiers persistés
     };
   };
+
+  # Pour faire passer les trim et discards à travers le volume LUKS
+  boot.initrd.luks.devices."cryptroot" = {
+    allowDiscards = true;
+    bypassWorkqueues = true;
+  };
+
 
 
   # --- ACTIVATION DU SWAP EN RAM COMPRESSEE (sera utilisé en priorité avant le swap sur disque) ---

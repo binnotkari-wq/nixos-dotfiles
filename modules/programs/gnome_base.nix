@@ -7,5 +7,11 @@
 
   # --- LOGICIELS A SUPPRIMER ---
   environment.gnome.excludePackages = with pkgs; [
+    epiphany
+    geary
+    gnome-calendar
+    gnome-contacts
+    showtime
+    gnome-software
   ];
 }
