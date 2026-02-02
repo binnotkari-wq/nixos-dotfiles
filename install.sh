@@ -14,8 +14,8 @@ echo "
 - Système sans Flakes ni Home Manager"
 
 # --- DEBUT DE LA DEFINITION DES VARIABLES ---
-DISK="nvme0n1" # parmis les disques listés avec la commande lsblk -dn -o NAME,SIZE,MODEL
-TARGET_HOSTNAME="dell-5485" # machine sur laquelle on fait l'installation, sont nom doit correspondre à la valeur de HOST dans les .nix
+DISK="sda" # parmis les disques listés avec la commande lsblk -dn -o NAME,SIZE,MODEL
+TARGET_HOSTNAME="len-x240" # machine sur laquelle on fait l'installation, sont nom doit correspondre à la valeur de HOST dans les .nix
 TARGET_USER="benoit" # utilisateur déclaré dans les .nix
 TARGET_MOUNT="/mnt" # laisser par défaut
 DOTFILES_PATH="$TARGET_MOUNT/home/$TARGET_USER/Mes-Donnees/Git/nixos-dotfiles" # on peut personnaliser le dossier dans lequel les .nix vont être copiés pour l'installation.

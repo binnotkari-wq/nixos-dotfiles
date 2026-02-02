@@ -10,10 +10,6 @@
   services.xserver.videoDrivers = [ "modesetting" ];
 
   # 3. Couche d'accélération matérielle (Espace utilisateur)
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true; # Crucial pour la compatibilité logicielle étendue
-
     extraPackages = with pkgs; [
       # --- Accélération Vidéo (VA-API) ---
 

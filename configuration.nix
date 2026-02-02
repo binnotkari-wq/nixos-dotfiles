@@ -12,8 +12,10 @@ in
     ./users/benoit.nix # définition utilisateur
     ./users/benoit_settings.nix # réglages utilisateur
     ./modules/programs/CLI_tools.nix # logiciels supplémentaires interface terminal
-    ./modules/programs/plasma_base.nix # KDE
-    ./modules/programs/plasma_apps.nix # applications Qt
+    # ./modules/programs/plasma_base.nix # KDE
+    # ./modules/programs/plasma_apps.nix # applications Qt
+    ./modules/programs/gnome_base.nix # Gnome
+    ./modules/programs/gnome_apps.nix # applications GTK
     ./modules/config/system_settings.nix # réglages sytème (boot, localisation, services ...)
     ./modules/config/impermanence-config.nix # fichier dédié pour la configuration de l'impermanence
     (builtins.fetchTarball { url = "https://github.com/nix-community/impermanence/archive/master.tar.gz";} + "/nixos.nix") # module impermanence à intégrer dans le store
