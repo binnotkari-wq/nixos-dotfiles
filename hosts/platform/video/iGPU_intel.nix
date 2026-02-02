@@ -10,7 +10,7 @@
   services.xserver.videoDrivers = [ "modesetting" ];
 
   # 3. Couche d'accélération matérielle (Espace utilisateur)
-    extraPackages = with pkgs; [
+    hardware.graphics.extraPackages = with pkgs; [
       # --- Accélération Vidéo (VA-API) ---
 
       # Pour l'i3 de 8e gén (et tout processeur Broadwell ou plus récent)
@@ -27,7 +27,6 @@
       # Traduction VDPAU vers VA-API (pour les anciens logiciels)
       libvdpau-va-gl
     ];
-  };
 
   # 4. Utilitaires de diagnostic (Inclus dans l'ISO pour tests rapides)
   environment.systemPackages = with pkgs; [
