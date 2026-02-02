@@ -13,5 +13,6 @@
     gnome-contacts
     showtime
     gnome-software
+    gnome-music
   ];
 }

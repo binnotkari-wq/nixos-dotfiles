@@ -7,14 +7,13 @@
   environment.systemPackages = with pkgs; [
     firefox                      # natif car pour une meilleure intégration système (KDE Connect, gestion des mots de passe, accélération matérielle). Le Flatpak peut parfois briser le sandboxing interne de Firefox.
     gnome-tweaks                 # paramètres Gnome supplémentaires
-    pkgs. boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-uuid/733276c2-7793-4faa-80e1-a699f57d3c19";
-    pkgs.gnomeExtensions.dash-to-panel
+    gnomeExtensions.applications-menu
+    gnomeExtensions.dash-to-panel
     fragments                    # Équivalent de KTorrent (Client BitTorrent GTK)
     pika-backup                  # Pour les sauvegardes, s'intègre parfaitement
     gnome-secrets                # gestionnaire de mots de passe compatible keepass
     meld                         # comparateurs de fichiers et dossiers. Trouver autre chose ?
-    obsidian                     # A essayer à la place de Zim
-    apostrophe                   # editeur / visualiseur avancé de Markdown
+    apostrophe                   # editeur / visualiseur Markdown
     foliate                      # lecteur ebook
     drawing                      # petit programme de dessin, identique à Paint
     lollypop                     # lecteur de musique
