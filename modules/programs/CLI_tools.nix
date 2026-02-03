@@ -9,6 +9,7 @@
     compsize    # analyse système de fichier btrfs : sudo compsize /nix
     powertop    # gestion d'énèrgie https://commandmasters.com/commands/powertop-linux/
     stow        # Gestionnaire de dotfiles (gestion automatisée de liens symboliques vers ~/.config/  -> permet de faire un repo github rationnel)
+    stress-ng   # outil de stress CPU : stress-ng --cpu 0 --cpu-method matrixprod -v
 
     # --- OPTIONNALS ---
     python313   # prend 45 Mo. Préférer à la version 315 qui prend 130 Mo

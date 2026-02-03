@@ -5,9 +5,10 @@
   # On active thermald pour éviter le throttling thermique brutal
   services.thermald.enable = true;
 
-  # 2. Configuration de TLP pour un contrôle fin (optionnel mais recommandé)
+  # 2. Configuration de TLP pour un contrôle fin (optionnel mais recommandé). En cas de blocage de build, désactiver toute cette partie. Mais ca fonctionne, actuellement sur le X240
+  services.power-profiles-daemon.enable = false; # on desactive celui-ci, moins efficace que TLP, sinon ils entrent en conflit
   services.tlp = {
-    enable = false;
+    enable = true;
     settings = {
       # Utilise le driver intel_pstate
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
@@ -34,13 +35,13 @@
     undervolt      # Pour vérifier l'état actuel : sudo undervolt --read
   ];
 
+  # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le bosst est maintenu, avec une température de moins de 70 degrés!)
   services.undervolt = {
     enable = true;
-    # core = -80;       # Valeur en mV (ex: -80 pour commencer)
-    # cache = -80;      # Souvent lié au core, il est conseillé de mettre la même valeur
-    # gpu = -40;        # L'iGPU peut aussi être undervolté
-    # uncore = -40;     # Contrôleur mémoire, etc.
-    # analogio = 0;     # Généralement laissé à 0
+    coreOffset = -80;       # Valeur en mV (ex: -80 pour commencer)
+    gpuOffset = -40;        # L'iGPU peut aussi être undervolté
+    uncoreOffset = -40;     # Contrôleur mémoire, etc.
+    analogioOffset = 0;     # Généralement laissé à 0
 
     # Paramètre optionnel : définit la limite de température avant throttling
     # temp = 75;
