@@ -29,6 +29,12 @@
       fsType = "btrfs";
       options = [ "subvol=@nix" ];
     };
+    
+  fileSystems."/persist" =
+    { device = "/dev/mapper/cryptroot";
+      fsType = "btrfs";
+      options = [ "subvol=@persist" ];
+    }; 
 
   boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-uuid/c9a31694-e9bc-4756-a42a-1f895a56e9e5";
 

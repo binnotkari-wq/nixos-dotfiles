@@ -26,6 +26,10 @@
       options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
       neededForBoot = true; # Autorise le montage AVANT que le système ne cherche les fichiers persistés
     };
+   "/persist" = {
+      options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+      neededForBoot = true; # Autorise le montage AVANT que le système ne cherche les fichiers persistés
+    };
   };
 
   # Pour faire passer les trim et discards à travers le volume LUKS
@@ -33,7 +37,6 @@
     allowDiscards = true;
     bypassWorkqueues = true;
   };
-
 
 
   # --- ACTIVATION DU SWAP EN RAM COMPRESSEE (sera utilisé en priorité avant le swap sur disque) ---

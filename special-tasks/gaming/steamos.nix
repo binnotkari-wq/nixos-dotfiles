@@ -22,24 +22,20 @@ let
 in
 
 {
-  # 2. On dit à SDDM de charger cette session spécifique
+  # 1. On dit à SDDM de charger cette session spécifique
   services.displayManager.sessionPackages = [ steam-custom-session ];
 
-  # 3. Le reste de ta config Steam
+  # 2. Le reste de ta config Steam
   programs.steam = {
     enable = true;
     gamescopeSession.enable = false; # on utilise la session custom à la place
     extraPackages = with pkgs; [ mangohud ];
   };
 
-  # 4. On active GameMode (toujours utile)
-  programs.gamemode.enable = true;
-
-  # 5. Paquets et scripts
+  # 3. Paquets et scripts
   environment.systemPackages = with pkgs; [
     gamescope
     mangohud
-    protonup-qt
     steam-custom-session
 
     # LE SCRIPT DE RETOUR AU BUREAU

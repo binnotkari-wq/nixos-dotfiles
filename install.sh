@@ -9,7 +9,7 @@ echo "
 - Les sous-volumes BTRFS /nix, /swap et /home
 - Le swap sera un swapfile, + un zram qui est configuré dans les .nix.
 - / est monté en tmpfs qui sera vidé à chaqué redémarrage, avec quelques éléments persistés grâce au module impermanence configuré dans les .nix.
-- Les sous-volumes /nix, /home et /swap étant distinct de /, il seront persistants.
+- Les sous-volumes /nix, /persist, /home et /swap étant distinct de /, il seront persistants.
 - Ces partitions sont provisoirement montées dans /mnt/, qui est la cible de l'installation.
 - Système sans Flakes ni Home Manager"
 
@@ -22,7 +22,7 @@ DOTFILES_PATH="$TARGET_MOUNT/home/$TARGET_USER/Mes-Donnees/Git/nixos-dotfiles" #
 
 echo -e "\e[36m==========================================================\e[0m"
 echo "🛠️  INSTALLATION NIXOS"
-echo "Au préalable, les variables doivent avoir été éditées dans le script, ainsi que user_name, host et choix de l'environnement logiciel dans configuration.nix"
+echo "Au préalable, les variables doivent avoir été éditées dans le script, ainsi que user_name, host et choix de l'environnement logiciel dans ${TARGET_HOSTNAME}.nix"hardware-configuration
 echo -e "\e[36m==========================================================\e[0m"
 echo "wipe : 💥 Efface TOUT le disque selectionné, et créé le schéma de partition"
 echo "reinstall :  volume LUKS2 existant du disque selectionné, garde /home, et reset de /nix /swap et /boot."
@@ -100,6 +100,7 @@ sudo btrfs subvolume delete $TARGET_MOUNT/@nix 2>/dev/null || true
 sudo btrfs subvolume delete $TARGET_MOUNT/@swap 2>/dev/null || true
 # Création des sous-volumes si nécessaire (@home est donc préservé s'il existe déjà)
 [[ ! -d "$TARGET_MOUNT/@nix" ]]  && sudo btrfs subvolume create $TARGET_MOUNT/@nix
+[[ ! -d "$TARGET_MOUNT/@persist" ]] && sudo btrfs subvolume create $TARGET_MOUNT/@persist
 [[ ! -d "$TARGET_MOUNT/@home" ]] && sudo btrfs subvolume create $TARGET_MOUNT/@home
 [[ ! -d "$TARGET_MOUNT/@swap" ]] && sudo btrfs subvolume create $TARGET_MOUNT/@swap
 sudo umount $TARGET_MOUNT
@@ -108,14 +109,14 @@ sudo umount $TARGET_MOUNT
 # 5. ARCHITECTURE STATELESS (RAM)  # systématique quel que soit le mode d'installation
 echo "🧠 Montage du Root en RAM (tmpfs)..."
 sudo mount -t tmpfs none $TARGET_MOUNT -o size=2G,mode=755
-sudo mkdir -p $TARGET_MOUNT/{boot,nix/persist,home,swap}
-sudo mkdir -p $TARGET_MOUNT/nix/persist
+sudo mkdir -p $TARGET_MOUNT/{boot,nix,persist,home,swap}
 
 
 # 7. MONTAGES FINAUX # systématique quel que soit le mode d'installation
 echo "🔗 Montages des volumes..."
 sudo mount $PART_BOOT $TARGET_MOUNT/boot
 sudo mount $PART_BTRFS $TARGET_MOUNT/nix -o subvol=@nix,noatime,compress=zstd,ssd,discard=async
+sudo mount $PART_BTRFS $TARGET_MOUNT/persist -o subvol=@persist,noatime,compress=zstd,ssd,discard=async
 sudo mount $PART_BTRFS $TARGET_MOUNT/home -o subvol=@home,noatime,compress=zstd,ssd,discard=async
 sudo mount $PART_BTRFS $TARGET_MOUNT/swap -o subvol=@swap,noatime,ssd # Pas de compression sur le swap, pas de trim (discard=async) car vu le contenu changeant du swapfile, il y aurait un trim constant
 
@@ -137,7 +138,7 @@ sudo nixos-generate-config --root $TARGET_MOUNT
 echo "📂 Copie de la configuration..."
 sudo mkdir -p $DOTFILES_PATH
 sudo cp -ra . $DOTFILES_PATH # on y copie tout le contenu du dossier ou se trouve le script, c'est à dire tous les fichiers nix
-sudo cp "$TARGET_MOUNT/etc/nixos/hardware-configuration.nix" "$DOTFILES_PATH/hosts/hardware-configuration/${TARGET_HOSTNAME}_hardware-configuration.nix" # on y copie le fichier fraîchement généré vers le dossier des dotfiles (tout en le renommant avec le nom de la machine)
+sudo cp "$TARGET_MOUNT/etc/nixos/hardware-configuration.nix" "$DOTFILES_PATH/hardware-support/hardware-configuration/${TARGET_HOSTNAME}_hardware-configuration.nix" # on y copie le fichier fraîchement généré vers le dossier des dotfiles (tout en le renommant avec le nom de la machine)
 sudo chown -R 1000:1000 "$TARGET_MOUNT/home/$TARGET_USER" # On donne les droits pour le futur système
 echo "Fichiers .nix mis en place dans $DOTFILES_PATH/"
 
@@ -146,16 +147,16 @@ echo "🔐 Configuration du mot de passe pour $TARGET_USER..."
 read -rs -p "Entrez le mot de passe pour $TARGET_USER : " USER_PASS
 echo
 # On génère le hash yescrypt et on l'enregistre. Ce fichier est appellé par le .nix de déclaration de l'utilisateur.
-sudo mkdir -p $TARGET_MOUNT/nix/persist/secrets
-echo "$USER_PASS" | mkpasswd -m yescrypt | sudo tee $TARGET_MOUNT/nix/persist/secrets/$TARGET_USER-password > /dev/null
-sudo chmod 600 $TARGET_MOUNT/nix/persist/secrets/$TARGET_USER-password
+sudo mkdir -p $TARGET_MOUNT/persist/secrets
+echo "$USER_PASS" | mkpasswd -m yescrypt | sudo tee $TARGET_MOUNT/persist/secrets/$TARGET_USER-password > /dev/null
+sudo chmod 600 $TARGET_MOUNT/persist/secrets/$TARGET_USER-password
 unset USER_PASS # Efface la variable de la RAM par sécurité
 
 
 # 11. INSTALLATION
-echo "❄️  Déploiement du système...sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/configuration.nix"
+echo "❄️  Déploiement du système...sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/${TARGET_HOSTNAME}.nix"
 read -p "Confirmer ? (y/N) : " CONFIRM
-sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/configuration.nix # sans flakes
+sudo nixos-install --root $TARGET_MOUNT -I nixos-config=$DOTFILES_PATH/${TARGET_HOSTNAME}.nix # sans flakes
 
 
 echo "✅ Installation terminée avec succès !"

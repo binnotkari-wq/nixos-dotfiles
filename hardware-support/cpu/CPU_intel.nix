@@ -5,7 +5,7 @@
   # On active thermald pour éviter le throttling thermique brutal
   services.thermald.enable = true;
 
-  # 2. Configuration de TLP pour un contrôle fin (optionnel mais recommandé). En cas de blocage de build, désactiver toute cette partie. Mais ca fonctionne, actuellement sur le X240
+  # 2. Configuration de TLP pour un contrôle fin (optionnel mais recommandé). En cas de blocage de build, désactiver toute cette partie. Mais ca fonctionne, actuellement sur le X240. A voir si on peut faire avec AMD ?
   services.power-profiles-daemon.enable = false; # on desactive celui-ci, moins efficace que TLP, sinon ils entrent en conflit
   services.tlp = {
     enable = true;
@@ -29,21 +29,8 @@
   # 3. Paramètres du Kernel pour forcer Intel P-State si nécessaire
   boot.kernelParams = [ "intel_pstate=active" ];
 
-  # 4. Configuration de l'Undervolting
-  # ATTENTION : Commencez par des valeurs faibles (ex: -50) et testez la stabilité.
+  # 4. Installation logiciel Undervolting (Intel)
   environment.systemPackages = with pkgs; [
     undervolt      # Pour vérifier l'état actuel : sudo undervolt --read
   ];
-
-  # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le bosst est maintenu, avec une température de moins de 70 degrés!)
-  services.undervolt = {
-    enable = true;
-    coreOffset = -80;       # Valeur en mV (ex: -80 pour commencer)
-    gpuOffset = -40;        # L'iGPU peut aussi être undervolté
-    uncoreOffset = -40;     # Contrôleur mémoire, etc.
-    analogioOffset = 0;     # Généralement laissé à 0
-
-    # Paramètre optionnel : définit la limite de température avant throttling
-    # temp = 75;
-  };
 }
