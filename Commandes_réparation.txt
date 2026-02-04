@@ -4,7 +4,7 @@ sudo cryptsetup open /dev/vda2 cryptroot
 
 # 2. Recréer le root en RAM pour le chroot
 sudo mount -t tmpfs none /mnt -o size=2G,mode=755
-sudo mkdir -p /mnt/{nix,home,boot,swap}
+sudo mkdir -p /mnt/{nix,persist,home,boot,swap}
 sudo mount /dev/mapper/cryptroot /mnt/nix -o subvol=@nix
 sudo mount /dev/mapper/cryptroot /mnt/persist -o subvol=@persist
 sudo mount /dev/mapper/cryptroot /mnt/home -o subvol=@home

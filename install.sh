@@ -86,6 +86,9 @@ PART_BTRFS="/dev/mapper/cryptroot" # systématique quel que soit le mode d'insta
 echo "🧹 Formatage des partitions..."
 sudo mkfs.vfat -F 32 -n BOOT $PART_BOOT # systématique quel que soit le mode d'installation
 [[ $MODE == "wipe" ]] && sudo mkfs.btrfs -f -L NIXOS $PART_BTRFS # (installe WIPE uniquement)
+# On force udev à rafraîchir les UUID immédiatement
+sudo udevadm trigger --subsystem-match=block
+sudo udevadm settle
 # Nota : [[ condition ]] && action équivaut à
 # if [ condition ]; then
 # action
@@ -97,6 +100,7 @@ sudo mount $PART_BTRFS $TARGET_MOUNT
 echo "📦 Ajustement des sous-volumes..."
 # Suppression des anciens (si existants)
 sudo btrfs subvolume delete $TARGET_MOUNT/@nix 2>/dev/null || true
+sudo btrfs subvolume delete $TARGET_MOUNT/@persist 2>/dev/null || true
 sudo btrfs subvolume delete $TARGET_MOUNT/@swap 2>/dev/null || true
 # Création des sous-volumes si nécessaire (@home est donc préservé s'il existe déjà)
 [[ ! -d "$TARGET_MOUNT/@nix" ]]  && sudo btrfs subvolume create $TARGET_MOUNT/@nix
@@ -119,12 +123,17 @@ sudo mount $PART_BTRFS $TARGET_MOUNT/nix -o subvol=@nix,noatime,compress=zstd,ss
 sudo mount $PART_BTRFS $TARGET_MOUNT/persist -o subvol=@persist,noatime,compress=zstd,ssd,discard=async
 sudo mount $PART_BTRFS $TARGET_MOUNT/home -o subvol=@home,noatime,compress=zstd,ssd,discard=async
 sudo mount $PART_BTRFS $TARGET_MOUNT/swap -o subvol=@swap,noatime,ssd # Pas de compression sur le swap, pas de trim (discard=async) car vu le contenu changeant du swapfile, il y aurait un trim constant
-
+sleep 2 # on laisse le temps aux infos de partions d'être mises à jour
+sudo partprobe /dev/$DISK # Rafraichi la détection de la nouvelle table de partitions
+sleep 2 # on laisse le temps aux infos de partions d'être mises à jour
+sudo udevadm settle  # Attend que toutes les partitions soient bien reconnues
 
 # 8. CRÉATION DU SWAPFILE (Méthode moderne Btrfs) # systématique quel que soit le mode d'installation
 echo "💾 Création du swapfile de 4Go..."
 sudo btrfs filesystem mkswapfile --size 4g $TARGET_MOUNT/swap/swapfile
 sudo swapon $TARGET_MOUNT/swap/swapfile
+
+
 
 # --- FIN DU SCRIPT DE PARTITIONNEMENT ---
 
