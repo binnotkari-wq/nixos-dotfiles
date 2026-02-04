@@ -58,7 +58,7 @@ fi
 
 
 # --- DÉBUT DU SCRIPT DE PARTITIONNEMENT ---
-dell-5485
+
 # 0. SECURITE : on désactive tous les éventuels swaps actifs pour libérer les fichiers
 sudo swapoff -a || true
 
@@ -72,7 +72,7 @@ if [[ $MODE == "wipe" ]]; then
 fi
 
 # 2. CHIFFREMENT LUKS2  -  (installe WIPE uniquement)
-# On utilise les régdell-5485lages standards robustes
+# On utilise les réglages standards robustes
 if [[ $MODE == "wipe" ]]; then
     echo "🔐 Chiffrement de la partition système (LUKS2)..."
     sudo cryptsetup luksFormat --type luks2 $PART_LUKS
