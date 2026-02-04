@@ -14,8 +14,8 @@ echo "
 - Système sans Flakes ni Home Manager"
 
 # --- DEBUT DE LA DEFINITION DES VARIABLES ---
-DISK="sda" # parmis les disques listés avec la commande lsblk -dn -o NAME,SIZE,MODEL
-TARGET_HOSTNAME="len-x240" # machine sur laquelle on fait l'installation, sont nom doit correspondre à la valeur de HOST dans les .nix
+DISK="nvme0n1" # parmis les disques listés avec la commande lsblk -dn -o NAME,SIZE,MODEL
+TARGET_HOSTNAME="dell-5485" # machine sur laquelle on fait l'installation, sont nom doit correspondre à la valeur de HOST dans les .nix
 TARGET_USER="benoit" # utilisateur déclaré dans les .nix
 TARGET_MOUNT="/mnt" # laisser par défaut
 DOTFILES_PATH="$TARGET_MOUNT/home/$TARGET_USER/Mes-Donnees/Git/nixos-dotfiles" # on peut personnaliser le dossier dans lequel les .nix vont être copiés pour l'installation.
@@ -58,7 +58,7 @@ fi
 
 
 # --- DÉBUT DU SCRIPT DE PARTITIONNEMENT ---
-
+dell-5485
 # 0. SECURITE : on désactive tous les éventuels swaps actifs pour libérer les fichiers
 sudo swapoff -a || true
 
@@ -72,7 +72,7 @@ if [[ $MODE == "wipe" ]]; then
 fi
 
 # 2. CHIFFREMENT LUKS2  -  (installe WIPE uniquement)
-# On utilise les réglages standards robustes
+# On utilise les régdell-5485lages standards robustes
 if [[ $MODE == "wipe" ]]; then
     echo "🔐 Chiffrement de la partition système (LUKS2)..."
     sudo cryptsetup luksFormat --type luks2 $PART_LUKS
@@ -86,8 +86,10 @@ PART_BTRFS="/dev/mapper/cryptroot" # systématique quel que soit le mode d'insta
 echo "🧹 Formatage des partitions..."
 sudo mkfs.vfat -F 32 -n BOOT $PART_BOOT # systématique quel que soit le mode d'installation
 [[ $MODE == "wipe" ]] && sudo mkfs.btrfs -f -L NIXOS $PART_BTRFS # (installe WIPE uniquement)
+sleep 2 # on laisse le temps aux infos de partions d'être mises à jour
 # On force udev à rafraîchir les UUID immédiatement
 sudo udevadm trigger --subsystem-match=block
+sleep 2 # on laisse le temps aux infos de partions d'être mises à jour
 sudo udevadm settle
 # Nota : [[ condition ]] && action équivaut à
 # if [ condition ]; then
