@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 
-# NE RIEN MODIFIER D'AUTRE ET NE RIEN DESACTIVER DANS CE FICHIER
+# NE RIEN MODIFIER DANS CE FICHIER
 
 {
   imports = [
