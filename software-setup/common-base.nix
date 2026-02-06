@@ -9,7 +9,8 @@
     ./programs/CLI_tools.nix # logiciels supplémentaires interface terminal
     # ./programs/plasma.nix # KDE Plasma
     ./programs/gnome.nix # Gnome
-    ./config/system_settings.nix # réglages sytème (boot, localisation, services ...)
+    ./config/system-settings.nix # réglages sytème universels (boot, localisation, services ...)
+    ./config/mountpoints-settings.nix # réglages spécifique au partionnement custom
     ./config/impermanence-config.nix # fichier dédié pour la configuration de l'impermanence
   ];
 }

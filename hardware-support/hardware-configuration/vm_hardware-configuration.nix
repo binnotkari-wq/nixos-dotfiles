@@ -10,7 +10,7 @@
 
   boot.initrd.availableKernelModules = [ "ahci" "xhci_pci" "virtio_pci" "sr_mod" "virtio_blk" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-amd" ]; # depend de l'hote
+  boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
@@ -18,26 +18,34 @@
       fsType = "tmpfs";
     };
 
-  fileSystems."/nix" =
-    { device = "/dev/disk/by-uuid/0d113fb8-17f0-4cee-a228-4ccc8a597801";
-      fsType = "btrfs";
-      options = [ "subvol=@nix" ];
-    };
-
-  fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/0d113fb8-17f0-4cee-a228-4ccc8a597801";
-      fsType = "btrfs";
-      options = [ "subvol=@home" ];
-    };
-
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/075E-FD1F";
+    { device = "/dev/disk/by-uuid/F893-BB54";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
+  fileSystems."/nix" =
+    { device = "/dev/mapper/cryptroot";
+      fsType = "btrfs";
+      options = [ "subvol=@nix" ];
+    };
+
+  boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-uuid/0b017676-88be-4010-bd96-cdc0a12a1989";
+
+  fileSystems."/persist" =
+    { device = "/dev/mapper/cryptroot";
+      fsType = "btrfs";
+      options = [ "subvol=@persist" ];
+    };
+
+  fileSystems."/home" =
+    { device = "/dev/mapper/cryptroot";
+      fsType = "btrfs";
+      options = [ "subvol=@home" ];
+    };
+
   fileSystems."/swap" =
-    { device = "/dev/disk/by-uuid/9f7d8cdf-fe07-4b59-a4dc-079b805fcd0f";
+    { device = "/dev/mapper/cryptroot";
       fsType = "btrfs";
       options = [ "subvol=@swap" ];
     };
