@@ -25,7 +25,6 @@
     qownnotes                                   # prise de notes et bobliothèque Markdown
     haruna                                      # lecteur vidéo
     keepassxc                                   # portefeuille de mots de passe
-    kiwix                                       # Interpréteur de fichiers wikimedia offline. Ne prend que 12 Mo : install de base.
     llama-cpp-vulkan                            # moteur LLM, interface web type Gemini / Chat GPT. Ne prend que 80 Mo : install de base.
   ]; 
  
