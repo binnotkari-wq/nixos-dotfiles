@@ -5,6 +5,6 @@
 {
   imports = [
     ./hardware-configuration/vm_hardware-configuration.nix # spécificités machine
-    ./tunings/qemu.nix # ajustements spécifiques machine
+    ./tunings/qemu_tunings.nix # ajustements spécifiques machine
   ];
 }
