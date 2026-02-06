@@ -158,9 +158,9 @@ echo "🔐 Configuration du mot de passe pour $TARGET_USER..."
 read -rs -p "Entrez le mot de passe pour $TARGET_USER : " USER_PASS
 echo
 # On génère le hash yescrypt et on l'enregistre. Ce fichier est appellé par le .nix de déclaration de l'utilisateur.
-sudo mkdir -p $TARGET_MOUNT/persist/secrets
-echo "$USER_PASS" | mkpasswd -m yescrypt | sudo tee $TARGET_MOUNT/persist/secrets/$TARGET_USER-password > /dev/null
-sudo chmod 600 $TARGET_MOUNT/persist/secrets/$TARGET_USER-password
+sudo mkdir -p $TARGET_MOUNT/persist/etc/secrets
+echo "$USER_PASS" | mkpasswd -m yescrypt | sudo tee $TARGET_MOUNT/persist/etc/secrets/$TARGET_USER-password > /dev/null
+sudo chmod 600 $TARGET_MOUNT/persist/etc/secrets/$TARGET_USER-password
 unset USER_PASS # Efface la variable de la RAM par sécurité
 
 

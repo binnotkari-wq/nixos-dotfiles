@@ -6,6 +6,6 @@
     uid = 1000; # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
     description = "Benoit";
     extraGroups = [ "networkmanager" "wheel" "video" "render" "lp" "scanner" ];
-    hashedPasswordFile = "/persist/secrets/benoit-password";
+    hashedPasswordFile = "/persist/etc/secrets/benoit-password";
   };
 }
