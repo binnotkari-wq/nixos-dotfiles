@@ -48,7 +48,10 @@
 
 
   # --- MATÉRIEL & SERVICES ---
-  services.printing.enable = true;
+  services.printing = {
+    enable = true;
+    system-config-printer.enable = false; pas besoin de cette interface graphique GTK3, les paraètres gnome gèrent cela très bien.
+  };
   services.flatpak.enable = true;
   hardware.bluetooth.enable = true;
   hardware.graphics = { # Vulkan

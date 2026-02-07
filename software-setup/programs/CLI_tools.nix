@@ -17,7 +17,6 @@
     s-tui       # Interface graphique CLI pour monitorer fréquence/température. Prend 49 Mo, dont la majorité en commun avec python 313
     htop        # gestionnaire de processus
     btop        # gestionnaire de processus, plus graphique
-    fastfetch   # affiche les caractéristiques du PC
     zellij      # un autre desktop, prend 92 Mo, dont la moitié est commune aux dépendances de python313
     mc          # gestionnaire de fichiers. Prend 45 Mo, mais la majeur parti est commune aux dépendances de python313
     mplayer     # lecteur video, ne prend que 12 Mo
