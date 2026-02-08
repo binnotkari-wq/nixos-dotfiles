@@ -6,7 +6,7 @@
   services.desktopManager.gnome.enable = true;
 
   # --- LACT pour la gestion GPU AMD / Nvidia / intel ---
-  services.lact.enable = true; # non, utilise GTK3
+  services.lact.enable = true;
 
   # --- LOGICIELS SUPPLEMENTAIRES --- 
   environment.systemPackages = with pkgs; [
