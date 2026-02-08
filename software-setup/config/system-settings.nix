@@ -22,16 +22,6 @@
   zramSwap.memoryPercent = 30; # Utilise jusqu'à 30% de tes 12Go si besoin
 
 
-  # --- OPTION ADDITIONNELLES FILESYSTEMS ( seront appliquées à tout sous-volume btrfs sauf /swap ---
-  fileSystems = lib.mapAttrs (name: fs: {
-    options = if (fs.fsType == "btrfs") then
-      if (name == "/swap") 
-      then [ "noatime" "ssd" ] ++ (fs.options or [])
-      else [ "noatime" "compress=zstd" "ssd" "discard=async" ] ++ (fs.options or [])
-    else fs.options;
-}) config.fileSystems;
-
-
   # --- RÉSEAU ---
   networking.networkmanager.enable = true;
   time.timeZone = "Europe/Paris";
