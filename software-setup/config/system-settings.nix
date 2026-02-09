@@ -71,4 +71,5 @@
   # --- OPTIMISATION NIX ---
   nixpkgs.config.allowUnfree = true;
   nix.settings.auto-optimise-store = true; # évite toute duplcation dans le store en créant des symlinks
+  programs.gamemode.enable = true;
 }
