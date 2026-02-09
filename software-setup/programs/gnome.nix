@@ -4,6 +4,9 @@
   # --- ENVIRONNEMENT DE BUREAU ---
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
+  
+  # --- ACTIVE LES SERVICES DE PORTAIL XDG (souvent nécessaire pour Gnome) ---
+  xdg.portal.enable = true;
 
   # --- LACT pour la gestion GPU AMD / Nvidia / intel ---
   services.lact.enable = true;
