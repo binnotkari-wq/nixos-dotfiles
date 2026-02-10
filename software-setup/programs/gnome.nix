@@ -11,7 +11,6 @@
   # --- LOGICIELS SUPPLEMENTAIRES --- 
   environment.systemPackages = with pkgs; [
     firefox                                     # natif car pour une meilleure intégration système
-    gnome-tweaks                                # paramètres Gnome supplémentaires
     gnomeExtensions.dash-to-panel               # extension : barre des taches
     gnomeExtensions.arcmenu                     # menu système
   ];
@@ -25,5 +24,6 @@
     showtime
     gnome-software
     gnome-connections
+    seahorse
   ];
 }
