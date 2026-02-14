@@ -19,7 +19,7 @@
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/7B0E-4D40";
+    { device = "/dev/disk/by-uuid/2C76-E404";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
@@ -30,7 +30,7 @@
       options = [ "subvol=@nix" ];
     };
 
-  boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-uuid/28145d67-61d9-4e93-94dd-35d1ab96631f";
+  boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-uuid/7440292c-8577-4071-adc9-9df23f1b8f74";
 
   fileSystems."/persist" =
     { device = "/dev/mapper/cryptroot";
