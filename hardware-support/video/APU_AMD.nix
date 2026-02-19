@@ -5,8 +5,6 @@
   # Pilotes dès l'initrd, si SDDM n'arrive pas à se lancer  -> c'est le cas pour le dell_5485, donc on active
   boot.initrd.kernelModules = [ "amdgpu" ]; # Pilote graphique et sa télémétrie
 
-  boot.kernelParams = [ "amdgpu.ppfeaturemask=4294967295" ];
-
   # La nouvelle manière officielle de débloquer l'overclocking/undervolting
   hardware.amdgpu.overdrive.enable = true;
 
@@ -17,7 +15,6 @@
     libva-vdpau-driver
     amdgpu_top  # Un moniteur de ressources génial pour voir la charge du CPU/GPU AMD. Prends 64 Mo, dont la majorité en commun avec python 313
     ryzenadj # Gestion TDP APU (Ryzen 3500U)
-    lm_sensors
   ];
 
   # Alias pour le confort

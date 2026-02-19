@@ -22,7 +22,7 @@ let
 in
 
 {
-  # 1. On dit à SDDM de charger cette session spécifique
+  # 1. On dit au gestionnaire de connexion (SDDM ou GDM) de charger cette session spécifique
   services.displayManager.sessionPackages = [ steam-custom-session ];
 
   # 2. Le reste de ta config Steam
@@ -31,6 +31,20 @@ in
     gamescopeSession.enable = false; # on utilise la session custom à la place
     extraPackages = with pkgs; [ mangohud ];
   };
+  
+  
+  # Règles polkit pour la communication de commandes au système
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+        if ((action.id == "org.freedesktop.login1.suspend" ||
+             action.id == "org.freedesktop.login1.suspend-multiple-sessions" ||
+             action.id == "org.freedesktop.login1.reboot" ||
+             action.id == "org.freedesktop.login1.power-off") &&
+            subject.isInGroup("users")) {
+            return polkit.Result.YES;
+        }
+    });
+  '';
 
   # 3. Paquets et scripts
   environment.systemPackages = with pkgs; [
