@@ -15,7 +15,7 @@
     gnomeExtensions.arcmenu                     # menu système
   ];
 
-  # --- LOGICIELS A SUPPRIMER DE BASE ---
+  # --- LOGICIELS A EXCLURE DE BASE ---
   environment.gnome.excludePackages = with pkgs; [
     epiphany
     geary

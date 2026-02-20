@@ -7,5 +7,6 @@
     pciutils    # pour la commande lspci
     compsize    # analyse système de fichier btrfs : sudo compsize /nix
     lm_sensors
+    toolbox
   ];
 }
