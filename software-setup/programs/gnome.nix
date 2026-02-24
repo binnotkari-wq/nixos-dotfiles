@@ -21,6 +21,7 @@
     geary
     gnome-calendar
     gnome-contacts
+    gnome-music
     showtime
     gnome-software
     gnome-connections
