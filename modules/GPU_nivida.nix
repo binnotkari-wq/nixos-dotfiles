@@ -19,4 +19,5 @@
     # Sélectionner le package de pilotes (stable est généralement le meilleur choix)
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
+
 }

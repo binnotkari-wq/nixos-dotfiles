@@ -1,18 +1,19 @@
 { config, pkgs, ... }:
 
 {
-  # --- VERSION NIXOS A INSTALLER ---
-  system.stateVersion = "25.11";
-  
-  
-  # NE PAS MODIFIER CES DECLARATIONS
-  
-  # --- IDENTIFICATION SYSTEME ---
-  networking.hostName = "dell-5485";
-  
-  # --- DEPLOIEMENTS ---
+  # --- MODULES ---
   imports = [
-    ./hardware-support/dell-5485_hardware-support.nix # paramètres matériel - spécifique machine
-    ./software-setup/common-base.nix # paramètres OS, bureau, applications et compte utilisateur - pour toute machine
+
   ];
+
+  # --- TUNING ---
+  environment.systemPackages = with pkgs; [
+    ryzenadj # Gestion TDP APU (Ryzen 3500U)
+  ];
+  
+  environment.shellAliases = {
+    ryzen-low = "sudo ryzenadj --stapm-limit=15000 --fast-limit=15000 --slow-limit=15000"; # TDP : 15W
+    ryzen-default = "sudo ryzenadj --stapm-limit=25000 --fast-limit=25000 --slow-limit=25000"; # TDP par défaut du 3500U : 25W
+  };
+  
 }
