@@ -1,9 +1,6 @@
 { config, pkgs, ... }:
 
 {
-  # --- LACT pour la gestion GPU AMD / Nvidia / intel ---
-  services.lact.enable = true;
-
   users.users.benoit = {
     packages = with pkgs; [
       gnomeExtensions.dash-to-panel               # extension : barre des taches
