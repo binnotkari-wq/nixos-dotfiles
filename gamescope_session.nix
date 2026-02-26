@@ -2,7 +2,6 @@
 
 # infos : si la session steam ne démarre pas, et qu'au bout d'un moment on revient à SSDM....en fait il faut confgurer le client de bureau avant tout (mise à jour, login, langue de l'interface)
 
-
 let
 
 # 1. On définit la session avec les métadonnées exigées par NixOS
@@ -22,20 +21,11 @@ let
 in
 
 {
-  # 1. On dit au gestionnaire de connexion (SDDM ou GDM) de charger cette session spécifique
+  # 2. On dit au gestionnaire de connexion (SDDM ou GDM) de charger cette session spécifique
   services.displayManager.sessionPackages = [ steam-custom-session ];
 
-
-  # 2. Le reste de ta config Steam
-  programs.gamemode.enable = true;
-  programs.steam = {
-    enable = true;
-    gamescopeSession.enable = false; # on utilise la session custom à la place
-    extraPackages = with pkgs; [ mangohud ];
-  };
-  
-  
-  # Règles polkit pour la communication de commandes au système
+ 
+  # 3. Règles polkit pour la communication de commandes au système
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
         if ((action.id == "org.freedesktop.login1.suspend" ||
@@ -48,10 +38,9 @@ in
     });
   '';
 
-  # 3. Paquets et scripts
+  # 4. Paquets et scripts
   environment.systemPackages = with pkgs; [
     gamescope
-    mangohud
     steam-custom-session
 
     # LE SCRIPT DE RETOUR AU BUREAU
