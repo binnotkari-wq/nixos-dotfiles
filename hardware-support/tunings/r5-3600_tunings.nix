@@ -2,7 +2,7 @@
 
 {
 
-  # --- SECOND SSD ---
+  # INUTILES GRACE AU SCRIPT DE MONTAGE AUTOMATISE --- SECOND SSD ---
 
   # Montage
   fileSystems."/run/media/benoit/1615eb5d-4346-4106-ba33-dbecf0b75b31" = {

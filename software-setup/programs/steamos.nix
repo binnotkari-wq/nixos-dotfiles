@@ -25,7 +25,9 @@ in
   # 1. On dit au gestionnaire de connexion (SDDM ou GDM) de charger cette session spécifique
   services.displayManager.sessionPackages = [ steam-custom-session ];
 
+
   # 2. Le reste de ta config Steam
+  programs.gamemode.enable = true;
   programs.steam = {
     enable = true;
     gamescopeSession.enable = false; # on utilise la session custom à la place
