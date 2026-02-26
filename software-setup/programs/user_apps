@@ -1,0 +1,27 @@
+{ config, pkgs, ... }:
+
+{
+  # --- LACT pour la gestion GPU AMD / Nvidia / intel ---
+  services.lact.enable = true;
+
+  users.users.benoit = {
+    packages = with pkgs; [
+      gnomeExtensions.dash-to-panel               # extension : barre des taches
+      gnomeExtensions.arcmenu
+      zellij
+    ]
+  }
+
+  # --- LOGICIELS A EXCLURE DE BASE ---
+  environment.gnome.excludePackages = with pkgs; [
+    epiphany
+    geary
+    gnome-calendar
+    gnome-contacts
+    gnome-music
+    showtime
+    gnome-software
+    gnome-connections
+    seahorse
+  ];
+}
