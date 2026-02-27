@@ -17,10 +17,10 @@
 
 # --- TMPFS ---
 # Montage de / en tmpfs (ce paramétrage prend le dessus sur celui de hardware-configuration.nix)
-  fileSystems."/" = {
+  fileSystems."/" = lib.mkForce {
     device = "tmpfs";
     fsType = "tmpfs";
-    options = [ "size=4G" "mode=755" ];
+    options = [ "size=2G" "mode=755" ];
   };
 
 
@@ -35,6 +35,7 @@
   # Si /home n'est pas sur une partion ou des sous-volume btrfs disincts, il faut le lister ici.
   environment.persistence."/nix/persist" = {
     hideMounts = true;
+    createDirectories = true;
     directories = [
       "/etc/NetworkManager/system-connections" # Wi-Fi
       "/etc/nixos"
