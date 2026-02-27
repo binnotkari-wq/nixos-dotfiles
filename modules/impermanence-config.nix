@@ -11,24 +11,31 @@
 
 
 # --- Au préalable on place dans le dossier de persistance tous les éléments à persister
+
 let
-  persistDirs = [
-    "/nix/persist/home"
-    "/nix/persist/etc/nixos"
-    "/nix/persist/etc/NetworkManager/system-connections"
-    "/nix/persist/var/lib/bluetooth"
-    "/nix/persist/var/lib/cups"
-    "/nix/persist/var/lib/fwupd"
-    "/nix/persist/var/lib/NetworkManager"
-    "/nix/persist/var/lib/nixos"
+  # --- dossiers à persister (source → target) ---
+  persistCopy = [
+    { src = "/home"; target = "/nix/persist/home"; }
+    { src = "/etc/nixos"; target = "/nix/persist/etc/nixos"; }
+    { src = "/etc/NetworkManager/system-connections"; target = "/nix/persist/etc/NetworkManager/system-connections"; }
+    { src = "/var/lib/bluetooth"; target = "/nix/persist/var/lib/bluetooth"; }
+    { src = "/var/lib/cups"; target = "/nix/persist/var/lib/cups"; }
+    { src = "/var/lib/fwupd"; target = "/nix/persist/var/lib/fwupd"; }
+    { src = "/var/lib/NetworkManager"; target = "/nix/persist/var/lib/NetworkManager"; }
+    { src = "/var/lib/nixos"; target = "/nix/persist/var/lib/nixos"; }
   ];
 in
+
 {
-  # Activation script qui crée tous les dossiers persistants avant le reboot
-  system.activationScripts.prePersistDirs = {
+  # --- COPIE PRÉALABLE DU CONTENU EXISTANT ---
+  system.activationScripts.copyPersistContent = {
     text = ''
-      echo "Création des dossiers persistants avant reboot"
-      ${lib.concatMapStringsSep "\n" (dir: "mkdir -p ${dir}") persistDirs}
+      echo "Copie des contenus existants vers /nix/persist avant le premier reboot"
+      mkdir -p /nix/persist
+      ${lib.concatMapStringsSep "\n" (d: ''
+        mkdir -p ${d.target}
+        cp -a ${d.src}/. ${d.target}/ || true
+      '') persistCopy}
       chown -R root:root /nix/persist
       chmod -R 755 /nix/persist
     '';
@@ -39,13 +46,13 @@ in
   environment.etc."shadow".source = "/etc/shadow";
 
 
-# --- MODULE IMPERMANENCE
+  # --- MODULE IMPERMANENCE
   imports = [
     (builtins.fetchTarball { url = "https://github.com/nix-community/impermanence/archive/master.tar.gz";} + "/nixos.nix") # module impermanence à intégrer dans le store
   ];
 
-# --- TMPFS ---
-# Montage de / en tmpfs (ce paramétrage prend le dessus sur celui de hardware-configuration.nix)
+  # --- TMPFS ---
+  # Montage de / en tmpfs (ce paramétrage prend le dessus sur celui de hardware-configuration.nix)
   fileSystems."/" = lib.mkForce {
     device = "tmpfs";
     fsType = "tmpfs";
