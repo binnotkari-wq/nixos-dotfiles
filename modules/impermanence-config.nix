@@ -10,6 +10,35 @@
 # !!! l'intégration doit se faire avec sudo nixos-rebuild boot et non sudo nixos-rebuild switch (il faut passer par un reboot propre du fait du changement dans les systèmes de fichiers).
 
 
+# --- Au préalable on place dans le dossier de persistance tous les éléments à persister
+let
+  persistDirs = [
+    "/nix/persist/home"
+    "/nix/persist/etc/nixos"
+    "/nix/persist/etc/NetworkManager/system-connections"
+    "/nix/persist/var/lib/bluetooth"
+    "/nix/persist/var/lib/cups"
+    "/nix/persist/var/lib/fwupd"
+    "/nix/persist/var/lib/NetworkManager"
+    "/nix/persist/var/lib/nixos"
+  ];
+in
+{
+  # Activation script qui crée tous les dossiers persistants avant le reboot
+  system.activationScripts.prePersistDirs = {
+    text = ''
+      echo "Création des dossiers persistants avant reboot"
+      ${lib.concatMapStringsSep "\n" (dir: "mkdir -p ${dir}") persistDirs}
+      chown -R root:root /nix/persist
+      chmod -R 755 /nix/persist
+    '';
+  };
+
+  # Fichiers persistants
+  environment.etc."machine-id".source = "/etc/machine-id";
+  environment.etc."shadow".source = "/etc/shadow";
+
+
 # --- MODULE IMPERMANENCE
   imports = [
     (builtins.fetchTarball { url = "https://github.com/nix-community/impermanence/archive/master.tar.gz";} + "/nixos.nix") # module impermanence à intégrer dans le store
@@ -36,19 +65,18 @@
   environment.persistence."/nix/persist" = {
     hideMounts = true;
     directories = [
-      { directory = "/home"; user = "root"; group = "root"; mode = "0755"; }
-      { directory = "/etc/nixos"; user = "root"; group = "root"; mode = "0755"; }
-      { directory = "/etc/NetworkManager/system-connections"; user = "root"; group = "root"; mode = "0755"; }
-      { directory = "/var/lib/bluetooth"; user = "root"; group = "root"; mode = "0755"; }
-      { directory = "/var/lib/cups"; user = "root"; group = "root"; mode = "0755"; }
-      { directory = "/var/lib/fwupd"; user = "root"; group = "root"; mode = "0755"; }
-      { directory = "/var/lib/NetworkManager"; user = "root"; group = "root"; mode = "0755"; }
-      { directory = "/var/lib/nixos"; user = "root"; group = "root"; mode = "0755"; }
+      "/home"
+      "/etc/nixos"
+      "/etc/NetworkManager/system-connections"
+      "/var/lib/bluetooth"
+      "/var/lib/cups"
+      "/var/lib/fwupd"
+      "/var/lib/NetworkManager"
+      "/var/lib/nixos"
     ];
-
     files = [
-      "/etc/machine-id" # Identité unique du PC.
-      "/etc/shadow" # mots de passe   
+      "/etc/machine-id"
+      "/etc/shadow"
     ];
   };
 
