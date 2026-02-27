@@ -7,7 +7,7 @@
 # - une partition /nix (chiffrée ou non)
 # !!! A noter que si on choisi un système de fichiers btrfs,
 # - et bien sûr dans l'installateur graphique, ne pas oublier de créer une partition /boot de 1024 Mo, FAT32, drapeau "boot"
-
+# !!! l'intégration doit se faire avec sudo nixos-rebuild boot et non sudo nixos-rebuild switch (il faut passer par un reboot propre du fait du changement dans les systèmes de fichiers).
 
 
 # --- MODULE IMPERMANENCE
@@ -35,9 +35,8 @@
   # Si /home n'est pas sur une partion ou des sous-volume btrfs disincts, il faut le lister ici.
   environment.persistence."/nix/persist" = {
     hideMounts = true;
-    createDirectories = true;
     directories = [
-      "/etc/NetworkManager/system-connections" # Wi-Fi
+      "/etc/NetworkManager/system-connections"
       "/etc/nixos"
       "/home"
       "/var/lib/bluetooth"
@@ -51,6 +50,24 @@
       "/etc/machine-id" # Identité unique du PC.
       "/etc/shadow" # mots de passe   
     ];
+  };
+
+
+# --- CREATION DES DOSSIERS D'ACCUEIL DES PERSISTANCES ---
+  # Ces dossiers seront créés sur /nix/persist au moment du rebuild.
+  system.activationScripts.createPersistDirs = {
+    text = ''
+      mkdir -p /nix/persist/etc/NetworkManager/system-connections
+      mkdir -p /nix/persist/etc/nixos
+      mkdir -p /nix/persist/var/lib/bluetooth
+      mkdir -p /nix/persist/var/lib/cups
+      mkdir -p /nix/persist/var/lib/fwupd
+      mkdir -p /nix/persist/var/lib/NetworkManager
+      mkdir -p /nix/persist/var/lib/nixos
+      mkdir -p /nix/persist/home
+      chown -R root:root /nix/persist
+      chmod 755 /nix/persist
+    '';
   };
 
 }
