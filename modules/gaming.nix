@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # --- LACT pour la gestion GPU AMD / Nvidia / intel ---

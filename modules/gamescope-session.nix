@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 # infos : si la session steam ne démarre pas, et qu'au bout d'un moment on revient à SSDM....en fait il faut confgurer le client de bureau avant tout (mise à jour, login, langue de l'interface)
 
@@ -24,7 +24,7 @@ in
   # 2. On dit au gestionnaire de connexion (SDDM ou GDM) de charger cette session spécifique
   services.displayManager.sessionPackages = [ steam-custom-session ];
 
- 
+
   # 3. Règles polkit pour la communication de commandes au système
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {

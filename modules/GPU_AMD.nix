@@ -13,7 +13,7 @@
     nvtopPackages.amd # nvtopPackages.nvidia" , nvtopPackages.intel
     radeontop
     libva-vdpau-driver
-    amdgpu_top  # Un moniteur de ressources génial pour voir la charge du CPU/GPU AMD. Prends 64 Mo, dont la majorité en commun avec python 313
+    amdgpu_top  # Un moniteur de ressources génial pour voir la charge du CPU/GPU AMD.
   ];
 
 }

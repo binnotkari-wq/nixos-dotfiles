@@ -9,7 +9,7 @@
       else [ "noatime" "compress=zstd" "ssd" "discard=async" ] ++ (fs.options or [])
     else fs.options;
   }) config.fileSystems;
-  
+
 
   # --- Optimisations des volumes LUKS (si existants)
   boot.initrd.luks.devices = builtins.filterAttrs (_: v: v != null) (
