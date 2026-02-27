@@ -1,11 +1,11 @@
 { config, lib, pkgs, ... }:
 
-{
+# derniere evolution : refaire un rebuild sur snapshot vierge de la vm. Apres un reboot, voir ce qui a été copié sur /nix/persist. Comparer avec le contenu original pour voir si tout y est. Et enqueter sur les éléments qui ne s'y sont pas retrouvés. Peux-être qu'il faut faire un script de copie manuel à executer avant le reboot, et ne pas bricoler de script de copie dans le fichier .nix.
+
 
 # PREREQUIS :
 # - une partition / (chiffrée ou non, taille 512Mo suffisent. Elle ne sera plus utilisée par la suite puisque sont contenu se trouvera en grande partie en tmpfs, et l'autre partie en persistance pour les quelques éléments concernés)
-# - une partition /nix (chiffrée ou non)
-# !!! A noter que si on choisi un système de fichiers btrfs,
+# - une partition /nix (chiffrée ou non) (ne serait peut-être pas nécessaire sur un systeme de fichier btrfs, si l'installateur de nixos créé de lui meme des sous-volumes)
 # - et bien sûr dans l'installateur graphique, ne pas oublier de créer une partition /boot de 1024 Mo, FAT32, drapeau "boot"
 # !!! l'intégration doit se faire avec sudo nixos-rebuild boot et non sudo nixos-rebuild switch (il faut passer par un reboot propre du fait du changement dans les systèmes de fichiers).
 
