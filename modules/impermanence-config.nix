@@ -36,38 +36,20 @@
   environment.persistence."/nix/persist" = {
     hideMounts = true;
     directories = [
-      "/etc/NetworkManager/system-connections"
-      "/etc/nixos"
-      "/home"
-      "/var/lib/bluetooth"
-      "/var/lib/cups"
-      "/var/lib/fwupd"
-      "/var/lib/NetworkManager"
-      "/var/lib/nixos"
+      { directory = "/home"; user = "root"; group = "root"; mode = "0755"; }
+      { directory = "/etc/nixos"; user = "root"; group = "root"; mode = "0755"; }
+      { directory = "/etc/NetworkManager/system-connections"; user = "root"; group = "root"; mode = "0755"; }
+      { directory = "/var/lib/bluetooth"; user = "root"; group = "root"; mode = "0755"; }
+      { directory = "/var/lib/cups"; user = "root"; group = "root"; mode = "0755"; }
+      { directory = "/var/lib/fwupd"; user = "root"; group = "root"; mode = "0755"; }
+      { directory = "/var/lib/NetworkManager"; user = "root"; group = "root"; mode = "0755"; }
+      { directory = "/var/lib/nixos"; user = "root"; group = "root"; mode = "0755"; }
     ];
 
     files = [
       "/etc/machine-id" # Identité unique du PC.
       "/etc/shadow" # mots de passe   
     ];
-  };
-
-
-# --- CREATION DES DOSSIERS D'ACCUEIL DES PERSISTANCES ---
-  # Ces dossiers seront créés sur /nix/persist au moment du rebuild.
-  system.activationScripts.createPersistDirs = {
-    text = ''
-      mkdir -p /nix/persist/etc/NetworkManager/system-connections
-      mkdir -p /nix/persist/etc/nixos
-      mkdir -p /nix/persist/var/lib/bluetooth
-      mkdir -p /nix/persist/var/lib/cups
-      mkdir -p /nix/persist/var/lib/fwupd
-      mkdir -p /nix/persist/var/lib/NetworkManager
-      mkdir -p /nix/persist/var/lib/nixos
-      mkdir -p /nix/persist/home
-      chown -R root:root /nix/persist
-      chmod 755 /nix/persist
-    '';
   };
 
 }
