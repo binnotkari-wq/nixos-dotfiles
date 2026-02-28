@@ -15,7 +15,9 @@
   boot.kernel.sysctl.vm.swappiness = 100; # Le noyau va commencer à envoyer des plages mémoire en zram sans attendre la saturation
   # swapDevices = [ { device = "/swapfile"; size = 2048; } ]; pas utile avec le zram. Et en l'état, pas compatible si sur un volume BTRFS compressé et avec COW.
 
+
   # --- MATÉRIEL & SERVICES ---
+  security.apparmor.enable = true; # les flatpaks ont un profil apparmor intégré : ils vont automatiquement profiter de apparmor. L'impact d'apparmor sur les performances est imperceptible.
   services.flatpak.enable = true;
   hardware.bluetooth.enable = true;
   hardware.graphics = { # Vulkan
@@ -30,7 +32,4 @@
     ]
   };
 
-
-  # --- OPTIMISATION NIX ---
-  nix.settings.auto-optimise-store = true; # évite toute duplication dans le store en créant des symlinks
 }

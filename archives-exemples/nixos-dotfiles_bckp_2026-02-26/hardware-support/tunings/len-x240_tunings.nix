@@ -1,19 +1,7 @@
-{ config, pkgs, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 {
-  # --- MODULES ---
-  imports = [
-  ./modules/tests.nix
-  ./modules/configuration_addons.nix
-  ./modules/filesystems-settings.nix
-  ./modules/stateless-light.nix
-  ./modules/user_apps.nix
-  ./modules/CPU_intel.nix
-  ./modules/iGPU_intel.nix
-  ];
-
-  # --- TUNING ---
-  # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le boost est maintenu, avec une température de moins de 70 degrés!)
+  # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le bosst est maintenu, avec une température de moins de 70 degrés!)
   services.undervolt = {
     enable = true;
     coreOffset = -40;       # Valeur en mV (-80 pour commencer : kernel panic lors du débranchement de l'alim)

@@ -10,5 +10,6 @@ llvm ? ca prend de la place. à quoi ca sert ? reponse chatgpt : c'est un compil
 
 
 
-ajouter
-{ config, pkgs, lib, ... }: en debut de chaque fichier nix
+Faire comme pour fédora : tout installer en flatpak (du moins, la même liste). Et donc, supprimer les applis natives correspondantes dans les .nix.
+
+
