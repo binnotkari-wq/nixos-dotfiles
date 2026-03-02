@@ -2,35 +2,48 @@
 
 {
 
-# --- OUTILS EN LIGNE DE COMMANDE ---
-  users.users.benoit = {
-    packages = with pkgs; [
-      # gnomeExtensions.dash-to-panel # il vaut mieux les gérer à travers l'appli flatpak Extensions
-      # gnomeExtensions.arcmenu # il vaut mieux les gérer à travers l'appli flatpak Extensions
-      git		# interface de versionning
-      wget		# téléchargement de fichiers par http
-      pciutils		# pour la commande lspci
-      compsize		# analyse système de fichier btrfs : sudo compsize /nix
-      lm_sensors
-      tree
-      dialog		# outils pratique pour créer des boites de dialogue dans les scripts
-      duf		# analyse  espace disque
-      powertop		# gestion d'énèrgie https://commandmasters.com/commands/powertop-linux/
-      stow		# Gestionnaire de dotfiles
-      stress-ng		# outil de stress CPU : stress-ng --cpu 0 --cpu-method matrixprod -v
-      python313		# prend 45 Mo. Préférer à la version 315 qui prend 130 Mo
-      s-tui		# Interface graphique CLI pour monitorer fréquence/température.
-      htop		# gestionnaire de processus
-      btop		# gestionnaire de processus, plus graphique
-      mc		# gestionnaire de fichiers.
-      just
-      zellij		# desktop en TUI
-      mdcat		# afficheur de fichiers Markdown, prend 13 Mo
-      kiwix-tools	# moteur wikipedia local. Lancer avec kiwix-serve --port 8080 "/chemin/vers/fichier.zim"
-      llama-cpp-vulkan	# moteur LLM, interface web type Gemini / Chat GPT. Ne prend que 80 Mo : install de base.
-      distrobox
-    ];
-  }
+  # --- OUTILS EN CLI ---
+  
+  # --- outils de diagnostic, de gestion de fichiers et de dépannage ---
+  environment.systemPackages = with pkgs; [
+    # --- Diagnostic & Hardware (Dell 5485 / R5-3600) ---
+    pciutils          # Essentiel pour l'inventaire matériel
+    lm_sensors        # Surveillance des températures
+    powertop          # Vital pour optimiser la batterie de ton laptop
+    stress-ng         # Pour tester la stabilité du Ryzen
+    s-tui             # Monitoring CPU en temps réel
+
+    # --- Système de fichiers & Réseau ---
+    compsize          # Spécifique à ta structure Btrfs sur /nix
+    duf               # Visualisation rapide de l'espace disque
+    wget              # Utilitaire de base
+    git               # Indispensable pour tes fichiers de config Nix
+
+    # --- Utilitaires de base ---
+    tree
+    dialog            # Pour tes scripts de configuration système
+    htop              # Le classique immanquable
+  ];
+
+
+  # --- usage quotidien, outils de confort et expérimentations (IA/LLM) ---
+  users.users.benoit.packages = with pkgs; [
+    # --- Workflow & Productivité ---
+    btop              # Version "esthétique" de htop (confort visuel)
+    mc                # Gestionnaire de fichiers interactif
+    zellij            # Ton multiplexeur de terminal (TUI Desktop)
+    stow              # Gestion de tes dotfiles personnels
+    just              # Ton exécuteur de commandes de projet
+    mdcat             # Lecture de documentation Markdown
+
+    # --- Développement & Data ---
+    python313         # Choix judicieux pour l'économie d'espace (45 Mo)
+    distrobox         # Pour tes tests Silverblue/Debian/Arch sans polluer NixOS
+
+    # --- Services & Contenu ---
+    kiwix-tools       # Ton accès Wikipedia hors-ligne
+    llama-cpp-vulkan  # Ton IA locale optimisée pour ton GPU/iGPU
+  ];
 
 
   # --- PODMAN ---
