@@ -22,6 +22,7 @@
     # --- Utilitaires de base ---
     tree
     dialog            # Pour tes scripts de configuration système
+    libnotify	      # Pour tes scripts de configuration système
     htop              # Le classique immanquable
   ];
 
@@ -65,7 +66,7 @@
   services.lact.enable = true; # (en natif, car ne fonctionne pas en flatpak, ne peut pas installer le service)
 
 
-  # --- LOGICIELS A EXCLURE DE BASE ---
+  # --- LOGICIELS A EXCLURE DE BASE  : car gestion 100% Flatpaks (image système la plus light et pure possible) ---
   programs.firefox.enable = lib.mkForce false; # pour contrer le "programs.firefox.enable = true;" de configuration.nix
   environment.gnome.excludePackages = with pkgs; [
     gnome-calculator

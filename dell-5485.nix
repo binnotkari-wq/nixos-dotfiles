@@ -4,12 +4,13 @@
   # --- MODULES ---
   imports = [
   #./modules/tests.nix
-  ./modules/configuration_addons.nix
-  ./modules/filesystems-settings.nix
-  ./modules/stateless-light.nix
+  ./modules/OS-functions_base.nix
+  ./modules/OS-optimizations_zram.nix
+  ./modules/OS-optimizations_stateless.nix
+  ./modules/OS-optimizations_filesystems.nix
   ./modules/apps.nix
-  ./modules/CPU_AMD.nix
-  ./modules/GPU_AMD.nix
+  ./modules/HW-tuning_CPU_AMD.nix
+  ./modules/HW-tuning_GPU_AMD.nix
   ];
 
   # --- TUNING ---

@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 
-# infos : si la session steam ne démarre pas, et qu'au bout d'un moment on revient à SSDM....en fait il faut confgurer le client de bureau avant tout (mise à jour, login, langue de l'interface)
+# infos : si la session steam ne démarre pas, et qu'au bout d'un moment on revient au gestionnaire de login...en fait il faut confgurer le client de bureau avant tout (mise à jour, login, langue de l'interface)
+# !! Ne pas installer les flatpaks steam, mangohud et gamescope si on active ce module nix
 
 let
 
@@ -13,7 +14,7 @@ let
     [Desktop Entry]
     Name=Steam
     Comment=Steam (Gamescope et MangoHud)
-    Exec=${pkgs.gamescope}/bin/gamescope --mangoapp -e -- ${pkgs.steam}/bin/steam -steamdeck -steamos3 -gamepadui
+    Exec=/run/wrappers/bin/gamescope --mangoapp -e -- ${pkgs.steam}/bin/steam -steamdeck -steamos3 -gamepadui
     Type=Application
     DesktopNames=gamescope
     EOF
@@ -38,19 +39,25 @@ in
     });
   '';
 
+
   # 4. Paquets et scripts
+
+  hardware.graphics.enable32Bit = true; # n'est utile que lorsque steam est installé en natif. La version flatpak de steam embarque ses propres packages de compatibilité 32 bits
+  programs.gamescope.enable = true;
+  programs.steam = {
+    enable = true;
+    gamescopeSession.enable = false; # on utilise la session custom à la place
+    extraPackages = with pkgs; [ mangohud ]; # On injecte MangoHud directement dans Steam pour MangoApp
+  };
+  
   environment.systemPackages = with pkgs; [
-    gamescope
-    steam-custom-session
+    mangohud # et mangohud sera également disponible pour toute autre application que Steam
 
     # LE SCRIPT DE RETOUR AU BUREAU
     (pkgs.writeShellScriptBin "steamos-session-select" ''
-      case "$1" in
-        *)
-          echo "Retour vers le bureau..."
-          ${pkgs.steam}/bin/steam -shutdown
-          ;;
-      esac
+      # Simule le comportement de SteamOS pour quitter la session
+      echo "Fermeture de Steam et retour au DM..."
+      ${pkgs.systemd}/bin/loginctl terminate-user ""
     '')
   ];
 
