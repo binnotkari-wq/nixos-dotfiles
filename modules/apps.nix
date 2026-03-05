@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
 
@@ -61,8 +61,28 @@
   security.unprivilegedUsernsClone = true;
 
 
+  # --- LACT pour la gestion GPU AMD / Nvidia / intel ---
+  services.lact.enable = true; # (en natif, car ne fonctionne pas en flatpak, ne peut pas installer le service)
+
+
   # --- LOGICIELS A EXCLURE DE BASE ---
+  programs.firefox.enable = lib.mkForce false; # pour contrer le "programs.firefox.enable = true;" de configuration.nix
   environment.gnome.excludePackages = with pkgs; [
+    gnome-calculator
+    gnome-characters
+    gnome-text-editor
+    gnome-weather
+    loupe
+    snapshot
+    baobab
+    gnome-maps
+    gnome-font-viewer
+    gnome-clocks
+    papers
+    gnome-logs
+    decibels
+    simple-scan
+    gnome-music
     epiphany
     geary
     gnome-calendar

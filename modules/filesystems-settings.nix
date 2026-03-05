@@ -2,20 +2,23 @@
 
 {
   # --- Optimisation des volumes BTRFS (si existants) sauf l'éventuel sous-volume /swap (d'après options de montages décrites dans https://wiki.nixos.org/wiki/Btrfs )
-  fileSystems = lib.mapAttrs (name: fs: {
-    options = if (fs.fsType == "btrfs") then
-      if (name == "/swap") 
-      then [ "noatime" "ssd" ] ++ (fs.options or [])
-      else [ "noatime" "compress=zstd" "ssd" "discard=async" ] ++ (fs.options or [])
-    else fs.options;
-  }) config.fileSystems;
+  # mkAfter garantit que ces options sont ajoutées APRES celles du hardware-configuration
+  # Il faudra y ajouter les éventuels autres volumes btrfs en cas de partitionnement custom, comme ils apparaissent dans hardware-configuration.nix
+
+  fileSystems."/" = {
+    options = lib.mkAfter [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+  };
+
+  fileSystems."/home" = {
+    options = lib.mkAfter [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+  };
 
 
-  # --- Optimisations des volumes LUKS (si existants)
-  boot.initrd.luks.devices = builtins.filterAttrs (_: v: v != null) (
-    builtins.mapAttrs (_: dev: if dev != null then {
-      allowDiscards = true;
-      bypassWorkqueues = true;
-    } else null) config.boot.initrd.luks.devices
-  );
+  # --- Optimisations des volumes LUKS
+  # Il faut récupérer la valeur "luks-xxxxx..." dans hardware-configuration.nix
+
+  boot.initrd.luks.devices."luks-400c5604-0663-4e0b-ab4e-8475af6212b8" = {
+    allowDiscards = true;
+    bypassWorkqueues = true;
+  };
 }

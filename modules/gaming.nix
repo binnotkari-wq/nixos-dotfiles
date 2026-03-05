@@ -1,10 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  # --- LACT pour la gestion GPU AMD / Nvidia / intel ---
-  services.lact.enable = true;
-
-  programs.gamemode.enable = true;
+  programs.gamemode.enable = true; # vérifier dans quelle mesure cela peut être bénéfique
 
   programs.steam = {
     enable = true;
