@@ -73,4 +73,5 @@
       fsType = "none";
       options = [ "bind" ];
     };
+  }
 }
