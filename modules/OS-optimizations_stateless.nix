@@ -2,7 +2,7 @@
 
 # Permet de se rapprocher d'une impermanence, mais sans avoir à définir un schéma de partitionnement adapté
 # ou une mise en place en pré-installation. On peu activer ou desactiver ce module quand on veut et quel
-# que soit le schéma de partitions.
+# que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation CD ...
 
 {
   # 0. Rigueur des comptes (Source de vérité = Code)

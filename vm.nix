@@ -3,10 +3,12 @@
 {
   # --- MODULES ---
   imports = [
-  ./modules/tests.nix
-  ./modules/configuration_addons.nix
-  # ./modules/filesystems-settings.nix # laisser commenté si l'installation a été faite depuis le script
-  ./modules/user_apps.nix
+  #./modules/tests.nix
+  ./modules/OS-functions_base.nix
+  ./modules/OS-optimizations_zram.nix
+  # ./modules/OS-optimizations_stateless.nix # commenter si on utilise impermanence
+  # ./modules/OS-optimizations_filesystems.nix # commenter si l'installation a été fite depuis le script
+  ./modules/apps.nix
   ];
 
   # --- TUNING ---
