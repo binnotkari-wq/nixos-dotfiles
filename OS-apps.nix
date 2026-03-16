@@ -67,7 +67,6 @@
 
 
   # --- LOGICIELS A EXCLURE DE BASE  : car gestion 100% Flatpaks (image système la plus light et pure possible) ---
-  programs.firefox.enable = lib.mkForce false; # pour contrer le "programs.firefox.enable = true;" de configuration.nix
   environment.gnome.excludePackages = with pkgs; [
     gnome-calculator
     gnome-characters
