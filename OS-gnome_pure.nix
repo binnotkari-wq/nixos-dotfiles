@@ -1,6 +1,10 @@
 { config, pkgs, lib, ... }:
 
 {
+  # Enable the GNOME Desktop Environment.
+  services.desktopManager.gnome.enable = true; # syntaxe corrigée
+  services.displayManager.gdm.enable = true; # syntaxe corrigée
+
   # --- LOGICIELS A EXCLURE DE BASE  : car gestion 100% Flatpaks (image système la plus light et pure possible) ---
   environment.gnome.excludePackages = with pkgs; [
     gnome-calculator
