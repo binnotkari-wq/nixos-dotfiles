@@ -3,13 +3,8 @@
 {
   # --- MODULES ---
   imports = [
-  ./modules/tests.nix
-  ./modules/configuration_addons.nix
-  ./modules/filesystems-settings.nix
-  ./modules/stateless-light.nix
-  ./modules/user_apps.nix
-  ./modules/CPU_intel.nix
-  ./modules/iGPU_intel.nix
+  ./HW-tuning_CPU_intel.nix
+  ./HW-tuning_iGPU_intel.nix
   ];
 
   # --- TUNING ---
