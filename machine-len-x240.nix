@@ -5,6 +5,7 @@
   imports = [
   ./HW-tuning_CPU_intel.nix
   ./HW-tuning_iGPU_intel.nix
+  ./tests1.nix
   ];
 
   # --- TUNING ---

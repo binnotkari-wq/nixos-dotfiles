@@ -24,6 +24,7 @@
     dialog            # Pour tes scripts de configuration système
     libnotify	      # Pour tes scripts de configuration système
     htop              # Le classique immanquable
+    nix-tree          # Analyse des paquets et dépendances
   ];
 
 

@@ -1,35 +1,19 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 
 {
-  # Enable the GNOME Desktop Environment.
   services.desktopManager.gnome.enable = true; # syntaxe corrigée
   services.displayManager.gdm.enable = true; # syntaxe corrigée
+  services.gnome.core-apps.enable = false; # sans le bundle des apps
+  services.orca.enable = false; # requires speechd
+  services.speechd.enable = false; # voice files are big and fat
 
-  # --- LOGICIELS A EXCLURE DE BASE  : car gestion 100% Flatpaks (image système la plus light et pure possible) ---
-  environment.gnome.excludePackages = with pkgs; [
-    gnome-calculator
-    gnome-characters
-    gnome-text-editor
-    gnome-weather
-    loupe
-    snapshot
-    baobab
-    gnome-maps
-    gnome-font-viewer
-    gnome-clocks
-    papers
-    gnome-logs
-    decibels
-    simple-scan
-    gnome-music
-    epiphany
-    geary
-    gnome-calendar
-    gnome-contacts
-    gnome-music
-    showtime
-    gnome-software
-    gnome-connections
-    seahorse
+  environment.systemPackages = with pkgs; [ # mais on veut celles-ci, essentielles (et présente dans silverblue -> liste flatpaks identique)
+    gnome-console
+    gnome-system-monitor
+    gnome-disk-utility
+    nautilus
+    gnome-user-docs
+    gnome-tour
+    yelp
   ];
 }
