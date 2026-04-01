@@ -16,4 +16,8 @@
     gnome-tour
     yelp
   ];
+  
+  services.xserver.excludePackages = with pkgs; [ 
+    xterm
+  ];
 }
