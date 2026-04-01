@@ -8,6 +8,8 @@
   ./tests1.nix
   ];
 
+  networking.hostName = "len-x240"; # Define your hostname.
+
   # --- TUNING ---
   # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le boost est maintenu, avec une température de moins de 70 degrés!)
   services.undervolt = {
