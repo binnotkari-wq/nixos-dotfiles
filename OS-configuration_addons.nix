@@ -38,7 +38,7 @@
   # --- 6. DEFINITION UTILISATEUR ---
   users.users.benoit = {
     uid = 1000; # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
-  }
+  };
 
   # Stateless
   # Permet de se rapprocher d'une impermanence, mais sans avoir à définir un schéma de partitionnement adapté
