@@ -15,8 +15,9 @@
     gnome-user-docs
     gnome-tour
     yelp
+    gnomeExtensions.dash-to-panel
   ];
-  
+
   services.xserver.excludePackages = with pkgs; [ 
     xterm
   ];

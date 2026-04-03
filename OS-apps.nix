@@ -37,6 +37,7 @@
     stow              # Gestion de tes dotfiles personnels
     just              # Ton exécuteur de commandes de projet
     mdcat             # Lecture de documentation Markdown
+    shellcheck	      # contrôle de syntaxe scripts bash
 
     # --- Développement & Data ---
     python313         # Choix judicieux pour l'économie d'espace (45 Mo)
