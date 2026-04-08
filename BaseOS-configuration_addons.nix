@@ -31,7 +31,6 @@
 
   # --- 5. MATÉRIEL & SERVICES ---
   security.apparmor.enable = true; # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
-  services.flatpak.enable = true;
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true; # Vulkan
 
@@ -43,7 +42,7 @@
   # Stateless
   # Permet de se rapprocher d'une impermanence, mais sans avoir à définir un schéma de partitionnement adapté
 # ou une mise en place en pré-installation. On peu activer ou desactiver ce module quand on veut et quel
-# que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation CD ...
+# que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation avec Calamares
 
   # 0. Rigueur des comptes (Source de vérité = Code)
   # users.mutableUsers = false;

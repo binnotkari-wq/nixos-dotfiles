@@ -5,7 +5,7 @@
 # - "services.xserver.displayManager.gdm.enable = true;" commenté car externalisé
 # - "services.xserver.desktopManager.gnome.enable = true;" commenté car externalisé
 # - "services.printing.enable = true;" commenté, car inutilisé
-# - "programs.firefox.enable = true;" commenté (on installera un flatpak)
+# - "programs.firefox.enable = true;" commenté car externalisé, on installation du flatpak selon le type de déploiement nixos
 
 { config, pkgs, ... }:
 

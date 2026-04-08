@@ -2,16 +2,16 @@
 
 {
 
-  # --- OUTILS EN CLI ---
-  
+  services.xserver.excludePackages = with pkgs; [ 
+    xterm
+  ];
+
   # --- outils de diagnostic, de gestion de fichiers et de dépannage ---
   environment.systemPackages = with pkgs; [
     # --- Diagnostic & Hardware (Dell 5485 / R5-3600) ---
     pciutils          # Essentiel pour l'inventaire matériel
     lm_sensors        # Surveillance des températures
     powertop          # Vital pour optimiser la batterie de ton laptop
-    stress-ng         # Pour tester la stabilité du Ryzen
-    s-tui             # Monitoring CPU en temps réel
 
     # --- Système de fichiers & Réseau ---
     compsize          # Spécifique à ta structure Btrfs sur /nix
@@ -24,24 +24,12 @@
     dialog            # Pour tes scripts de configuration système
     libnotify	      # Pour tes scripts de configuration système
     htop              # Le classique immanquable
-    nix-tree          # Analyse des paquets et dépendances
-  ];
-
-
-  # --- usage quotidien, outils de confort et expérimentations (IA/LLM) ---
-  users.users.benoit.packages = with pkgs; [
-    # --- Workflow & Productivité ---
-    btop              # Version "esthétique" de htop (confort visuel)
-    mc                # Gestionnaire de fichiers interactif
-    zellij            # Ton multiplexeur de terminal (TUI Desktop)
-    stow              # Gestion de tes dotfiles personnels
-    just              # Ton exécuteur de commandes de projet
-    mdcat             # Lecture de documentation Markdown
     shellcheck	      # contrôle de syntaxe scripts bash
 
     # --- Développement & Data ---
     python313         # Choix judicieux pour l'économie d'espace (45 Mo)
     distrobox         # Pour tes tests Silverblue/Debian/Arch sans polluer NixOS
+    vim
 
     # --- Services & Contenu ---
     kiwix-tools       # Ton accès Wikipedia hors-ligne
@@ -62,8 +50,4 @@
 
   # Active user namespaces correctement
   security.unprivilegedUsernsClone = true;
-
-
-  # --- LACT pour la gestion GPU AMD / Nvidia / intel ---
-  services.lact.enable = true; # (en natif, car ne fonctionne pas en flatpak, ne peut pas installer le service)
 }
