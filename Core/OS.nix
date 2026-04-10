@@ -34,7 +34,7 @@
   fileSystems."/".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/nix".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/home".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-    fileSystems."/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+  fileSystems."/var/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
 
   # --- 5. SERVICES ---
   security.apparmor.enable = true; # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
@@ -78,8 +78,7 @@
   # que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation avec Calamares
 
   # 0. Rigueur des comptes (Source de vérité = Code)
-  # users.mutableUsers = false;
-  # Note : il faut définir hashedPassword ou initialPassword ici.
+  users.mutableUsers = false;
 
   # RAM Disk natif pour /tmp ---
   boot.tmp.useTmpfs = true;

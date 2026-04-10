@@ -8,32 +8,33 @@
 
   # --- outils de diagnostic, de gestion de fichiers et de dépannage ---
   environment.systemPackages = with pkgs; [
-    # --- Diagnostic & Hardware (Dell 5485 / R5-3600) ---
+    # --- Diagnostic & Hardware ---
     pciutils          # Essentiel pour l'inventaire matériel
     lm_sensors        # Surveillance des températures
-    powertop          # Vital pour optimiser la batterie de ton laptop
+    powertop          # Vital pour optimiser la batterie
 
     # --- Système de fichiers & Réseau ---
-    compsize          # Spécifique à ta structure Btrfs sur /nix
+    compsize          # utilitaire analyse Btrfs
     duf               # Visualisation rapide de l'espace disque
-    wget              # Utilitaire de base
-    git               # Indispensable pour tes fichiers de config Nix
+    wget
+    git
 
     # --- Utilitaires de base ---
     tree
-    dialog            # Pour tes scripts de configuration système
-    libnotify	      # Pour tes scripts de configuration système
+    dialog            # Pour scripts de configuration système
+    libnotify	      # Pour scripts de configuration système
     htop              # Le classique immanquable
     shellcheck	      # contrôle de syntaxe scripts bash
+    aria2             # gestionnaire de téléchargement universel
 
     # --- Développement & Data ---
     python313         # Choix judicieux pour l'économie d'espace (45 Mo)
-    distrobox         # Pour tes tests Silverblue/Debian/Arch sans polluer NixOS
+    distrobox         # Pour tests Silverblue/Debian/Arch sans polluer NixOS
     vim
 
     # --- Services & Contenu ---
-    kiwix-tools       # Ton accès Wikipedia hors-ligne
-    llama-cpp-vulkan  # Ton IA locale optimisée pour ton GPU/iGPU
+    kiwix-tools       # Wikipedia hors-ligne
+    llama-cpp-vulkan  # Pour LLM optimisée GPU/iGPU
   ];
 
 
