@@ -1,9 +1,15 @@
 { config, pkgs, ... }:
 
 {
-  # Optimisations et settings persos
+
+  # --- 0. NIXOS ---
+  nixpkgs.config.allowUnfree = true;
+  system.stateVersion = "25.11";
 
   # --- 1. BOOTLOADER & KERNEL ---
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "quiet" "splash" "loglevel=3" "rd.systemd.show_status=false" ];
   boot.plymouth.enable = true;
   boot.initrd.systemd.enable = true; # On confie à Systemd le démarrage des pilotes graphiques et Plymouth. C'est la méthode utilisée par Fedora.
@@ -28,37 +34,64 @@
   fileSystems."/".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/nix".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/home".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+    fileSystems."/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
 
-  # --- 5. MATÉRIEL & SERVICES ---
+  # --- 5. SERVICES ---
   security.apparmor.enable = true; # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true; # Vulkan
-
-  # --- 6. DEFINITION UTILISATEUR ---
-  users.users.benoit = {
-    uid = 1000; # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
+  networking.networkmanager.enable = true;
+  services.xserver.enable = true;
+  # Enable sound with pipewire.
+  services.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
   };
 
-  # Stateless
+  # --- 6. LOCALISATION ---
+  time.timeZone = "Europe/Paris";
+  i18n.defaultLocale = "fr_FR.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "fr_FR.UTF-8";
+    LC_IDENTIFICATION = "fr_FR.UTF-8";
+    LC_MEASUREMENT = "fr_FR.UTF-8";
+    LC_MONETARY = "fr_FR.UTF-8";
+    LC_NAME = "fr_FR.UTF-8";
+    LC_NUMERIC = "fr_FR.UTF-8";
+    LC_PAPER = "fr_FR.UTF-8";
+    LC_TELEPHONE = "fr_FR.UTF-8";
+    LC_TIME = "fr_FR.UTF-8";
+  };
+  console.keyMap = "fr";
+  services.xserver.xkb = {
+    layout = "fr";
+    variant = "azerty";
+  };
+
+  # --- 7. STATELESS ---
   # Permet de se rapprocher d'une impermanence, mais sans avoir à définir un schéma de partitionnement adapté
-# ou une mise en place en pré-installation. On peu activer ou desactiver ce module quand on veut et quel
-# que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation avec Calamares
+  # ou une mise en place en pré-installation. On peu activer ou desactiver ce module quand on veut et quel
+  # que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation avec Calamares
 
   # 0. Rigueur des comptes (Source de vérité = Code)
   # users.mutableUsers = false;
   # Note : il faut définir hashedPassword ou initialPassword ici.
 
-# --- 1. RAM Disk natif pour /tmp ---
+  # RAM Disk natif pour /tmp ---
   boot.tmp.useTmpfs = true;
   boot.tmp.tmpfsSize = "2G";
 
-  # --- 2. Journalisation Volatile (Propre et limitée) ---
+  # Journalisation Volatile (Propre et limitée) ---
   services.journald.extraConfig = ''
     Storage=volatile
     RuntimeMaxUse=100M
   '';
 
-  # --- 3. Règles d'hygiène automatique (Systemd-tmpfiles) ---
+  # Règles d'hygiène automatique (Systemd-tmpfiles) ---
   systemd.tmpfiles.rules = [
     "R /var/cache/* - - - - -"
     "R /var/spool/cups/* - - - - -"
@@ -66,16 +99,17 @@
     "e /var/tmp 1777 root root 30d -"   # On nettoie /var/tmp s'il n'est pas touché pendant 30 jours
   ];
 
-  # --- 4. Sécurité : données sudo en tmpfs, pas conservées sur disque ---
+  # Sécurité : données sudo en tmpfs, pas conservées sur disque ---
   fileSystems = {
     "/var/db/sudo" = { device = "none"; fsType = "tmpfs"; options = [ "defaults" "size=5M" "mode=700" ]; };
   };
 
-  # --- 5. Hygiène du Nix Store ---
+  # Hygiène du Nix Store ---
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 14d";
   };
   nix.settings.auto-optimise-store = true;
+
 }

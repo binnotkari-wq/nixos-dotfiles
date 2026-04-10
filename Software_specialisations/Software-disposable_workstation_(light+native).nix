@@ -7,14 +7,12 @@
 # Gérer des containers : distrobox (dans le nix de soutils CLI)
 # Executer une LLM (le modèle doit donc être téléchargé dans la foulée de l'installation) : llama (dans le nix de soutils CLI)
 # Consulter une base wikipedia offline (le zim doit donc être téléchargé dans la foulée de l'installation) : kiwix (dans le nix de soutils CLI)
+# Réaliser des taches grâce a des outils appropriés (images, video, musique, documents, administratif, mails)
+# C'est un environnement-service pour accomplir des choses, pas gaming ou multimedia
 
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./flatpaks.nix
-    ];
 
   programs.firefox.enable = true;
 
@@ -28,6 +26,7 @@
   ];
 
   environment.systemPackages = with pkgs; [
+    # ne pas inclure apostrophe, heroic, bottles ou lutris ou steam en nixpkgs sur une machine service et production. Tirent trop de dépendances.
     meld
     libreoffice
     fragments
@@ -36,5 +35,11 @@
     gimp
     gnome-secrets
     impression
+    tagger
+    foliate
+    fragments
+    pinta
+    morphosis
+    pdfarranger
    ];
 }
