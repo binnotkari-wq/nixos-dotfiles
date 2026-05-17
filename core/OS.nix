@@ -4,7 +4,6 @@
 
   # --- 0. NIXOS ---
   nixpkgs.config.allowUnfree = true;
-  system.stateVersion = "25.11";
 
   # --- 1. BOOTLOADER & KERNEL ---
   boot.loader.systemd-boot.enable = true;

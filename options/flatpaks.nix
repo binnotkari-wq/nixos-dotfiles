@@ -5,14 +5,18 @@ let
   grep = pkgs.gnugrep;
   # 1. Declare the Flatpaks you *want* on your system
   desiredFlatpaks = [
-    "org.gnome.gitlab.somas.Apostrophe"
-    lutris
+    org.gnome.gitlab.somas.Apostrophe # imperatif en flatpak, les dépendances sont tentaculaires.
+    org.libreoffice.LibreOffice   
+    com.heroicgameslauncher.hgl # imperatif en flatpak, les dépendances sont tentaculaires avec le sous-système 32 bits
+    net.lutris.Lutris # imperatif en flatpak, les dépendances sont tentaculaires avec le sous-système 32 bits
+    com.usebottles.bottles # imperatif en flatpak, les dépendances sont tentaculaires avec le sous-système 32 bits
+    com.valvesoftware.Steam # installer en natif que sur PC Gaming
+    com.valvesoftware.Steam.CompatibilityTool.Proton-GE # installer en natif que sur PC Gaming
   ];
 
 in
 
 {
-
   services.flatpak.enable = true;
 
   system.userActivationScripts.flatpakManagement = {
@@ -45,5 +49,4 @@ in
       ${pkgs.flatpak}/bin/flatpak update -y
     '';
   };
-
 }
