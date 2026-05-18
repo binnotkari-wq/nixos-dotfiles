@@ -1,9 +1,21 @@
 { config, pkgs, ... }:
 
 {
+  imports =
+    [ # Include the results of the hardware scan.
+      ./hardware-configuration.nix
+      ./machine_settings/@@HOSTNAME@@.nix
+      # ./modules/workstation.nix # optionnel
+      # ./modules/home-manager.nix # optionnel
+      # ./modules/flatpaks_list.nix # optionnel
+      # ./modules/gaming.nix # optionnel
+      # ./modules/SteamOS.nix # optionnel
+    ];
 
   # --- 0. NIXOS ---
   nixpkgs.config.allowUnfree = true;
+  system.stateVersion = "@@NIXOSVERSION@@"; # à adapter à la version NixOS
+  networking.hostName = "@@HOSTNAME@@"; # Define your hostname.
 
   # --- 1. BOOTLOADER & KERNEL ---
   boot.loader.systemd-boot.enable = true;
@@ -110,4 +122,66 @@
   };
   nix.settings.auto-optimise-store = true;
 
+  # Définition utilisateur ---
+  users.users.@@USERNAME@@ = {
+    isNormalUser = true;
+    description = "@@USERNAME_DISPLAY@@";
+    extraGroups = [ "networkmanager" "wheel" ];
+    uid = 1000; # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
+    hashedPassword = "@@HASHED_PASSWORD@@";
+  };
+
+  # Définition D.E. ---
+  services.desktopManager.gnome.enable = true; # syntaxe corrigée
+  services.displayManager.gdm.enable = true; # syntaxe corrigée
+  
+  
+  # Configuration logicielle commune
+  services.orca.enable = false; # requires speechd
+  services.speechd.enable = false; # voice files are big and fat
+  services.flatpak.enable = true;
+  programs.firefox.enable = true;
+  
+  services.xserver.excludePackages = with pkgs; [ 
+    xterm
+  ];
+
+  environment.gnome.excludePackages = with pkgs; [
+    epiphany
+    geary
+    gnome-calendar
+    gnome-contacts
+    gnome-software
+    gnome-connections
+  ];
+  
+  environment.systemPackages = with pkgs; [
+    # GUI
+    gnomeExtensions.dash-to-panel
+    fragments
+    gnome-secrets
+    
+    # CLI
+    # --- Diagnostic & Hardware ---
+    pciutils          # Essentiel pour l'inventaire matériel
+    lm_sensors        # Surveillance des températures
+    powertop          # Vital pour optimiser la batterie
+    stress-ng         # Pour tester la stabilité du Ryzen
+    s-tui             # Monitoring CPU en temps réel
+    
+    # --- Système de fichiers & Réseau ---
+    compsize          # utilitaire analyse Btrfs
+    duf               # Visualisation rapide de l'espace disque
+    wget
+    git
+    tree
+    
+    # --- Utilitaires de base ---
+    dialog            # Pour scripts de configuration système
+    libnotify	      # Pour scripts de configuration système
+    htop              # Le classique immanquable
+    btop              # Version "esthétique" de htop (confort visuel)
+    aria2             # gestionnaire de téléchargement universel
+    nix-tree          # Analyse des paquets et dépendances    
+  ];
 }

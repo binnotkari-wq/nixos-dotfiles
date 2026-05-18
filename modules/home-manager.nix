@@ -1,7 +1,18 @@
 { config, pkgs, ... }:
 
-{
+let
+  home-manager = builtins.fetchTarball https://github.com/nix-community/home-manager/archive/release-@@NIXOSVERSION@@.tar.gz;
+in
 
+{
+  imports =
+    [
+      (import "${home-manager}/nixos")
+    ];
+  
+  home.username = "@@USERNAME@@";
+  home.homeDirectory = "/home/@@USERNAME@@";
+  home.stateVersion = "@@NIXOSVERSION@@"; # à adapter à la version NixOS
   home-manager.useGlobalPkgs = true; # https://nix-community.github.io/home-manager/index.xhtml#sec-install-nixos-module
   
   # ============================================================

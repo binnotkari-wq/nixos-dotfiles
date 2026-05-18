@@ -51,8 +51,6 @@ in
   };
   
   environment.systemPackages = with pkgs; [
-    mangohud # et mangohud sera également disponible pour toute autre application que Steam
-
     # LE SCRIPT DE RETOUR AU BUREAU
     (pkgs.writeShellScriptBin "steamos-session-select" ''
       # Simule le comportement de SteamOS pour quitter la session
