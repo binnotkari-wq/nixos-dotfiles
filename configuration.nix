@@ -6,8 +6,8 @@
       ./hardware-configuration.nix
       ./machine_settings/@@HOSTNAME@@.nix
       # ./modules/workstation.nix # optionnel
-      # ./modules/home-manager.nix # optionnel
-      # ./modules/flatpaks_list.nix # optionnel
+      # ./modules/home-manager.nix # optionnel - invalide, à corriger dans la VM
+      # ./modules/flatpaks_list.nix # optionnel - à corriger d'apres celui de la VM
       # ./modules/gaming.nix # optionnel
       # ./modules/SteamOS.nix # optionnel
     ];

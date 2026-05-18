@@ -1,0 +1,4 @@
+recuperer le nix flatpaks dans la VM.
+Il est corrigé.
+
+Ensuite, travailler le fichier home manager .nix : il y a eu des erreurs et elles sont annotés dans le fichier
