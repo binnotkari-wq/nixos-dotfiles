@@ -3,8 +3,8 @@
 {
   # --- MODULES ---
   imports = [
-  ./HW-tuning_CPU_AMD.nix
-  ./HW-tuning_GPU_AMD.nix
+  ./drivers_settings/CPU_AMD.nix
+  ./drivers_settings/GPU_AMD.nix
   ];
 
   # --- TUNING ---

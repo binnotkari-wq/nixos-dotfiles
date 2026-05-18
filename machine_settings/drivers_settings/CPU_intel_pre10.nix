@@ -5,7 +5,7 @@
   # On active thermald pour éviter le throttling thermique brutal
   services.thermald.enable = true;
 
-  # 2. Configuration de TLP pour un contrôle fin (optionnel mais recommandé). En cas de blocage de build, désactiver toute cette partie. Mais ca fonctionne, actuellement sur le X240. A voir si on peut faire avec AMD ?
+  # 2. Configuration de TLP pour un contrôle fin (optionnel mais recommandé). En cas de blocage de build, désactiver toute cette partie. Mais ca fonctionne, actuellement sur le X240.
   services.power-profiles-daemon.enable = false; # on desactive celui-ci, moins efficace que TLP, sinon ils entrent en conflit
   services.tlp = {
     enable = true;
@@ -32,5 +32,6 @@
   # 4. Installation logiciel Undervolting (Intel)
   environment.systemPackages = with pkgs; [
     undervolt      # Pour vérifier l'état actuel : sudo undervolt --read
+    # attention, cet outil ne fonctionne plus sur les CPU Intel depuis la génération Comet Lake (10e gen) — Intel a verrouillé le MSR via microcode en réponse à Plundervolt. 
   ];
 }

@@ -12,7 +12,7 @@
   environment.systemPackages = with pkgs; [
     nvtopPackages.amd # nvtopPackages.nvidia" , nvtopPackages.intel
     radeontop
-    libva-vdpau-driver
+    libva-mesa-driver
     amdgpu_top  # Un moniteur de ressources génial pour voir la charge du CPU/GPU AMD.
   ];
 

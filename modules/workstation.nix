@@ -25,7 +25,11 @@
     pinta
     morphosis
     pdfarranger
-       
+    distroshelf
+    video-trimmer
+    drum-machine
+    gnome-sound-recorder
+
     # CLI
     # --- Utilitaires de base ---
     stow              # Gestion de tes dotfiles personnels

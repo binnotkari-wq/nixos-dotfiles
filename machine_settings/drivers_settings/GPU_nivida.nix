@@ -2,7 +2,7 @@
 
 {
 
-  # Charger le driver nvidia pour X11 et Wayland
+  # Charger le driver nvidia Wayland
   services.xserver.videoDrivers = ["nvidia"];
 
   hardware.nvidia = {
@@ -10,7 +10,9 @@
     modesetting.enable = true;
 
     # Utiliser les modules kernel open-source de NVIDIA (recommandé pour RTX 30xx)
-    # Note : Si vous rencontrez des problèmes graphiques, essayez de mettre 'false'
+    # si problèmes graphiques, essayer de mettre 'false'
+    # open = true  → RTX 30xx+ (Turing+) uniquement
+    # open = false → GTX, anciennes générations
     open = true;
 
     # Activer le menu de configuration NVIDIA

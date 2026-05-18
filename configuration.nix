@@ -5,10 +5,10 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./machine_settings/@@HOSTNAME@@.nix
-      # ./modules/workstation.nix # optionnel
-      # ./modules/home-manager.nix # optionnel - invalide, à corriger dans la VM
-      # ./modules/flatpaks_list.nix # optionnel - à corriger d'apres celui de la VM
-      # ./modules/gaming.nix # optionnel
+      ./modules/workstation.nix # optionnel
+      ./modules/home-manager.nix # optionnel
+      ./modules/flatpaks_list.nix # optionnel
+      ./modules/gaming.nix # optionnel
       # ./modules/SteamOS.nix # optionnel
     ];
 
@@ -160,6 +160,10 @@
     gnomeExtensions.dash-to-panel
     fragments
     gnome-secrets
+    shortwave
+    smile
+    deja-dup
+    gnome-firmware
     
     # CLI
     # --- Diagnostic & Hardware ---
@@ -168,6 +172,7 @@
     powertop          # Vital pour optimiser la batterie
     stress-ng         # Pour tester la stabilité du Ryzen
     s-tui             # Monitoring CPU en temps réel
+    libva-utils       # Permet de lancer 'vainfo' pour tester l'accélération vidéo
     
     # --- Système de fichiers & Réseau ---
     compsize          # utilitaire analyse Btrfs
