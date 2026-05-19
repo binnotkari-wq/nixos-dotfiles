@@ -3,12 +3,9 @@
 {
   # --- MODULES ---
   imports = [
-  ./HW-tuning_CPU_intel.nix
-  ./HW-tuning_iGPU_intel.nix
-  ./tests1.nix
+  ./drivers_settings/CPU_intel_pre10.nix
+  ./drivers_settings/iGPU_intel.nix
   ];
-
-  networking.hostName = "len-x240"; # Define your hostname.
 
   # --- TUNING ---
   # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le boost est maintenu, avec une température de moins de 70 degrés!)
