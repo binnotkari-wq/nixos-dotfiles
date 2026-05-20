@@ -83,9 +83,9 @@ in
         enabled-extensions     = [ "dash-to-panel@jderose9.github.com" ];
         disable-user-extensions = false;
         favorite-apps = [
-          "org.mozilla.firefox.desktop"
+          "firefox.desktop"
           "org.gnome.Nautilus.desktop"
-          "org.gnome.Ptyxis.desktop"
+          "org.gnome.Console.desktop"
           "org.gnome.TextEditor.desktop"
           "org.gnome.Calculator.desktop"
           "org.gnome.SystemMonitor.desktop"

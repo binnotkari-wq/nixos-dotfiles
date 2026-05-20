@@ -140,8 +140,50 @@
   services.orca.enable = false; # requires speechd
   services.speechd.enable = false; # voice files are big and fat
   services.flatpak.enable = true;
-  programs.firefox.enable = true;
   
+  programs.firefox = {
+    enable = true;
+    languagePacks = [ "fr" ];
+    preferences = {
+      "browser.translations.automaticallyPopup" = false;
+      "browser.startup.homepage" = "https://duckduckgo.com/";
+      "intl.locale.requested" = "fr";
+      "intl.accept_languages" = "fr-fr,fr";
+      "spellchecker.dictionary" = "fr-FR";
+    };  
+    policies = {
+        DisableTelemetry = true;
+        DisableFirefoxStudies = true;
+        EnableTrackingProtection = {
+          Value= true;
+          Locked = true;
+          Cryptomining = true;
+          Fingerprinting = true;
+        };
+        DontCheckDefaultBrowser = true;  
+        SearchEngines = {
+          Remove = [
+            "eBay"
+            "Google"
+            "Bing"
+            "Ecosia"
+            "Wikipedia"
+            "Perplexity"
+          ];
+          Add = [
+            {
+                "Name" = "DuckDuckGo";
+                "URLTemplate" = "https://duckduckgo.com/?q={searchTerms}&ia=web&assist=false";
+                "IconURL" = "https://duckduckgo.com/favicon.ico";
+                "Alias" = "ddg";
+                "Description" = "Duckduckgo without AI integrations";
+            }
+          ];
+          Default = "DuckDuckGo";
+        };   
+    };
+  };
+
   services.xserver.excludePackages = with pkgs; [ 
     xterm
   ];
@@ -187,6 +229,6 @@
     htop              # Le classique immanquable
     btop              # Version "esthétique" de htop (confort visuel)
     aria2             # gestionnaire de téléchargement universel
-    nix-tree          # Analyse des paquets et dépendances    
+    nix-tree          # Analyse des paquets et dépendances
   ];
 }

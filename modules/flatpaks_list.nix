@@ -15,14 +15,14 @@ in
     }];
     packages = [
       "org.gnome.gitlab.somas.Apostrophe"
-      "org.libreoffice.LibreOffice"
-      "com.heroicgameslauncher.hgl"
-      "net.lutris.Lutris"
-      "com.usebottles.bottles"
-      "com.valvesoftware.Steam"
-      "com.valvesoftware.Steam.CompatibilityTool.Proton-GE"
-      "io.github.flattool.Warehouse"
-      "com.github.tchx84.Flatseal"
+      # "org.libreoffice.LibreOffice"
+      # "com.heroicgameslauncher.hgl"
+      # "net.lutris.Lutris"
+      # "com.usebottles.bottles"
+      # "com.valvesoftware.Steam"
+      # "com.valvesoftware.Steam.CompatibilityTool.Proton-GE"
+      # "io.github.flattool.Warehouse"
+      # "com.github.tchx84.Flatseal"
     ];
     uninstallUnmanaged = true; # supprime les flatpaks absents de la liste
   };
