@@ -66,7 +66,8 @@
 
   # --- VIRTUALISATION ---
   virtualisation.libvirtd.enable = true;
-
+  virtualisation.spiceUSBRedirection.enable = true;
+  services.spice-vdagentd.enable = true;
   users.users.benoit = {
     extraGroups = [ "libvirtd" "kvm" ];
   };
