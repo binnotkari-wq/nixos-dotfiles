@@ -65,10 +65,9 @@
 
 
   # --- VIRTUALISATION ---
-  # virtualisation.libvirtd.enable = true; # inutile avec Gnomes Machine, qui s'appuie sur qemu
+  virtualisation.libvirtd.enable = true; # inutile avec Gnomes Machine, qui s'appuie sur qemu
   # services.spice-vdagentd.enable = true; # utile uniquement sur l'invité
   virtualisation.spiceUSBRedirection.enable = true;
-  users.users.@@USERNAME@@.extraGroups = [ "kvm" ];
-
+  users.users.@@USERNAME@@.extraGroups = [ "libvirtd" "kvm" ];
 
 }
