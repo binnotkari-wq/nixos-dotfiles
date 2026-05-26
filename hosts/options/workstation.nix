@@ -63,4 +63,12 @@
   # Active user namespaces correctement
   security.unprivilegedUsernsClone = true;
 
+
+  # --- VIRTUALISATION ---
+  virtualisation.libvirtd.enable = true;
+
+  users.users.benoit = {
+    extraGroups = [ "libvirtd" "kvm" ];
+  };
+
 }

@@ -187,6 +187,9 @@
     stress-ng         # Pour tester la stabilité du Ryzen
     s-tui             # Monitoring CPU en temps réel
     libva-utils       # Permet de lancer 'vainfo' pour tester l'accélération vidéo
+    wirelesstools
+    usbutils
+    iw
     
     # --- Système de fichiers & Réseau ---
     compsize          # utilitaire analyse Btrfs
