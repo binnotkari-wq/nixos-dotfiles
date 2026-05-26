@@ -51,8 +51,8 @@
     kiwix-tools       # Wikipedia hors-ligne
     llama-cpp-vulkan  # Pour LLM optimisée GPU/iGPU   
   ];
-   
-   
+
+
   # --- PODMAN ---
   virtualisation.podman = {
     enable = true;
@@ -65,11 +65,10 @@
 
 
   # --- VIRTUALISATION ---
-  virtualisation.libvirtd.enable = true;
+  # virtualisation.libvirtd.enable = true; # inutile avec Gnomes Machine, qui s'appuie sur qemu
+  # services.spice-vdagentd.enable = true; # utile uniquement sur l'invité
   virtualisation.spiceUSBRedirection.enable = true;
-  services.spice-vdagentd.enable = true;
-  users.users.benoit = {
-    extraGroups = [ "libvirtd" "kvm" ];
-  };
+  users.users.@@USERNAME@@.extraGroups = [ "kvm" ];
+
 
 }
