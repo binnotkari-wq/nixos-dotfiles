@@ -1,23 +1,29 @@
-{ config, pkgs, lib, ... }:
+        { config, pkgs, lib, ... }:
 
 let
-  home-manager = builtins.fetchTarball
-    "https://github.com/nix-community/home-manager/archive/release-@@NIXOSVERSION@@.tar.gz";
+  home-manager = builtins.fetchTarball {
+   url = "https://github.com/nix-community/home-manager/archive/release-@@NIXOSVERSION@@.tar.gz";
+   # sha256 = "sha256:13sahz1mxbk7n67jvz9fi0f85ax7l6s3ffiwa6x0rfrwfwhgj7x3";
+  };
 in
+
 {
   imports = [
     (import "${home-manager}/nixos")
+    ./options/prefs_git.nix
+    ./options/bash.nix
   ];
 
   home-manager.backupFileExtension = "backup";
   home-manager.useGlobalPkgs = true;
-  # home-manager.useUserPackages = true;
+  home-manager.useUserPackages = true; # également utile pour déclarer des scripts et des raccourcis .desktop
 
   home-manager.users.@@USERNAME@@ = { config, pkgs, lib, ... }: {
-
     home.username = "@@USERNAME@@";
     home.homeDirectory = "/home/@@USERNAME@@";
     home.stateVersion = "@@NIXOSVERSION@@"; # à adapter à la version NixOS
+
+
 
     # ============================================================
     # XDG USER DIRS
@@ -52,6 +58,42 @@ in
     };
 
     # ============================================================
+    # RACCOURCIS VERS LES SCRIPTS
+    # ============================================================
+
+    xdg.desktopEntries = {
+      llm-start = {
+        name = "Démarrer LLM";
+        exec = "/home/@@USERNAME@@/Mes-Donnees/Git/scripts/start_llm.sh";
+        terminal = true;
+        icon = "media-playback-start";
+        type = "Application";
+        comment = "Lance le serveur llama.cpp";
+        categories = [ "Education" ];
+      };
+
+      llm-stop = {
+        name = "Arrêter LLM";
+        exec = "/home/@@USERNAME@@/Mes-Donnees/Git/scripts/stop_llm.sh";
+        terminal = false;
+        icon = "media-playback-stop";
+        type = "Application";
+        comment = "Arrête le serveur llama.cpp";
+        categories = [ "Education" ];
+      };
+
+      kiwix = {
+        name = "Démarrer Kiwix";
+        exec = "/home/@@USERNAME@@/Mes-Donnees/Git/scripts/kiwix-launcher.sh";
+        terminal = false;
+        icon = "accessories-dictionary";
+        type = "Application";
+        comment = "Lance le serveur Kiwix";
+        categories = [ "Education" ];
+      };
+    };
+
+    # ============================================================
     # DCONF - GNOME
     # ============================================================
 
@@ -69,7 +111,13 @@ in
       "org/gnome/desktop/wm/keybindings" = {
         maximize   = [ "<Super>Up" ];
         unmaximize = [ "<Super>Down" "<Alt>F5" ];
+      }; 
+      
+      # Bouton réduire et agrandire la fenêtre     
+      "org/gnome/desktop/wm/preferences" = {
+        button-layout = ":minimize,maximize,close";
       };
+      
       "org/gnome/mutter" = {
         edge-tiling = true;
       };
@@ -122,6 +170,23 @@ in
         sort-directories-first = true;
       };
 
+      # Editeur de texte
+      "org/gnome/TextEditor" = {
+        show-line-numbers     = true;
+        highlight-current-line = true;
+        restore-session       = false;
+        # show-right-margin     = true;
+        show-map              = true;    # minimap du fichier sur la droite
+        auto-indent           = true;    # indentation automatique
+        indent-style          = "space"; # "space" ou "tab"
+        wrap-text             = false;   # pas de retour à la ligne automatique
+        spellcheck            = false;   # correcteur ortho (souvent gênant pour du code)
+        recolor-window        = true;    # la fenêtre prend la couleur du thème de l'éditeur
+        keybindings           = "default"; # "default", "vim" ou "emacs" !
+        style-variant         = "follow"; # suit le thème système ("follow", "light", "dark")
+        draw-spaces	      = [ "space" "tab" "newline" "trailing" "leading" ];
+      };
     };
+
   };
 }

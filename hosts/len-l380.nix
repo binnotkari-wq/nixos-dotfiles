@@ -8,7 +8,10 @@
   ./tests1.nix
   ];
 
-  networking.hostName = "len-l380"; # Define your hostname.
+# Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
+  environment.etc."machine-id" = {
+    text = "a0768d6ce6c9403c94e014c102ca6b16\n";
+  };
 
 
   # A ADAPTER POUR LE L380 !!

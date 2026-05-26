@@ -1,15 +1,16 @@
 { config, pkgs, ... }:
 
+# L'installation doit avoir été faite par le script, notamment :
+# - les options du volume encrypté, qui est créé par le script
+# - pour les différents sous-volumes btrfs, créés par le script
+# - le symlink de /etc/nixos/ vers .config/nixos dans le dossier utilisateur, les fichier .nix y étant placés par le script
+
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./machine_settings/@@HOSTNAME@@.nix
-      ./modules/workstation.nix # optionnel
-      ./modules/home-manager.nix # optionnel
-      ./modules/flatpaks_list.nix # optionnel
-      ./modules/gaming.nix # optionnel
-      # ./modules/SteamOS.nix # optionnel
+      ./hosts/@@HOSTNAME@@.nix
+      ./home_manager/home.nix # optionnel
     ];
 
   # --- 0. NIXOS ---
@@ -44,8 +45,12 @@
   # --- 4. OPTIMISATIONS BTRFS (https://wiki.nixos.org/wiki/Btrfs) ---
   fileSystems."/".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/nix".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+  fileSystems."/persist" = {
+    options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+    neededForBoot = true; # vérifier comment cela s'intègre concrètement avec le module impermanence
+  };
   fileSystems."/home".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-  fileSystems."/var/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+  fileSystems."/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
 
   # --- 5. SERVICES ---
   security.apparmor.enable = true; # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
@@ -85,7 +90,7 @@
 
   # --- 7. STATELESS ---
   # Permet de se rapprocher d'une impermanence, mais sans avoir à définir un schéma de partitionnement adapté
-  # ou une mise en place en pré-installation. On peu activer ou desactiver ce module quand on veut et quel
+  # ou une mise en place en pré-installation. On peut activer ou desactiver ce module quand on veut et quel
   # que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation avec Calamares
 
   # 0. Rigueur des comptes (Source de vérité = Code)
@@ -122,8 +127,15 @@
   };
   nix.settings.auto-optimise-store = true;
 
-  # Définition utilisateur ---
+  # Symlink /etc/nixos → config utilisateur
+  # Les commandes nixos-rebuild restent transparentes
+  environment.etc."nixos" = {
+    source = "/home/@@USERNAME@@/.config/nixos";
+  };
+
+  # --- 8. DEFINITION UTILISATEUR ---
   users.users.@@USERNAME@@ = {
+    shell = pkgs.bash;
     isNormalUser = true;
     description = "@@USERNAME_DISPLAY@@";
     extraGroups = [ "networkmanager" "wheel" ];
@@ -131,59 +143,15 @@
     hashedPassword = "@@HASHED_PASSWORD@@";
   };
 
-  # Définition D.E. ---
+  # --- 7. DEFINITION D.E. ---
   services.desktopManager.gnome.enable = true; # syntaxe corrigée
   services.displayManager.gdm.enable = true; # syntaxe corrigée
-  
-  
+
   # Configuration logicielle commune
   services.orca.enable = false; # requires speechd
   services.speechd.enable = false; # voice files are big and fat
   services.flatpak.enable = true;
   
-  programs.firefox = {
-    enable = true;
-    languagePacks = [ "fr" ];
-    preferences = {
-      "browser.translations.automaticallyPopup" = false;
-      "browser.startup.homepage" = "https://duckduckgo.com/";
-      "intl.locale.requested" = "fr";
-      "intl.accept_languages" = "fr-fr,fr";
-      "spellchecker.dictionary" = "fr-FR";
-    };  
-    policies = {
-        DisableTelemetry = true;
-        DisableFirefoxStudies = true;
-        EnableTrackingProtection = {
-          Value= true;
-          Locked = true;
-          Cryptomining = true;
-          Fingerprinting = true;
-        };
-        DontCheckDefaultBrowser = true;  
-        SearchEngines = {
-          Remove = [
-            "eBay"
-            "Google"
-            "Bing"
-            "Ecosia"
-            "Wikipedia"
-            "Perplexity"
-          ];
-          Add = [
-            {
-                "Name" = "DuckDuckGo";
-                "URLTemplate" = "https://duckduckgo.com/?q={searchTerms}&ia=web&assist=false";
-                "IconURL" = "https://duckduckgo.com/favicon.ico";
-                "Alias" = "ddg";
-                "Description" = "Duckduckgo without AI integrations";
-            }
-          ];
-          Default = "DuckDuckGo";
-        };   
-    };
-  };
-
   services.xserver.excludePackages = with pkgs; [ 
     xterm
   ];
@@ -196,6 +164,10 @@
     gnome-software
     gnome-connections
   ];
+  
+  programs.firefox = {
+    enable = true;
+  };
   
   environment.systemPackages = with pkgs; [
     # GUI
@@ -224,11 +196,30 @@
     tree
     
     # --- Utilitaires de base ---
-    dialog            # Pour scripts de configuration système
-    libnotify	      # Pour scripts de configuration système
+    dialog            # outil boites de dialogue scripts
+    zenity            # outil boites de dialogue scripts (GTK)
+    libnotify	      # outil boites de dialogue scripts
     htop              # Le classique immanquable
     btop              # Version "esthétique" de htop (confort visuel)
     aria2             # gestionnaire de téléchargement universel
     nix-tree          # Analyse des paquets et dépendances
   ];
+  
+  environment.shellAliases = { 
+    ll = "ls -l";
+    nrs = "sudo nixos-rebuild switch";
+    garbage = "nix-collect-garbage -d";
+    backup = "/home/@@USERNAME@@/Mes-Donnees/Git/scripts/backup.sh";
+    bash-history = "/home/@@USERNAME@@/Mes-Donnees/Git/scripts/bash-history-export.sh";
+    git-sync = "/home/@@USERNAME@@/Mes-Donnees/Git/scripts/git-sync.sh";
+  };
+  
+  environment.interactiveShellInit = ''
+    HISTTIMEFORMAT="%s "
+    HISTSIZE=100000
+    HISTFILESIZE=100000
+    shopt -s histappend
+    echo "# SESSION $(date +%s)" >> "$HISTFILE"
+    PROMPT_COMMAND="history -a''${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+  '';
 }

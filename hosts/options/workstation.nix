@@ -43,6 +43,9 @@
     distrobox         # Pour tests Silverblue/Debian/Arch sans polluer NixOS
     vim
     just              # Ton exécuteur de commandes de projet
+    pandoc
+    imagemagick
+    groff
 
     # --- Services & Contenu ---
     kiwix-tools       # Wikipedia hors-ligne

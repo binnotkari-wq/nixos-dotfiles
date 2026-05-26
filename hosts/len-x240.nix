@@ -7,6 +7,11 @@
   ./drivers_settings/iGPU_intel.nix
   ];
 
+# Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
+  environment.etc."machine-id" = {
+    text = "813a1841e6d14827827edc58b5269bf1\n";
+  };
+
   # --- TUNING ---
   # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le boost est maintenu, avec une température de moins de 70 degrés!)
   services.undervolt = {
