@@ -4,7 +4,12 @@
   # --- MODULES ---
   imports = 
     [
-      # lister les imports
+      # ./options/workstation.nix # optionnel
+      ./options/prefs_firefox.nix # optionnel
+      # ./options/flatpaks_list.nix # optionnel
+      # ./options/impermanence.nix # optionnel
+      # ./options/gaming.nix # optionnel
+      # ./options/SteamOS.nix # optionnel
     ];
 
 # Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
