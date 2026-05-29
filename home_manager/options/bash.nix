@@ -3,9 +3,6 @@
 # A utiliser en tant qu'import home manager.
 
 {
-
-  home-manager.users.@@USERNAME@@ = { config, pkgs, lib, ... }:
-    {
       # ─── Message de bienvenue stocké comme fichier géré par Home Manager ───────
       home.file.".config/shell/nixos-welcome.sh" = {
         executable = true;
@@ -67,13 +64,13 @@
       };
 
 
-  # ─── Configuration bash ────────────────────────────────────────────────────
+      # ─── Configuration bash ────────────────────────────────────────────────────
       programs.bash = {
         enable = true; # pour que home-manager puis gérer .bashrc et .profile
         sessionVariables = {};  # optionnel
 
         bashrcExtra = ''
-          export PATH="/home/@@USERNAME@@/Mes-Donnees/Git/scripts:$PATH"
+          export PATH="${config.home.homeDirectory}/Mes-Donnees/Git/scripts:$PATH"
           # Message de bienvenue NixOS (uniquement en shell interactif non-login)
           if [[ $- == *i* ]]; then
             bash "$HOME/.config/shell/nixos-welcome.sh"
@@ -87,7 +84,4 @@
           fi
         '';
       };
-
-    };
-
 }

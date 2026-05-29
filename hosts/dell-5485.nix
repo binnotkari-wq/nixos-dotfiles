@@ -6,18 +6,22 @@
     [
       ./drivers_settings/CPU_AMD.nix
       ./drivers_settings/GPU_AMD.nix
-      ./options/workstation.nix # optionnel
-      ./options/prefs_firefox.nix # optionnel
-      ./options/flatpaks_list.nix # optionnel
-      # ./options/impermanence.nix # optionnel
-      # ./options/gaming.nix # optionnel
-      # ./options/SteamOS.nix # optionnel
+      ./specialisations/workstation.nix # optionnel
+      ./specialisations/gaming.nix # optionnel
+      ./specialisations/SteamOS.nix # optionnel
   ];
 
-# Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
+  # Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
   environment.etc."machine-id" = {
     text = "658437cc7c2542a5b5dc2c93c1af3705\n";
   };
+
+  # Disque secondaire CARGO (actuellement formaté en ext4)
+  fileSystems."/CARGO" =
+    { device = "/dev/disk/by-uuid/1615eb5d-4346-4106-ba33-dbecf0b75b31";
+      fsType = "ext4";
+      options = [ "defaults" "nofail" "noatime" ]; # nofail = le système boote même si le disque est absent
+    };
 
   # --- TUNING ---
 

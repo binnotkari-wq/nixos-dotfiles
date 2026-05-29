@@ -1,23 +1,22 @@
 { config, pkgs, lib, ... }:
 
-# infos : si la session steam ne démarre pas, et qu'au bout d'un moment on revient au gestionnaire de login...en fait il faut confgurer le client de bureau avant tout (mise à jour, login, langue de l'interface)
+# infos : si la session steam ne démarre pas, et qu'au bout d'un moment on revient au gestionnaire de login...en fait il faut confgurer
+# le client de bureau avant tout (mise à jour, login, langue de l'interface, ajout d'un disque de stockage secondaire...)
 # !! Ne pas installer les flatpaks steam, mangohud et gamescope si on active ce module nix
 
 let
-
-# 1. On définit la session avec les métadonnées exigées par NixOS
   steam-custom-session = pkgs.runCommand "steam-custom-session" {
     passthru.providedSessions = [ "steam-custom" ];
   } ''
     mkdir -p $out/share/wayland-sessions
-    cat <<EOF > $out/share/wayland-sessions/steam-custom.desktop
-    [Desktop Entry]
-    Name=Steam
-    Comment=Steam (Gamescope et MangoHud)
-    Exec=/run/wrappers/bin/gamescope --mangoapp -e -- ${pkgs.steam}/bin/steam -steamdeck -steamos3 -gamepadui
-    Type=Application
-    DesktopNames=gamescope
-    EOF
+    cat > $out/share/wayland-sessions/steam-custom.desktop << 'EOF'
+[Desktop Entry]
+Name=Steam
+Comment=Steam (Gamescope et MangoHud)
+Exec=${pkgs.gamescope}/bin/gamescope --mangoapp -e -- ${pkgs.steam}/bin/steam -steamdeck -steamos3 -gamepadui
+Type=Application
+DesktopNames=gamescope
+EOF
   '';
 in
 

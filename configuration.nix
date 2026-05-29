@@ -3,14 +3,17 @@
 # L'installation doit avoir été faite par le script, notamment :
 # - les options du volume encrypté, qui est créé par le script
 # - pour les différents sous-volumes btrfs, créés par le script
-# - le symlink de /etc/nixos/ vers .config/nixos dans le dossier utilisateur, les fichier .nix y étant placés par le script
 
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./hosts/@@HOSTNAME@@.nix
-      ./home_manager/home.nix # optionnel
+      ./home_manager/home.nix # optionnel. 100% indépendant, auxcune déclaratio Nixos, que des déclaration home-manager.
+      ./modules/flatpak.nix # optionnel.
+      ./modules/prefs_firefox.nix # optionnel.
+      ./modules/impermanence.nix # optionnel. Ne pas activer en même temps que pseudo_impermanence.nix
+      # ./modules/pseudo_impermanence.nix # optionnel. Ne pas activer en même temps que impermanence.nix
     ];
 
   # --- 0. NIXOS ---
@@ -45,10 +48,7 @@
   # --- 4. OPTIMISATIONS BTRFS (https://wiki.nixos.org/wiki/Btrfs) ---
   fileSystems."/".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/nix".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-  fileSystems."/persist" = {
-    options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-    neededForBoot = true; # vérifier comment cela s'intègre concrètement avec le module impermanence
-  };
+  fileSystems."/persist".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/home".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
 
@@ -57,7 +57,6 @@
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true; # Vulkan
   networking.networkmanager.enable = true;
-  services.xserver.enable = true;
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -69,6 +68,7 @@
   };
 
   # --- 6. LOCALISATION ---
+  console.keyMap = "fr";
   time.timeZone = "Europe/Paris";
   i18n.defaultLocale = "fr_FR.UTF-8";
   i18n.extraLocaleSettings = {
@@ -82,35 +82,24 @@
     LC_TELEPHONE = "fr_FR.UTF-8";
     LC_TIME = "fr_FR.UTF-8";
   };
-  console.keyMap = "fr";
+
   services.xserver.xkb = {
     layout = "fr";
     variant = "azerty";
-  };
+    };
 
   # --- 7. STATELESS ---
-  # Permet de se rapprocher d'une impermanence, mais sans avoir à définir un schéma de partitionnement adapté
-  # ou une mise en place en pré-installation. On peut activer ou desactiver ce module quand on veut et quel
-  # que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation avec Calamares
-
-  # 0. Rigueur des comptes (Source de vérité = Code)
+  # Rigueur des comptes (Source de vérité = Code) - à activer après étude
   users.mutableUsers = false;
 
   # RAM Disk natif pour /tmp ---
   boot.tmp.useTmpfs = true;
   boot.tmp.tmpfsSize = "2G";
 
-  # Journalisation Volatile (Propre et limitée) ---
-  services.journald.extraConfig = ''
-    Storage=volatile
-    RuntimeMaxUse=100M
-  '';
-
   # Règles d'hygiène automatique (Systemd-tmpfiles) ---
   systemd.tmpfiles.rules = [
     "R /var/cache/* - - - - -"
     "R /var/spool/cups/* - - - - -"
-    "R /var/lib/upower/* - - - - -"
     "e /var/tmp 1777 root root 30d -"   # On nettoie /var/tmp s'il n'est pas touché pendant 30 jours
   ];
 
@@ -127,34 +116,23 @@
   };
   nix.settings.auto-optimise-store = true;
 
-  # Symlink /etc/nixos → config utilisateur
-  # Les commandes nixos-rebuild restent transparentes
-  environment.etc."nixos" = {
-    source = "/home/@@USERNAME@@/.config/nixos";
-  };
-
   # --- 8. DEFINITION UTILISATEUR ---
   users.users.@@USERNAME@@ = {
     shell = pkgs.bash;
     isNormalUser = true;
     description = "@@USERNAME_DISPLAY@@";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" "kvm" ];
     uid = 1000; # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
     hashedPassword = "@@HASHED_PASSWORD@@";
   };
 
-  # --- 7. DEFINITION D.E. ---
+  # --- 9. DEFINITION D.E. ---
   services.desktopManager.gnome.enable = true; # syntaxe corrigée
   services.displayManager.gdm.enable = true; # syntaxe corrigée
 
   # Configuration logicielle commune
   services.orca.enable = false; # requires speechd
   services.speechd.enable = false; # voice files are big and fat
-  services.flatpak.enable = true;
-  
-  services.xserver.excludePackages = with pkgs; [ 
-    xterm
-  ];
 
   environment.gnome.excludePackages = with pkgs; [
     epiphany
@@ -212,9 +190,9 @@
     ll = "ls -l";
     nrs = "sudo nixos-rebuild switch";
     garbage = "nix-collect-garbage -d";
-    backup = "/home/@@USERNAME@@/Mes-Donnees/Git/scripts/backup.sh";
-    bash-history = "/home/@@USERNAME@@/Mes-Donnees/Git/scripts/bash-history-export.sh";
-    git-sync = "/home/@@USERNAME@@/Mes-Donnees/Git/scripts/git-sync.sh";
+    backup       = "$HOME/Mes-Donnees/Git/scripts/backup.sh";
+    bash-history = "$HOME/Mes-Donnees/Git/scripts/bash-history-export.sh";
+    git-sync     = "$HOME/Mes-Donnees/Git/scripts/git-sync.sh";
   };
   
   environment.interactiveShellInit = ''

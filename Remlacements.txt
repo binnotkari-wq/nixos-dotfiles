@@ -1,0 +1,47 @@
+Remlacements
+
+
+/configuration.nix
+@@NIXOSVERSION@@
+configuration.nix:21:  system.stateVersion = "25.11"; # à adapter à la version NixOS
+
+@@USERNAME@@
+configuration.nix:120:  users.users.benoit = {
+
+@@HASHED_PASSWORD@@
+configuration.nix:126:    hashedPassword = "$y$j9T$HyXfocWupPlfojS9rLgV/1$5bwEwn13aNlBecvwyG4Q.9s0CZVxp9wHclw4nGLmLW1";
+
+@@USERNAME_DISPLAY@@
+configuration.nix:123:    description = "Benoit";
+
+@@HOSTNAME@@
+configuration.nix:11:      ./hosts/dell-5485.nix
+configuration.nix:22:  networking.hostName = "dell-5485"; # Define your hostname.
+
+
+
+
+/home_manager/home.nix
+@@USERNAME@@
+home_manager/home.nix:19:  home-manager.users.benoit = { config, pkgs, lib, ... }: {
+home_manager/home.nix:26:    home.username = "benoit";
+home_manager/home.nix:27:    home.homeDirectory = "/home/benoit";
+
+@@NIXOSVERSION@@
+home_manager/home.nix:5:   url = "https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz";
+home_manager/home.nix:28:    home.stateVersion = "25.11"; # à adapter à la version NixOS
+
+
+
+
+/home_manager/options/prefs_git.nix
+@@GIT_USERNAME@@
+home_manager/options/prefs_git.nix:11:        user.name = "binnotkari-wq";
+
+@@GIT_USERMAIL@@
+home_manager/options/prefs_git.nix:12:        user.email = "benoit.dorczynski@gmail.com";
+
+
+
+
+

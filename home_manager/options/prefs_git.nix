@@ -3,9 +3,6 @@
 # A utiliser en tant qu'import home manager.
 
 {
-
-  home-manager.users.@@USERNAME@@ = { config, pkgs, lib, ... }: {
-  
     programs.git = {
       enable = true;
       settings = {
@@ -30,13 +27,11 @@
         # L'astuce : RemainAfterExit permet de déclencher ExecStop à la fin
         RemainAfterExit = true;
         ExecStart = "/bin/sh -c 'echo Initialisation du service de sync'";
-        ExecStop = "${pkgs.bash}/bin/bash /home/@@USERNAME@@/Mes-Donnees/Git/scripts/git-sync.sh";
+        ExecStop = "${pkgs.bash}/bin/bash ${config.home.homeDirectory}/Mes-Donnees/Git/scripts/git-sync.sh";
       };
 
       Install = {
         WantedBy = [ "default.target" ];
       };
     };
-  
-  };
 }

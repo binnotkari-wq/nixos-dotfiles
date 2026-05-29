@@ -1,7 +1,5 @@
 { config, pkgs, ... }:
 
-# A utiliser en tant qu'import home manager.
-
 let
   nix-flatpak = builtins.fetchTarball {
     url = "https://github.com/gmodena/nix-flatpak/archive/refs/tags/v0.7.0.tar.gz";
@@ -14,6 +12,7 @@ in
   ];
 
   services.flatpak = {
+    enable = true;
     remotes = [{
       name = "flathub";
       location = "https://flathub.org/repo/flathub.flatpakrepo";
