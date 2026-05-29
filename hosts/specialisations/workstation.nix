@@ -49,7 +49,8 @@
 
     # --- Services & Contenu ---
     kiwix-tools       # Wikipedia hors-ligne
-    llama-cpp-vulkan  # Pour LLM optimisée GPU/iGPU   
+    llama-cpp-vulkan  # Pour LLM optimisée GPU/iGPU
+    ffmpeg
   ];
 
 
