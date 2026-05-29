@@ -29,6 +29,7 @@
     video-trimmer
     drum-machine
     gnome-sound-recorder
+    audacity
 
     # CLI
     # --- Utilitaires de base ---
