@@ -16,7 +16,7 @@
     text = "658437cc7c2542a5b5dc2c93c1af3705\n";
   };
 
-  # Disque secondaire CARGO (actuellement formaté en ext4)
+  # Montage du disque secondaire CARGO (actuellement formaté en ext4)
   fileSystems."/CARGO" =
     { device = "/dev/disk/by-uuid/1615eb5d-4346-4106-ba33-dbecf0b75b31";
       fsType = "ext4";
@@ -25,10 +25,16 @@
 
   # --- TUNING ---
 
+# sur le dell-5485, avec sa puce wifi atheros, l'economie d'energie sur ce composant fait tomber la connection. 
+# le reglage sudo iw dev wlp2s0 set power_save off permet de desactiver l'economie d'energie sur le wifi.
+# déclarativement :
+  networking.networkmanager.wifi.powersave = false;
+
   environment.systemPackages = with pkgs; [
     ryzenadj # Gestion TDP APU (Ryzen 3500U)
   ];
 
+  # Préreglage TDP pour le ryzen 5 3500u
   environment.shellAliases = {
     ryzen-low = "sudo ryzenadj --stapm-limit=15000 --fast-limit=15000 --slow-limit=15000"; # TDP : 15W
     ryzen-default = "sudo ryzenadj --stapm-limit=25000 --fast-limit=25000 --slow-limit=25000"; # TDP par défaut du 3500U : 25W
