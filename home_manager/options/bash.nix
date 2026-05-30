@@ -67,7 +67,6 @@
       # ─── Configuration bash ────────────────────────────────────────────────────
       programs.bash = {
         enable = true; # pour que home-manager puis gérer .bashrc et .profile
-        sessionVariables = {};  # optionnel
 
         bashrcExtra = ''
           export PATH="${config.home.homeDirectory}/Mes-Donnees/Git/scripts:$PATH"

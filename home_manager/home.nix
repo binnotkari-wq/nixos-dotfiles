@@ -3,7 +3,8 @@
 let
   home-manager = builtins.fetchTarball {
    url = "https://github.com/nix-community/home-manager/archive/release-@@NIXOSVERSION@@.tar.gz";
-   # sha256 = "sha256:13sahz1mxbk7n67jvz9fi0f85ax7l6s3ffiwa6x0rfrwfwhgj7x3";
+   # sha256 = "sha256:13sahz1mxbk7n67jvz9fi0f85ax7l6s3ffiwa6x0rfrwfwhgj7x3"; (optionnel, pour verrouiller le commit qu'on, va utiliser)
+   # nix-prefetch-url --unpack https://github.com/nix-community/home-manager/archive/release-26.05.tar.gz # pour obtenir le SHA
   };
 in
 

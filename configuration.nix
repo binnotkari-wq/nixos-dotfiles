@@ -27,7 +27,7 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "quiet" "splash" "loglevel=3" "rd.systemd.show_status=false" ];
   boot.plymouth.enable = true;
-  boot.initrd.systemd.enable = true; # On confie à Systemd le démarrage des pilotes graphiques et Plymouth. C'est la méthode utilisée par Fedora.
+  # boot.initrd.systemd.enable = true; # On confie à Systemd le démarrage des pilotes graphiques et Plymouth. C'est la méthode utilisée par Fedora. # devenu inutiles dans 26.05 car activé par défaut.
 
   # --- 2. OPTIONS LUKS ---
   boot.initrd.luks.devices."cryptroot" = {
@@ -136,7 +136,7 @@
 
   environment.gnome.excludePackages = with pkgs; [
     epiphany
-    geary
+    # geary # devenu inutiles dans 26.05 car ne fait plus partie du pack de logiciels Gnome.
     gnome-calendar
     gnome-contacts
     gnome-software
@@ -165,7 +165,7 @@
     stress-ng         # Pour tester la stabilité du Ryzen
     s-tui             # Monitoring CPU en temps réel
     libva-utils       # Permet de lancer 'vainfo' pour tester l'accélération vidéo
-    wirelesstools
+    # wirelesstools   # Obsolète sur 26.05
     usbutils
     iw
     

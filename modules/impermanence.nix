@@ -25,7 +25,8 @@
 let
   impermanence = builtins.fetchTarball {
     url = "https://github.com/nix-community/impermanence/archive/master.tar.gz";
-    sha256 = "1iip4kjrk09mnha9jhafvcg61g1d0g6pqnljzdp08zz6zk38jzyk";
+    # sha256 = "1iip4kjrk09mnha9jhafvcg61g1d0g6pqnljzdp08zz6zk38jzyk"; (optionnel, pour verrouiller le commit qu'on, va utiliser)
+    # nix-prefetch-url --unpack https://github.com/nix-community/impermanence/archive/master.tar.gz # pour obtenir le SHA
   };
 in
 
