@@ -9,6 +9,8 @@
       "intl.locale.requested" = "fr";
       "intl.accept_languages" = "fr-fr,fr";
       "spellchecker.dictionary" = "fr-FR";
+      "spellchecker.dictionary_path" = "${pkgs.hunspellDicts.fr-any}/share/hunspell";
+      "layout.spellcheckDefault" = 2;
     };  
     policies = {
         DisableTelemetry = true;

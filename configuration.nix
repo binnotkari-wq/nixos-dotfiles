@@ -184,6 +184,9 @@
     btop              # Version "esthétique" de htop (confort visuel)
     aria2             # gestionnaire de téléchargement universel
     nix-tree          # Analyse des paquets et dépendances
+    hunspell
+    hunspellDicts.fr-any
+    hunspellDicts.fr-moderne
   ];
   
   environment.shellAliases = { 

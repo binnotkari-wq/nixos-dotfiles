@@ -15,7 +15,6 @@
     # GUI
     # ne pas inclure apostrophe, heroic, bottles ou lutris ou steam en nixpkgs sur une machine service et production. Tirent trop de dépendances.
     meld
-    libreoffice
     gnome-boxes
     handbrake
     gimp
@@ -30,6 +29,7 @@
     drum-machine
     gnome-sound-recorder
     audacity
+    libreoffice-fresh
 
     # CLI
     # --- Utilitaires de base ---
