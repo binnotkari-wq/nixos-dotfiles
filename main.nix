@@ -121,7 +121,13 @@ in
     dates = "weekly";
     options = "--delete-older-than 14d";
   };
+
   nix.settings.auto-optimise-store = true;
+
+  nix.optimise = {
+    automatic = true;
+    dates = [ "weekly" ];
+    };
 
   # --- 8. DEFINITION UTILISATEUR ---
   users.users.${vars.username} = {  # hérité de variables.nix
