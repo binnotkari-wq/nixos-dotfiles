@@ -16,6 +16,8 @@
     text = "658437cc7c2542a5b5dc2c93c1af3705\n";
   };
 
+  boot.consoleLogLevel = 0; # pour désactiver les messages concernant les tables ACPI non documentées, lors du démarrage
+
   # Montage du disque secondaire CARGO (actuellement formaté en ext4)
   fileSystems."/CARGO" =
     { device = "/dev/disk/by-uuid/1615eb5d-4346-4106-ba33-dbecf0b75b31";
@@ -24,11 +26,6 @@
     };
 
   # --- TUNING ---
-
-# sur le dell-5485, avec sa puce wifi atheros, l'economie d'energie sur ce composant fait tomber la connection. 
-# le reglage sudo iw dev wlp2s0 set power_save off permet de desactiver l'economie d'energie sur le wifi.
-# déclarativement :
-  networking.networkmanager.wifi.powersave = false;
 
   environment.systemPackages = with pkgs; [
     ryzenadj # Gestion TDP APU (Ryzen 3500U)

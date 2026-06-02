@@ -24,7 +24,6 @@ in
   # 2. On dit au gestionnaire de connexion (SDDM ou GDM) de charger cette session spécifique
   services.displayManager.sessionPackages = [ steam-custom-session ];
 
-
   # 3. Règles polkit pour la communication de commandes au système
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
@@ -38,17 +37,14 @@ in
     });
   '';
 
-
   # 4. Paquets et scripts
 
-  hardware.graphics.enable32Bit = true; # n'est utile que lorsque steam est installé en natif. La version flatpak de steam embarque ses propres packages de compatibilité 32 bits
   programs.gamescope.enable = true;
   programs.steam = {
-    enable = true;
     gamescopeSession.enable = false; # on utilise la session custom à la place
-    extraPackages = with pkgs; [ mangohud ]; # On injecte MangoHud directement dans Steam pour MangoApp
+
   };
-  
+
   environment.systemPackages = with pkgs; [
     # LE SCRIPT DE RETOUR AU BUREAU
     (pkgs.writeShellScriptBin "steamos-session-select" ''

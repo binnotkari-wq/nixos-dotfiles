@@ -7,6 +7,12 @@
   environment.systemPackages = with pkgs; [
     mangohud
     warzone2100
+    hydralauncher
   ];
+
+  programs.steam = {
+    enable = true;
+    extraPackages = with pkgs; [ mangohud ]; # On injecte MangoHud directement dans Steam pour MangoApp
+  };
 
 }

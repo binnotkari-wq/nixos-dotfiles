@@ -5,7 +5,6 @@
 # Executer une LLM (le modèle doit donc être téléchargé dans la foulée de l'installation) : llama (dans le nix de soutils CLI)
 # Consulter une base wikipedia offline (le zim doit donc être téléchargé dans la foulée de l'installation) : kiwix (dans le nix de soutils CLI)
 # Réaliser des taches grâce a des outils appropriés (images, video, musique, documents, administratif, mails)
-# N'inclut pas la partie gaming, gérée en flatpaks à cause des dépendance, ou par un fichier nix spécialisé supplémentaire.
 
 { config, pkgs, ... }:
 
@@ -13,7 +12,6 @@
 
   environment.systemPackages = with pkgs; [
     # GUI
-    # ne pas inclure apostrophe, heroic, bottles ou lutris ou steam en nixpkgs sur une machine service et production. Tirent trop de dépendances.
     meld
     gnome-boxes
     handbrake
@@ -30,10 +28,11 @@
     gnome-sound-recorder
     audacity
     libreoffice-fresh
+    marker # éditeur / live preview markdown. Contrairement à Apostrophe, ne tire quasi aucune dépendance.
 
     # CLI
     # --- Utilitaires de base ---
-    stow              # Gestion de tes dotfiles personnels
+    # stow              # Gestion de tes dotfiles personnels # pas utile lorsqu'on utilise home manager
     mdcat             # Lecture de documentation Markdown
     mc                # Gestionnaire de fichiers interactif
     zellij            # Ton multiplexeur de terminal (TUI Desktop)
@@ -54,7 +53,6 @@
     ffmpeg
   ];
 
-
   # --- PODMAN ---
   virtualisation.podman = {
     enable = true;
@@ -64,7 +62,6 @@
 
   # Active user namespaces correctement
   security.unprivilegedUsernsClone = true;
-
 
   # --- VIRTUALISATION ---
   virtualisation.libvirtd.enable = true;

@@ -15,6 +15,13 @@
     policies = {
         DisableTelemetry = true;
         DisableFirefoxStudies = true;
+        Extensions = {
+          Install = [
+            "https://addons.mozilla.org/firefox/downloads/file/4822564/empiric_markdown_viewer-0.4.0.xpi"
+            "https://addons.mozilla.org/firefox/downloads/file/4617846/kiwix_offline-4.3.0.xpi"
+            "https://addons.mozilla.org/firefox/downloads/file/4591252/gnome_shell_integration-12.1.xpi"
+          ];
+        };
         EnableTrackingProtection = {
           Value= true;
           Locked = true;

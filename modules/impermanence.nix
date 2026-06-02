@@ -16,10 +16,6 @@
 #   - sous-volume @blank existant (snapshot readonly de @ vide)
 #   - sous-volume @persist monté sur /persist
 #   - données existantes migrées vers /persist avant premier boot
-#
-# 26/05/2026 à faire : 
-# - automatiser la copie des fichiers à persister (les fichiers individuels sont persistés avec l'option "files")
-# - voir au fur et à mesure les éléments à persister. Au gré des plantages :)
 # ============================================================
 
 let

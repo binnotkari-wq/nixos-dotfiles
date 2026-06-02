@@ -1,16 +1,21 @@
-{ config, pkgs, ... }:
+{ config, pkgs, vars, ... }:
 
 # L'installation doit avoir été faite par le script, notamment :
 # - les options du volume encrypté, qui est créé par le script
 # - pour les différents sous-volumes btrfs, créés par le script
 
+let
+  vars = import ./variables.nix;
+in
+
 {
+  _module.args = { inherit vars; };
+
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./hosts/@@HOSTNAME@@.nix
+      ./hosts/${vars.hostname}.nix  # hérité de variables.nix
       ./home_manager/home.nix # optionnel. 100% indépendant, auxcune déclaratio Nixos, que des déclaration home-manager.
-      ./modules/flatpak.nix # optionnel.
+      # ./modules/flatpak.nix # optionnel.
       ./modules/prefs_firefox.nix # optionnel.
       ./modules/impermanence.nix # optionnel. Ne pas activer en même temps que pseudo_impermanence.nix
       # ./modules/pseudo_impermanence.nix # optionnel. Ne pas activer en même temps que impermanence.nix
@@ -18,8 +23,8 @@
 
   # --- 0. NIXOS ---
   nixpkgs.config.allowUnfree = true;
-  system.stateVersion = "@@NIXOSVERSION@@"; # à adapter à la version NixOS
-  networking.hostName = "@@HOSTNAME@@"; # Define your hostname.
+  system.stateVersion  = vars.nixosVersion; # hérité de variables.nix
+  networking.hostName  = vars.hostname; # hérité de variables.nix
 
   # --- 1. BOOTLOADER & KERNEL ---
   boot.loader.systemd-boot.enable = true;
@@ -27,7 +32,8 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "quiet" "splash" "loglevel=3" "rd.systemd.show_status=false" ];
   boot.plymouth.enable = true;
-  # boot.initrd.systemd.enable = true; # On confie à Systemd le démarrage des pilotes graphiques et Plymouth. C'est la méthode utilisée par Fedora. # devenu inutiles dans 26.05 car activé par défaut.
+  hardware.enableRedistributableFirmware = true; # pour avoir des firmware supplémentaire open-source (wifi...)
+  # hardware.enableAllFirmware = true; # pour avoir des firmware closed source (matériel spécifique...)
 
   # --- 2. OPTIONS LUKS ---
   boot.initrd.luks.devices."cryptroot" = {
@@ -54,6 +60,7 @@
 
   # --- 5. SERVICES ---
   security.apparmor.enable = true; # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
+  # services.fwupd.enable = true; # service de mise à jour de firmwares. Si besoin de flasher un firmware. 
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true; # Vulkan
   networking.networkmanager.enable = true;
@@ -117,16 +124,16 @@
   nix.settings.auto-optimise-store = true;
 
   # --- 8. DEFINITION UTILISATEUR ---
-  users.users.@@USERNAME@@ = {
+  users.users.${vars.username} = {  # hérité de variables.nix
     shell = pkgs.bash;
     isNormalUser = true;
-    description = "@@USERNAME_DISPLAY@@";
+    description = vars.usernameDisplay;  # hérité de variables.nix
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "kvm" ];
     uid = 1000; # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
-    hashedPassword = "@@HASHED_PASSWORD@@";
+    hashedPassword = vars.hashedPassword;  # hérité de variables.nix
   };
 
-  # --- 9. DEFINITION D.E. ---
+  # --- 9. BASE D.E. ---
   services.desktopManager.gnome.enable = true; # syntaxe corrigée
   services.displayManager.gdm.enable = true; # syntaxe corrigée
 
@@ -136,17 +143,16 @@
 
   environment.gnome.excludePackages = with pkgs; [
     epiphany
-    # geary # devenu inutiles dans 26.05 car ne fait plus partie du pack de logiciels Gnome.
     gnome-calendar
     gnome-contacts
     gnome-software
     gnome-connections
   ];
-  
+
   programs.firefox = {
     enable = true;
   };
-  
+
   environment.systemPackages = with pkgs; [
     # GUI
     gnomeExtensions.dash-to-panel
@@ -155,8 +161,9 @@
     shortwave
     smile
     deja-dup
-    gnome-firmware
-    
+    # gnome-firmware # si besoin de flasher un firmware. NB : nécessite services.fwupd.enable = true;
+    heroic # permet émulation windows avec proton GE, avec peu de dépendances (contrairement à heroic et bottles). Peut lancer à la fois jeux et logiciels.
+
     # CLI
     # --- Diagnostic & Hardware ---
     pciutils          # Essentiel pour l'inventaire matériel
@@ -165,17 +172,16 @@
     stress-ng         # Pour tester la stabilité du Ryzen
     s-tui             # Monitoring CPU en temps réel
     libva-utils       # Permet de lancer 'vainfo' pour tester l'accélération vidéo
-    # wirelesstools   # Obsolète sur 26.05
     usbutils
     iw
-    
+
     # --- Système de fichiers & Réseau ---
     compsize          # utilitaire analyse Btrfs
     duf               # Visualisation rapide de l'espace disque
     wget
     git
     tree
-    
+
     # --- Utilitaires de base ---
     dialog            # outil boites de dialogue scripts
     zenity            # outil boites de dialogue scripts (GTK)
@@ -188,7 +194,7 @@
     hunspellDicts.fr-any
     hunspellDicts.fr-moderne
   ];
-  
+
   environment.shellAliases = { 
     ll = "ls -l";
     nrs = "sudo nixos-rebuild switch";
@@ -197,7 +203,7 @@
     bash-history = "$HOME/Mes-Donnees/Git/scripts/bash-history-export.sh";
     git-sync     = "$HOME/Mes-Donnees/Git/scripts/git-sync.sh";
   };
-  
+
   environment.interactiveShellInit = ''
     HISTTIMEFORMAT="%s "
     HISTSIZE=100000

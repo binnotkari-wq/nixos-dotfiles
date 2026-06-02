@@ -1,10 +1,11 @@
 { config, pkgs, lib, ... }:
 
 let
+  vars = import ../variables.nix;
   home-manager = builtins.fetchTarball {
-   url = "https://github.com/nix-community/home-manager/archive/release-@@NIXOSVERSION@@.tar.gz";
+   url = "https://github.com/nix-community/home-manager/archive/release-${vars.nixosVersion}.tar.gz";
    # sha256 = "sha256:13sahz1mxbk7n67jvz9fi0f85ax7l6s3ffiwa6x0rfrwfwhgj7x3"; (optionnel, pour verrouiller le commit qu'on, va utiliser)
-   # nix-prefetch-url --unpack https://github.com/nix-community/home-manager/archive/release-26.05.tar.gz # pour obtenir le SHA
+   # nix-prefetch-url --unpack https://github.com/nix-community/home-manager/archive/release-xx.xx.tar.gz # pour obtenir le SHA
   };
 in
 
@@ -17,16 +18,20 @@ in
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true; # également utile pour déclarer des scripts et des raccourcis .desktop
 
-  home-manager.users.@@USERNAME@@ = { config, pkgs, lib, ... }: {
+  home-manager.extraSpecialArgs = { inherit vars; };
+
+  home-manager.users.${vars.username} = { config, pkgs, lib, ... }: {  # hérité de variables.nix
+    _module.args = { inherit vars; };
     imports = [
       ./options/prefs_git.nix
       ./options/bash.nix
       ./options/dconf_gnome.nix
+      ./options/vim.nix
     ];
     
-    home.username = "@@USERNAME@@";
-    home.homeDirectory = "/home/@@USERNAME@@";
-    home.stateVersion = "@@NIXOSVERSION@@"; # à adapter à la version NixOS
+    home.username = vars.username;  # hérité de variables.nix
+    home.homeDirectory = "/home/${vars.username}"; # hérité de variables.nix
+    home.stateVersion = vars.nixosVersion; # hérité de variables.nix
 
     # ============================================================
     # XDG USER DIRS
@@ -57,6 +62,8 @@ in
       defaultApplications = {
         "application/x-shellscript" = "org.gnome.TextEditor.desktop";
         "inode/symlink"             = "org.gnome.TextEditor.desktop";
+        "text/markdown"   = [ "firefox.desktop" ];
+        "text/x-markdown" = [ "firefox.desktop" ];
       };
     };
 

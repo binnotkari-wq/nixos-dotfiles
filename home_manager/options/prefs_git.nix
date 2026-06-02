@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, vars, ... }:
 
 # A utiliser en tant qu'import home manager.
 
@@ -8,8 +8,8 @@
       settings = {
         init.defaultBranch = "main";
         credential.helper = "store";
-        user.name = "@@GIT_USERNAME@@";
-        user.email = "@@GIT_USERMAIL@@";
+        user.name = vars.gitUsername;
+        user.email = vars.gitUsermail;
       };
     };
   

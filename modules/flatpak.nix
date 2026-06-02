@@ -18,12 +18,11 @@ in
       location = "https://flathub.org/repo/flathub.flatpakrepo";
     }];
     packages = [
-      "org.gnome.gitlab.somas.Apostrophe"
-      # "org.gnome.meld"
+      # "org.gnome.gitlab.somas.Apostrophe"  # Utiliser plutot marker en pkg Contrairement à Apostrophe en pkg, ne tire quasi aucune dépendance.
       # "org.libreoffice.LibreOffice" # préférer la version pkgs nix
-      # "com.heroicgameslauncher.hgl"
-      # "net.lutris.Lutris"
-      # "com.usebottles.bottles"
+      # "com.heroicgameslauncher.hgl" # préférer la version pkgs nix
+      # "net.lutris.Lutris" # inutile : Heroic (en pkg) gère très bien SKetchup (seul logiciel windows utilisé)
+      # "com.usebottles.bottles" # inutile : Heroic (en pkg) gère très bien SKetchup (seul logiciel windows utilisé)
       # "com.valvesoftware.Steam"
       # "com.valvesoftware.Steam.CompatibilityTool.Proton-GE"
       # "io.github.flattool.Warehouse"
