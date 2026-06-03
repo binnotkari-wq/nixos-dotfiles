@@ -68,6 +68,42 @@ in
     };
 
     # ============================================================
+    # FICHIERS MODELES
+    # ============================================================
+
+      home.file."${config.home.homeDirectory}/Modèles/Fichier Markdown.md" = {
+        text = ''
+        # H1
+        ## H2
+        ### H3...etc...
+
+        *Italique*
+
+        **gras**
+
+        ```bash
+        # Un commentaire
+        cd /usr/bin &&
+        Texte aléatoire
+        Encadré par ```
+        ```
+        [Markdown Cheatsheet.md] (${config.home.homeDirectory}/Mes-Donnees/03_Ressources_Externes/Utilisation du syst%C3%A8me/Markdown Cheatsheet.md)
+        '';
+      };
+
+      home.file."${config.home.homeDirectory}/Modèles/Fichier texte.txt" = {
+        text = ''
+        '';
+      };
+
+      home.file."${config.home.homeDirectory}/Modèles/Script.sh" = {
+        executable = true;
+        text = ''
+        #!/usr/bin/env bash
+        '';
+      };
+
+    # ============================================================
     # RACCOURCIS VERS LES SCRIPTS
     # ============================================================
 
