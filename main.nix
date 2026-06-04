@@ -15,6 +15,7 @@ in
     [ # Include the results of the hardware scan.
       ./hosts/${vars.hostname}.nix  # hérité de variables.nix
       ./home_manager/home.nix # optionnel. 100% indépendant, auxcune déclaratio Nixos, que des déclaration home-manager.
+      ./modules/gnome_DE.nix
       # ./modules/flatpak.nix # optionnel.
       ./modules/prefs_firefox.nix # optionnel.
       ./modules/impermanence.nix # optionnel. Ne pas activer en même temps que pseudo_impermanence.nix
@@ -139,21 +140,10 @@ in
     hashedPassword = vars.hashedPassword;  # hérité de variables.nix
   };
 
-  # --- 9. BASE D.E. ---
-  services.desktopManager.gnome.enable = true; # syntaxe corrigée
-  services.displayManager.gdm.enable = true; # syntaxe corrigée
+  # --- 9. CONFIGURATION LOGICIELLE COMMUNE ---
 
-  # Configuration logicielle commune
   services.orca.enable = false; # requires speechd
   services.speechd.enable = false; # voice files are big and fat
-
-  environment.gnome.excludePackages = with pkgs; [
-    epiphany
-    gnome-calendar
-    gnome-contacts
-    gnome-software
-    gnome-connections
-  ];
 
   programs.firefox = {
     enable = true;
@@ -161,13 +151,6 @@ in
 
   environment.systemPackages = with pkgs; [
     # GUI
-    gnomeExtensions.dash-to-panel
-    fragments
-    gnome-secrets
-    shortwave
-    smile
-    deja-dup
-    # gnome-firmware # si besoin de flasher un firmware. NB : nécessite services.fwupd.enable = true;
     heroic # permet émulation windows avec proton GE, avec peu de dépendances (contrairement à heroic et bottles). Peut lancer à la fois jeux et logiciels.
 
     # CLI
