@@ -1,0 +1,39 @@
+
+Récap — passage de QXL à VirtIO-GPU
+
+Correctif du décalage curseur dans GNOME Boxes (hôte Wayland + invité NixOS)
+
+1 — Côté hôte : exporter le XML
+virsh dumpxml nixos-unknow > ~/nixos-unknow.xml
+
+2 — Modifier le bloc <video> dans le XML
+
+Avant :
+<video>
+  <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1' primary='yes'>
+    <acceleration accel3d='no'/>
+  </model>
+</video>
+
+Après :
+<video>
+  <model type='virtio' heads='1' primary='yes'>
+  </model>
+</video>
+
+3 — Réinjecter le XML (VM éteinte)
+virsh define ~/nixos-unknow.xml
+
+4 — Vérifier
+virsh dumpxml nixos-unknow | grep -A3 "video"
+
+5 — Côté invité NixOS : module kernel
+boot.initrd.kernelModules = [ "virtio_gpu" ];
+
+à ajouter dans configuration.nix avant d'éteindre la VM
+
+Backup
+cp ~/nixos-unknow.xml ~/.config/libvirt/qemu/nixos-unknow-backup.xml
+
+Si GNOME Boxes réécrit la config un jour, virsh define suffit à restaurer.
+
