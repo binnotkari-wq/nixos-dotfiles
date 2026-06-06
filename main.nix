@@ -182,6 +182,10 @@ in
     hunspell
     hunspellDicts.fr-any
     hunspellDicts.fr-moderne
+    mdcat             # Lecture de documentation Markdown
+    mc                # Gestionnaire de fichiers interactif
+    zellij            # Ton multiplexeur de terminal (TUI Desktop)
+    vim
   ];
 
   environment.shellAliases = { 

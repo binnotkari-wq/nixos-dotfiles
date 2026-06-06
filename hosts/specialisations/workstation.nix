@@ -33,15 +33,11 @@
     # CLI
     # --- Utilitaires de base ---
     # stow              # Gestion de tes dotfiles personnels # pas utile lorsqu'on utilise home manager
-    mdcat             # Lecture de documentation Markdown
-    mc                # Gestionnaire de fichiers interactif
-    zellij            # Ton multiplexeur de terminal (TUI Desktop)
 
     # --- Développement & Data ---
     shellcheck	      # contrôle de syntaxe scripts bash
     python313         # Choix judicieux pour l'économie d'espace (45 Mo)
     distrobox         # Pour tests Silverblue/Debian/Arch sans polluer NixOS
-    vim
     just              # Ton exécuteur de commandes de projet
     pandoc
     imagemagick
