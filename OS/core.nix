@@ -48,9 +48,7 @@
   fileSystems."/home".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
 
-  # --- 5. SERVICES ---
-  security.apparmor.enable = true; # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
-  # services.fwupd.enable = true; # service de mise à jour de firmwares. Si besoin de flasher un firmware. 
+  # --- 5. INTERFACES HARDWARE ---
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true; # Vulkan
   networking.networkmanager.enable = true;
@@ -131,6 +129,8 @@
 
   # --- 9. CONFIGURATION LOGICIELLE COMMUNE ---
 
+  security.apparmor.enable = true; # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
+  # services.fwupd.enable = true; # service de mise à jour de firmwares. Si besoin de flasher un firmware. 
   services.orca.enable = false; # requires speechd
   services.speechd.enable = false; # voice files are big and fat
 
@@ -140,7 +140,7 @@
 
   environment.systemPackages = with pkgs; [
     # GUI
-    heroic # permet émulation windows avec proton GE, avec peu de dépendances (contrairement à heroic et bottles). Peut lancer à la fois jeux et logiciels.
+    heroic # permet émulation windows avec proton GE, avec peu de dépendances (contrairement à heroic et bottles). Agnostique : ni GTK, ni QT. Peut lancer à la fois jeux et logiciels.
 
     # CLI
     # --- Diagnostic & Hardware ---
@@ -175,6 +175,11 @@
     mc                # Gestionnaire de fichiers interactif
     zellij            # Ton multiplexeur de terminal (TUI Desktop)
     vim
+    shellcheck	      # contrôle de syntaxe scripts bash
+    
+    # --- Services & Contenu ---
+    kiwix-tools       # (3.0 MiB download, 12.6 MiB unpacked) wikipedia offline
+    llama-cpp-vulkan  # (10.6 MiB download, 79.9 MiB unpacked) Pour LLM optimisée GPU/iGPU
   ];
 
   environment.shellAliases = { 

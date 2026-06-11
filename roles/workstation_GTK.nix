@@ -1,41 +1,22 @@
-# Objectif : un environnement tout inclu, deployable en une commande.
-# Une fois installé, on peut:
-# Executer une machine virtuelle : gnome boxes
-# Gérer des containers : distrobox (dans le nix de soutils CLI)
-# Executer une LLM (le modèle doit donc être téléchargé dans la foulée de l'installation) : llama (dans le nix de soutils CLI)
-# Consulter une base wikipedia offline (le zim doit donc être téléchargé dans la foulée de l'installation) : kiwix (dans le nix de soutils CLI)
-# Réaliser des taches grâce a des outils appropriés (images, video, musique, documents, administratif, mails)
-
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
 
   environment.systemPackages = with pkgs; [
     # GUI
-    meld
-    gnome-boxes
-    handbrake
-    gimp
-    impression
-    tagger
-    foliate
-    pinta
-    morphosis
-    pdfarranger
-    distroshelf
-    video-trimmer
-    drum-machine
-    gnome-sound-recorder
-    audacity
-    libreoffice-fresh
-    marker # éditeur / live preview markdown. Contrairement à Apostrophe, ne tire quasi aucune dépendance.
+    gnome-boxes # (33.7 MiB download, 187.2 MiB unpacked)
+    handbrake # (60.7 MiB download, 288.1 MiB unpacked)
+    gimp # (61.0 MiB download, 353.5 MiB unpacked)
+    morphosis # (26.9 MiB download, 208.9 MiB unpacked) (parmis les dépendance : pandoc, qui prend le plus de place)
+    distroshelf # (2.8 MiB download, 15.2 MiB unpacked)
+    drum-machine # (46.5 MiB download, 258.2 MiB unpacked)
+    libreoffice-fresh # (303.4 MiB download, 1.6 GiB unpacked)
 
     # CLI
     # --- Utilitaires de base ---
     # stow              # Gestion de tes dotfiles personnels # pas utile lorsqu'on utilise home manager
 
     # --- Développement & Data ---
-    shellcheck	      # contrôle de syntaxe scripts bash
     python313         # Choix judicieux pour l'économie d'espace (45 Mo)
     distrobox         # Pour tests Silverblue/Debian/Arch sans polluer NixOS
     just              # Ton exécuteur de commandes de projet
@@ -44,10 +25,15 @@
     groff
 
     # --- Services & Contenu ---
-    kiwix-tools       # Wikipedia hors-ligne
-    llama-cpp-vulkan  # Pour LLM optimisée GPU/iGPU
     ffmpeg
   ];
+
+  # Pour ne pas installer ABiword et Gnumeric qui sont inutiles lorsqu'on installe libreoffice : 
+  nixpkgs.config.packageOverrides = pkgs: {
+    # On vide virtuellement les paquets pour ce profil en les remplaçant par un paquet vide
+    abiword = pkgs.emptyDirectory;
+    gnumeric = pkgs.emptyDirectory;
+  };
 
   # --- PODMAN ---
   virtualisation.podman = {
