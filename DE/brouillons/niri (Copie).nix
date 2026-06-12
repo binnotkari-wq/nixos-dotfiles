@@ -1,12 +1,9 @@
 { config, pkgs, ... }:
 {
+  # ─── Compositeur Wayland ───────────────────────────────────────────────────
+  programs.niri.enable = true;
 
-# services à activer explicitement (sous gnome par contre, ils sont activé en dépendances)
-services.upower.enable = true;
-services.power-profiles-daemon.enable = true;
-services.udev.packages = [ pkgs.brightnessctl ];
-
-    # ─── Login manager : greetd + tuigreet ────────────────────────────────────
+  # ─── Login manager : greetd + tuigreet ────────────────────────────────────
   # greetd est le choix de référence dans l'écosystème niri.
   # tuigreet est un frontend TUI sobre qui fonctionne sans X ni Wayland.
   services.greetd = {
@@ -19,12 +16,9 @@ services.udev.packages = [ pkgs.brightnessctl ];
     };
   };
 
-  # ─── Compositeur Wayland ───────────────────────────────────────────────────
-  programs.niri.enable = true;
-
   # Correctif PATH nécessaire : sans ça, le service systemd niri.service
   # reçoit un PATH tronqué qui masque celui configuré par niri-session.
-  # systemd.user.services.niri.enableDefaultPath = false;
+  systemd.user.services.niri.enableDefaultPath = false;
 
   # ─── Services complémentaires ─────────────────────────────────────────────
   # Agent Polkit indispensable pour les actions privilégiées (montage, etc.)
@@ -39,18 +33,32 @@ services.udev.packages = [ pkgs.brightnessctl ];
 
   # ─── Paquets système ──────────────────────────────────────────────────────
   environment.systemPackages = with pkgs; [
-    
-    noctalia-shell
-    kitty
-    
-    # Controle de la luminosité de l'écran avec le clavier
-    brightnessctl
+    # Lanceur d'applications (remplace fuzzel par défaut dans la config niri)
+    fuzzel
 
-    # Clavier virtuel (à associer à la touche clavier dans la config niri)
-    wvkbd
-    
-    # Controle de l'écran
-    wdisplays
+    # Terminal (requis par la config niri par défaut)
+    alacritty
+
+    # Barre de statut
+    waybar
+
+    # Notifications
+    mako
+
+    # Verrouillage d'écran
+    swaylock
+    swayidle
+
+    # Presse-papier Wayland (indispensable : pas de clipboard persistant sinon)
+    wl-clipboard
+    cliphist
+
+    # Fond d'écran
+    # swaybg
+
+    # Captures d'écran
+    # grim
+    # slurp
 
     # Réglages visuels GTK sous Wayland
     gsettings-desktop-schemas
@@ -69,5 +77,6 @@ services.udev.packages = [ pkgs.brightnessctl ];
     shortwave
     smile
     deja-dup
+    gnome-console
   ];
 }

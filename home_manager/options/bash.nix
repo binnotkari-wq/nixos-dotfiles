@@ -21,9 +21,9 @@
         BLUE='\033[0;34m'
 
         echo ""
-        echo -e "''${YELLOW}┌──────────────────────────────────────────────────────┐''${RESET}"
-        echo -e "''${YELLOW}│''${RESET}  ''${PURPLE}⬡''${RESET}  ''${BOLD}''${BLUE}Bienvenue sur NixOS''${RESET}  ''${GRAY}— $HOSTNAME''${RESET}  ''${YELLOW}               │''${RESET}"
-        echo -e "''${YELLOW}└──────────────────────────────────────────────────────┘''${RESET}"
+        # echo -e "''${YELLOW}┌──────────────────────────────────────────────────────┐''${RESET}"
+        echo -e "''${PURPLE}⬡''${RESET}  ''${BOLD}''${BLUE}Bienvenue sur NixOS''${RESET}  ''${GRAY}— $HOSTNAME''${RESET}"
+        # echo -e "''${YELLOW}└──────────────────────────────────────────────────────┘''${RESET}"
         echo ""
 
         # ── Rebuild & mise à jour ──────────────────────────────────────────────
@@ -35,16 +35,16 @@
 
         # ── Nix store & paquets ────────────────────────────────────────────────
         echo -e "''${YELLOW}▸ NIX STORE & PAQUETS''${RESET}"
-        echo -e "  ''${CYAN}nix search nixpkgs <paquet>''${RESET}         ''${GRAY}# Cherche un paquet dans nixpkgs''${RESET}"
-        echo -e "  ''${CYAN}nix shell nixpkgs#<paquet>''${RESET}          ''${GRAY}# Shell temporaire avec le paquet''${RESET}"
+        # echo -e "  ''${CYAN}nix search nixpkgs <paquet>''${RESET}         ''${GRAY}# Cherche un paquet dans nixpkgs''${RESET}"
+        echo -e "  ''${CYAN}nix-shell -p <paquet>''${RESET}               ''${GRAY}# Shell temporaire avec le paquet''${RESET}"
         echo -e "  ''${CYAN}nix-collect-garbage -d''${RESET}              ''${GRAY}# Supprime les générations et nettoie''${RESET}"
-        echo -e "  ''${CYAN}nix store gc''${RESET}                        ''${GRAY}# Garbage collect (commande moderne)''${RESET}"
         echo -e "  ''${CYAN}du -sh /nix/store''${RESET}                   ''${GRAY}# Taille occupée par le store (compression zstd ignorée)''${RESET}"
         echo ""
 
         # ── Générations & rollback ─────────────────────────────────────────────
         echo -e "''${YELLOW}▸ GÉNÉRATIONS & ROLLBACK''${RESET}"
         echo -e "  ''${CYAN}nixos-rebuild list-generations''${RESET}      ''${GRAY}# Liste toutes les générations''${RESET}"
+        echo -e "  ''${CYAN}nix-env -p /nix/var/nix/profiles/system --delete-generations 1 2 3 5''${RESET} ''${GRAY}# Supprime ces générations''${RESET}"
         echo -e "  ''${RED}sudo nixos-rebuild switch --rollback''${RESET} ''${GRAY}# Revenir à la génération précédente''${RESET}"
         echo ""
 

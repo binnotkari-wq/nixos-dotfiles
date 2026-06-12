@@ -31,6 +31,11 @@
         toggle-tiled-left  = [ "<Super>Left" ];
         toggle-tiled-right = [ "<Super>Right" ];
       };
+      
+      "org/gnome/desktop/interface" = {
+        accent-color = "yellow";
+        color-scheme = "prefer-dark";
+      };
 
       # Shell : extensions et barre des tâches
       "org/gnome/shell" = {

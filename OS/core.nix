@@ -130,7 +130,7 @@
   # --- 9. CONFIGURATION LOGICIELLE COMMUNE ---
 
   security.apparmor.enable = true; # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
-  # services.fwupd.enable = true; # service de mise à jour de firmwares. Si besoin de flasher un firmware. 
+  # services.fwupd.enable = true; # service de mise à jour de firmwares. Si besoin de flasher un firmware.
   services.orca.enable = false; # requires speechd
   services.speechd.enable = false; # voice files are big and fat
 
