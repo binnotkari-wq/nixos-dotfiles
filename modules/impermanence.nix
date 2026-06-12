@@ -9,13 +9,13 @@
 #   fait des déclarations, alors il n'existe pas dans @. Seul son symlink existe, et
 #   celui-ci est reconstruit dynamiquement.
 #
-# Pour désactiver : commenter l'import dans configuration.nix.
+# Pour désactiver : commenter l'import dans "machine".nix.
 #
 # Prérequis :
 #   - le système de fichier BTRFS est contenu dans un volume LUKS
 #   - sous-volume @blank existant (snapshot readonly de @ vide)
-#   - sous-volume @persist monté sur /persist
-#   - données existantes migrées vers /persist avant premier boot
+#   - dossier /nix/persist/ existant
+#   - données existantes migrées vers /nix/persist avant premier boot
 # ============================================================
 
 let
@@ -54,8 +54,8 @@ in
   };
 
   # Persistence (on peut vérifier la bonne création des bind-mounts avec findmnt -n -t btrfs -o UUID,TARGET --list)
-  fileSystems."/persist".neededForBoot = true; # on s'assure que /persist sera monté très tôt lors du démarrage
-  environment.persistence."/persist" = {
+  #fileSystems."/persist".neededForBoot = true; # on s'assure que /persist sera monté très tôt lors du démarrage
+  environment.persistence."/nix/persist" = {
     hideMounts = true;
     directories = [
       "/etc/lact" # contenu existant à copier dans persist

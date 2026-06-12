@@ -9,15 +9,17 @@ in
 
   imports =
     [
+      ./OS/core.nix # obligatoire
       ./DE/gnome.nix # pointer vers le D.E. à utiliser
       ./DE/TUI.nix # logiciels TUI avancés
       ./drivers/CPU_AMD.nix # pointer vers divers CPU adapté
       ./drivers/GPU_AMD.nix # pointer vers divers GPU adapté
       ./home_manager/home.nix # optionnel
-      ./OS/core.nix # obligatoire
-      ./roles/workstation_GTK.nix # optionnel
-      ./roles/gaming.nix # optionnel
-      ./roles/SteamOS.nix # optionnel
+      ./modules/impermanence.nix
+      ./modules/prefs_firefox.nix
+      ./modules/workstation_GTK.nix # optionnel
+      ./modules/gaming.nix # optionnel
+      ./modules/SteamOS.nix # optionnel
     ];
 
   # Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'

@@ -27,6 +27,9 @@ in
 
   # --- TUNINGS SPECIFIQUES ---
   
+  # --- OPTIMISATIONS BTRFS SOUS-VOLUME POUR LES MACHINE SANS SSD SECONDAIRE
+  fileSystems."/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+
   # A ADAPTER POUR LE L380
   # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le boost est maintenu, avec une température de moins de 70 degrés!)
   # services.undervolt = {

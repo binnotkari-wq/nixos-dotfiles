@@ -5,11 +5,6 @@
 # - pour les différents sous-volumes btrfs, créés par le script
 
 {
-  imports =
-    [
-      ./modules/prefs_firefox.nix # optionnel.
-      ./modules/impermanence.nix # optionnel. Ne pas activer en même temps que pseudo_impermanence.nix
-    ];
 
   # --- 0. NIXOS ---
   nixpkgs.config.allowUnfree = true;
@@ -44,9 +39,9 @@
   # --- 4. OPTIMISATIONS BTRFS (https://wiki.nixos.org/wiki/Btrfs) ---
   fileSystems."/".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/nix".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-  fileSystems."/persist".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+  # fileSystems."/persist".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/home".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-  fileSystems."/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+  
 
   # --- 5. INTERFACES HARDWARE ---
   hardware.bluetooth.enable = true;
