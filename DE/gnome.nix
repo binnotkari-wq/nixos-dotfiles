@@ -13,6 +13,10 @@
     gnome-connections
   ];
 
+  programs.firefox = {
+    enable = true;
+  };
+
   environment.systemPackages = with pkgs; [
     gnomeExtensions.dash-to-panel
     fragments
@@ -33,6 +37,7 @@
     abiword # (6.4 MiB download, 31.5 MiB unpacked) parfait sur pc de base, sans la lourdeur de libreoffice. Ne s'installe pas lorsqu'on active workstation_GTK.nix grâce à l'exclusion
     gnumeric # (12.4 MiB download, 45.6 MiB unpacked) parfait sur pc de base, sans la lourdeur de libreoffice. Ne s'installe pas lorsqu'on active workstation_GTK.nix grâce à l'exclusion
     # gnome-firmware # si besoin de flasher un firmware. NB : nécessite services.fwupd.enable = true;
+    heroic # permet émulation windows avec proton GE, avec peu de dépendances (contrairement à heroic et bottles). Agnostique : ni GTK, ni QT. Peut lancer à la fois jeux et logiciels.
   ];
 
 }

@@ -3,6 +3,20 @@
 # A utiliser en tant qu'import home manager.
 
 {
+
+home.file.".local/bin/open-music-player.sh" = {
+  executable = true;
+  text = ''
+    #!/usr/bin/env bash
+    desktop=$(xdg-mime query default audio/mpeg)
+    gtk-launch "''${desktop%.desktop}"
+  '';
+};
+
+
+
+
+
     dconf.settings = {
 
       # Clavier - disposition
@@ -12,6 +26,25 @@
       "org/gnome/desktop/peripherals/keyboard" = {
         numlock-state = true;
       };
+
+    "org/gnome/settings-daemon/plugins/media-keys" = {
+      custom-keybindings = [
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
+      ];
+    };
+
+    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
+      name = "Open Gmail";
+      command = "xdg-open https://mail.google.com";
+      binding = "XF86Mail";
+    };
+
+    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
+      name = "Open Music Player";
+      command = "${config.home.homeDirectory}/.local/bin/open-music-player.sh";
+      binding = "XF86Tools";
+    };
 
       # Raccourcis fenêtres
       "org/gnome/desktop/wm/keybindings" = {

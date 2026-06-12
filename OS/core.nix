@@ -52,6 +52,8 @@
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true; # Vulkan
   networking.networkmanager.enable = true;
+  services.upower.enable = true;
+  services.power-profiles-daemon.enable = true; # ne pas utiliser tlp, pas pris dans plusieurs D.E.
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -134,14 +136,7 @@
   services.orca.enable = false; # requires speechd
   services.speechd.enable = false; # voice files are big and fat
 
-  programs.firefox = {
-    enable = true;
-  };
-
   environment.systemPackages = with pkgs; [
-    # GUI
-    heroic # permet émulation windows avec proton GE, avec peu de dépendances (contrairement à heroic et bottles). Agnostique : ni GTK, ni QT. Peut lancer à la fois jeux et logiciels.
-
     # CLI
     # --- Diagnostic & Hardware ---
     pciutils          # Essentiel pour l'inventaire matériel
@@ -155,31 +150,23 @@
 
     # --- Système de fichiers & Réseau ---
     compsize          # utilitaire analyse Btrfs
-    duf               # Visualisation rapide de l'espace disque
     wget
     git
-    tree
 
     # --- Utilitaires de base ---
     dialog            # outil boites de dialogue scripts
     zenity            # outil boites de dialogue scripts (GTK)
     libnotify	      # outil boites de dialogue scripts
-    htop              # Le classique immanquable
-    btop              # Version "esthétique" de htop (confort visuel)
     aria2             # gestionnaire de téléchargement universel
     nix-tree          # Analyse des paquets et dépendances
-    hunspell
-    hunspellDicts.fr-any
-    hunspellDicts.fr-moderne
-    mdcat             # Lecture de documentation Markdown
-    mc                # Gestionnaire de fichiers interactif
-    zellij            # Ton multiplexeur de terminal (TUI Desktop)
-    vim
     shellcheck	      # contrôle de syntaxe scripts bash
     
     # --- Services & Contenu ---
     kiwix-tools       # (3.0 MiB download, 12.6 MiB unpacked) wikipedia offline
     llama-cpp-vulkan  # (10.6 MiB download, 79.9 MiB unpacked) Pour LLM optimisée GPU/iGPU
+    hunspell
+    hunspellDicts.fr-any
+    hunspellDicts.fr-moderne
   ];
 
   environment.shellAliases = { 
