@@ -3,18 +3,16 @@
 # A utiliser en tant qu'import home manager.
 
 {
-
-home.file.".local/bin/open-music-player.sh" = {
-  executable = true;
-  text = ''
-    #!/usr/bin/env bash
-    desktop=$(xdg-mime query default audio/mpeg)
-    gtk-launch "''${desktop%.desktop}"
-  '';
-};
-
-
-
+  # Petit script lancé par la touche lecteur multimedia
+  home.file.".local/bin/open-music-player.sh" = {
+   executable = true;
+    text = ''
+      #!/usr/bin/env bash
+      # desktop=$(xdg-mime query default audio/mpeg)
+      # gtk-launch "''${desktop%.desktop}"
+      gnome-music
+    '';
+  };
 
 
     dconf.settings = {
@@ -27,24 +25,27 @@ home.file.".local/bin/open-music-player.sh" = {
         numlock-state = true;
       };
 
-    "org/gnome/settings-daemon/plugins/media-keys" = {
-      custom-keybindings = [
-        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
-        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
-      ];
-    };
+      # identification des touche qui ne sont pas affectées sur le clavier
+      "org/gnome/settings-daemon/plugins/media-keys" = {
+        custom-keybindings = [
+          "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+          "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
+        ];
+      };
 
-    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
-      name = "Open Gmail";
-      command = "xdg-open https://mail.google.com";
-      binding = "XF86Mail";
-    };
+      # Touche messagerie
+      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
+        name = "Open Gmail";
+        command = "xdg-open https://mail.google.com";
+        binding = "XF86Mail";
+      };
 
-    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
-      name = "Open Music Player";
-      command = "${config.home.homeDirectory}/.local/bin/open-music-player.sh";
-      binding = "XF86Tools";
-    };
+      # Touche lecteur multimedia
+      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
+        name = "Open Music Player";
+        command = "${config.home.homeDirectory}/.local/bin/open-music-player.sh";
+        binding = "XF86Tools";
+      };
 
       # Raccourcis fenêtres
       "org/gnome/desktop/wm/keybindings" = {
