@@ -5,7 +5,6 @@
 # - pour les différents sous-volumes btrfs, créés par le script
 
 {
-
   # --- 0. NIXOS ---
   nixpkgs.config.allowUnfree = true;
   system.stateVersion  = vars.nixosVersion; # hérité de variables.nix
@@ -155,6 +154,7 @@
     aria2             # gestionnaire de téléchargement universel
     nix-tree          # Analyse des paquets et dépendances
     shellcheck	      # contrôle de syntaxe scripts bash
+    glow              # visualisateur fichiers markdown
     
     # --- Services & Contenu ---
     kiwix-tools       # (3.0 MiB download, 12.6 MiB unpacked) wikipedia offline
@@ -163,22 +163,4 @@
     hunspellDicts.fr-any
     hunspellDicts.fr-moderne
   ];
-
-  environment.shellAliases = { 
-    ll = "ls -l";
-    nrs = "sudo nixos-rebuild switch";
-    garbage = "nix-collect-garbage -d";
-    backup       = "$HOME/Mes-Donnees/Git/scripts/backup.sh";
-    bash-history = "$HOME/Mes-Donnees/Git/scripts/bash-history-export.sh";
-    git-sync     = "$HOME/Mes-Donnees/Git/scripts/git-sync.sh";
-  };
-
-  environment.interactiveShellInit = ''
-    HISTTIMEFORMAT="%s "
-    HISTSIZE=100000
-    HISTFILESIZE=100000
-    shopt -s histappend
-    echo "# SESSION $(date +%s)" >> "$HISTFILE"
-    PROMPT_COMMAND="history -a''${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
-  '';
 }

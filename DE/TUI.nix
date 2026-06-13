@@ -2,12 +2,15 @@
 
 {
 
+  programs.zoxide = { # cd intelligent. Commencer par lancer zoxide add "le répertoire à intégrer dans la base de données". Puis, z remplace cd (pas immédiat, il faut déjà se promener un peu dans les dossiers)
+    enable = true;
+    enableBashIntegration = true;
+  };
+
   environment.systemPackages = with pkgs; [
     superfile         # explorateur de fichiers esthétique
     kitty             # console accelerée GPU, esthétique
-    glow              # visualisateur fichiers markdown
     fzf               # recherche intelligente
-    zoxide            # cd intelligent
     ranger            # gestionnaire de fichiers esthétique
     tldr              # astuces et conseil d'utilisation des logiciels
     dust              # analyse graphique de l'espace disque
@@ -23,6 +26,7 @@
     tree              # visualisation d'arborence (peut être redirigé ver sune sortie fichier texte)
     htop              # Le classique immanquable
     btop              # Version "esthétique" de htop (confort visuel)
+    musikcube         # Lecteur mp3 esthétique
   ];
 
 }

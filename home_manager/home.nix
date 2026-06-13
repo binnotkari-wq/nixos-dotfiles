@@ -24,7 +24,9 @@ in
     _module.args = { inherit vars; };
     imports = [
       ./options/prefs_git.nix
-      ./options/bash.nix
+      ./options/shell.nix
+      ./options/glow.nix
+      ./options/kitty.nix
       ./options/dconf_gnome.nix
       ./options/vim.nix
     ];
@@ -100,6 +102,18 @@ in
         executable = true;
         text = ''
         #!/usr/bin/env bash
+        '';
+      };
+      
+      home.file."${config.home.homeDirectory}/Modèles/Fichier nix.nix" = {
+        text = ''
+        { config, pkgs, lib, ... }:
+
+        # Fichier nix
+
+        {
+
+        }
         '';
       };
 
