@@ -27,6 +27,15 @@
     htop              # Le classique immanquable
     btop              # Version "esthétique" de htop (confort visuel)
     musikcube         # Lecteur mp3 esthétique
+    # aerc            # client mail
+    newsboat          # lecteur RSS
+    # yazi            # explorateur de fichiers esthétique. Mais superfile est mieux.
+    mplayer           # nécessaire à pyradio
+    pyradio           # radio web
+    yt-dlp            # téléchargement de fichiers sur youtube (complet, juste audio, etc...)
+    gophertube        # chercher, regarder et télécharger des vidéos depuis youtube
+    w3m               # navigateur internet
+    # atuin           # analyse de l'historique bash. Mais par rappor à la confidentialité ....non (synchro de l'historique en ligne, etc...)
   ];
 
 }

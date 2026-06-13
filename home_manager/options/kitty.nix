@@ -1,6 +1,17 @@
 { config, pkgs, ... }:
 
 {
+
+  dconf.settings = {
+
+    # Shell : extensions et barre des tâches
+      "org/gnome/shell" = {
+        favorite-apps = [
+          "kitty.desktop"
+        ];
+      };
+    };
+
   home.file.".config/kitty/kitty.conf" = {
     text = ''
 foreground            #c0caf5

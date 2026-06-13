@@ -23,12 +23,14 @@ in
   home-manager.users.${vars.username} = { config, pkgs, lib, ... }: {  # hérité de variables.nix
     _module.args = { inherit vars; };
     imports = [
-      ./options/prefs_git.nix
+      ./options/git.nix
       ./options/shell.nix
       ./options/glow.nix
       ./options/kitty.nix
-      ./options/dconf_gnome.nix
+      ./options/gnome.nix
+      ./options/newsboat.nix
       ./options/vim.nix
+      ./options/pyradio.nix
     ];
     
     home.username = vars.username;  # hérité de variables.nix
