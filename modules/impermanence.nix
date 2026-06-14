@@ -2,8 +2,8 @@
 
 # ============================================================
 # IMPERMANENCE
-# Rollback btrfs @ vers @blank à chaque boot.
-# C'est donc un reset de toute ce qui n'est pas déclaré dans les .nix :
+# A cahque boot, remise à zéro de / avec un service systemd, puis recréation des liens depuis les données persistées.
+# C'est donc un reset de tout ce qui n'est pas déclaré dans les .nix :
 # - Ce qui est impératif et qu'on veut conserver, on le gère grâce au module impermanence.
 # - Ce qui est déclaratif n'est pas concerné. Si un fichier ou dossier existe dans @nix du
 #   fait des déclarations, alors il n'existe pas dans @. Seul son symlink existe, et
@@ -13,15 +13,14 @@
 #
 # Prérequis :
 #   - le système de fichier BTRFS est contenu dans un volume LUKS
-#   - sous-volume @blank existant (snapshot readonly de @ vide)
 #   - dossier /nix/persist/ existant
-#   - données existantes migrées vers /nix/persist avant premier boot
+#   - dossiers ci-dessous mis en place vers /nix/persist, avec cp -a. Le module impermanence se charge ensuite, à chaque démarrage, de créer les liens.
 # ============================================================
 
 let
   impermanence = builtins.fetchTarball {
     url = "https://github.com/nix-community/impermanence/archive/master.tar.gz";
-    # sha256 = "1iip4kjrk09mnha9jhafvcg61g1d0g6pqnljzdp08zz6zk38jzyk"; (optionnel, pour verrouiller le commit qu'on, va utiliser)
+    # sha256 = "1iip4kjrk09mnha9jhafvcg61g1d0g6pqnljzdp08zz6zk38jzyk"; (optionnel, pour verrouiller le commit qu'on va utiliser)
     # nix-prefetch-url --unpack https://github.com/nix-community/impermanence/archive/master.tar.gz # pour obtenir le SHA
   };
 in
@@ -47,14 +46,15 @@ in
             btrfs subvolume delete "/mnt/$subvol"
           done
         btrfs subvolume delete /mnt/@
-        btrfs subvolume snapshot /mnt/@blank /mnt/@
+        btrfs subvolume create /mnt/@
+        # btrfs subvolume snapshot /mnt/@blank /mnt/@ # alternative à la recréation de @ : son ecrasement avec une snaphot vide. Il faut créer le snapshot au préalable (un sous-volume vide)
         umount /mnt
       '';
     };
   };
 
   # Persistence (on peut vérifier la bonne création des bind-mounts avec findmnt -n -t btrfs -o UUID,TARGET --list)
-  #fileSystems."/persist".neededForBoot = true; # on s'assure que /persist sera monté très tôt lors du démarrage
+  #fileSystems."/persist".neededForBoot = true; # on s'assure que /persist sera monté très tôt lors du démarrage. Utile uniquement quand on utilise un sous-volume dédié.
   environment.persistence."/nix/persist" = {
     hideMounts = true;
     directories = [

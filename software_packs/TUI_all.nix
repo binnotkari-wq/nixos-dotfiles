@@ -1,7 +1,6 @@
 { config, pkgs, ... }:
 
 {
-
   programs.zoxide = { # cd intelligent. Commencer par lancer zoxide add "le répertoire à intégrer dans la base de données". Puis, z remplace cd (pas immédiat, il faut déjà se promener un peu dans les dossiers)
     enable = true;
     enableBashIntegration = true;
@@ -37,5 +36,4 @@
     w3m               # navigateur internet
     # atuin           # analyse de l'historique bash. Mais par rappor à la confidentialité ....non (synchro de l'historique en ligne, etc...)
   ];
-
 }

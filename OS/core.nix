@@ -38,9 +38,7 @@
   # --- 4. OPTIMISATIONS BTRFS (https://wiki.nixos.org/wiki/Btrfs) ---
   fileSystems."/".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/nix".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-  # fileSystems."/persist".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
   fileSystems."/home".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-  
 
   # --- 5. INTERFACES HARDWARE ---
   hardware.bluetooth.enable = true;
@@ -131,36 +129,16 @@
   services.speechd.enable = false; # voice files are big and fat
 
   environment.systemPackages = with pkgs; [
-    # CLI
-    # --- Diagnostic & Hardware ---
-    pciutils          # Essentiel pour l'inventaire matériel
-    lm_sensors        # Surveillance des températures
+    # Utilitaires du système de base, nécessaires.
     powertop          # Vital pour optimiser la batterie
-    stress-ng         # Pour tester la stabilité du Ryzen
-    s-tui             # Monitoring CPU en temps réel
-    libva-utils       # Permet de lancer 'vainfo' pour tester l'accélération vidéo
-    usbutils
-    iw
-
-    # --- Système de fichiers & Réseau ---
     compsize          # utilitaire analyse Btrfs
-    wget
-    git
-
-    # --- Utilitaires de base ---
+    git               # versionning, et interface avec repos en ligne
     dialog            # outil boites de dialogue scripts
     zenity            # outil boites de dialogue scripts (GTK)
     libnotify	      # outil boites de dialogue scripts
-    aria2             # gestionnaire de téléchargement universel
-    nix-tree          # Analyse des paquets et dépendances
-    shellcheck	      # contrôle de syntaxe scripts bash
     glow              # visualisateur fichiers markdown
-    
-    # --- Services & Contenu ---
-    kiwix-tools       # (3.0 MiB download, 12.6 MiB unpacked) wikipedia offline
-    llama-cpp-vulkan  # (10.6 MiB download, 79.9 MiB unpacked) Pour LLM optimisée GPU/iGPU
-    hunspell
-    hunspellDicts.fr-any
-    hunspellDicts.fr-moderne
+    hunspell          # vérificateur orthographe, utilisé à l'échelle du système
+    hunspellDicts.fr-any        # dictionaire français, utilisé à l'échelle du système
+    hunspellDicts.fr-moderne    # dictionnaire francais, utilisé à l'échelle du système
   ];
 }

@@ -42,7 +42,6 @@ in
   programs.gamescope.enable = true;
   programs.steam = {
     gamescopeSession.enable = false; # on utilise la session custom à la place
-
   };
 
   environment.systemPackages = with pkgs; [

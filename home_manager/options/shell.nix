@@ -7,6 +7,7 @@
 
     # ── Alias ────────────────────────────────────────────────────────────
     shellAliases = {
+      d       = "du -h --max-depth=0";
       ll      = "ls -l";
       nrs     = "sudo nixos-rebuild switch";
       garbage = "nix-collect-garbage -d";
