@@ -1,10 +1,26 @@
 { config, pkgs, lib, ... }:
 
-{
-  # --- MODULES ---
-  imports = 
-    [
+let
+  vars = import ./variables.nix;
+in
 
+{
+  _module.args = { inherit vars; };
+
+  imports =
+    [
+      ./OS/core.nix # obligatoire
+      ./DE/gnome.nix # pointer vers le D.E. à utiliser
+      # ./home_manager/home.nix # optionnel
+      ./modules/impermanence.nix # optionnel
+      # ./modules/prefs_firefox.nix # optionnel
+      # ./modules/SteamOS.nix # optionnel
+      # ./software_packs/dev_experiments.nix # optionnel
+      # ./software_packs/gaming.nix # optionnel
+      # ./software_packs/GTK_all.nix # optionnel
+      # ./software_packs/GTK_base.nix # optionnel
+      # ./software_packs/TUI_all.nix # optionnel
+      # ./software_packs/TUI_base.nix # optionnel
     ];
 
   boot.initrd.kernelModules = [ "virtio_gpu" ];

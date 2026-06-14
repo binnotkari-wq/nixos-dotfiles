@@ -24,13 +24,13 @@ in
     _module.args = { inherit vars; };
     imports = [
       ./options/git.nix
-      ./options/shell.nix
       ./options/glow.nix
-      ./options/kitty.nix
       ./options/gnome.nix
+      ./options/kitty.nix
       ./options/newsboat.nix
-      ./options/vim.nix
       ./options/pyradio.nix
+      ./options/shell.nix
+      ./options/vim.nix
     ];
     
     home.username = vars.username;  # hérité de variables.nix

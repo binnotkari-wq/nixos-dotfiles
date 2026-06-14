@@ -11,15 +11,18 @@ in
     [
       ./OS/core.nix # obligatoire
       ./DE/gnome.nix # pointer vers le D.E. à utiliser
-      ./DE/TUI.nix # logiciels TUI avancés
       ./drivers/CPU_AMD.nix # pointer vers divers CPU adapté
       ./drivers/GPU_AMD.nix # pointer vers divers GPU adapté
       ./home_manager/home.nix # optionnel
-      ./modules/impermanence.nix
-      ./modules/prefs_firefox.nix
-      ./modules/workstation_GTK.nix # optionnel
-      ./modules/gaming.nix # optionnel
+      ./modules/impermanence.nix # optionnel
+      ./modules/prefs_firefox.nix # optionnel
       ./modules/SteamOS.nix # optionnel
+      ./software_packs/dev_experiments.nix # optionnel
+      ./software_packs/gaming.nix # optionnel
+      ./software_packs/GTK_all.nix # optionnel
+      ./software_packs/GTK_base.nix # optionnel
+      ./software_packs/TUI_all.nix # optionnel
+      ./software_packs/TUI_base.nix # optionnel
     ];
 
   # Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
