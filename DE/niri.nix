@@ -2,8 +2,6 @@
 {
 
 # services à activer explicitement (sous gnome par contre, ils sont activé en dépendances)
-services.upower.enable = true;
-services.power-profiles-daemon.enable = true;
 services.udev.packages = [ pkgs.brightnessctl ];
 
     # ─── Login manager : greetd + tuigreet ────────────────────────────────────
@@ -40,8 +38,25 @@ services.udev.packages = [ pkgs.brightnessctl ];
   # ─── Paquets système ──────────────────────────────────────────────────────
   environment.systemPackages = with pkgs; [
     
-    noctalia-shell
+    # Shell graphique
+    # noctalia-shell
+    waybar # barre de statut
+    swaynotificationcenter
+    fuzzel # Lanceur d'applications
+    mako # Notifications
+    swaylock # Verrouillage d'écran
+    swayidle # Verrouillage d'écran
+    wl-clipboard # Presse-papier Wayland (indispensable : pas de clipboard persistant sinon)
+    cliphist # Presse-papier Wayland (indispensable : pas de clipboard persistant sinon)
+    # swaybg # Fond d'écran
+    # grim # Captures d'écran
+    # slurp # Captures d'écran
+    
+    
+    # Terminal
     kitty
+    # foot
+    # alacritty
     
     # Controle de la luminosité de l'écran avec le clavier
     brightnessctl

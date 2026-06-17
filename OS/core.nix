@@ -44,8 +44,8 @@
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true; # Vulkan
   networking.networkmanager.enable = true;
-  services.upower.enable = true;
-  services.power-profiles-daemon.enable = true; # ne pas utiliser tlp, pas pris dans plusieurs D.E.
+  services.upower.enable = true; # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light
+  services.power-profiles-daemon.enable = true; # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light. Ne pas utiliser tlp, pas pris dans plusieurs D.E.
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -140,5 +140,6 @@
     hunspell          # vérificateur orthographe, utilisé à l'échelle du système
     hunspellDicts.fr-any        # dictionaire français, utilisé à l'échelle du système
     hunspellDicts.fr-moderne    # dictionnaire francais, utilisé à l'échelle du système
+    llama-cpp-vulkan  # (10.6 MiB download, 79.9 MiB unpacked) Pour LLM optimisée GPU/iGPU
   ];
 }

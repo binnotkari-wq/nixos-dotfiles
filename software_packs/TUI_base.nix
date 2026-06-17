@@ -22,7 +22,6 @@
     
     # --- Services & Contenu ---
     kiwix-tools       # (3.0 MiB download, 12.6 MiB unpacked) wikipedia offline
-    llama-cpp-vulkan  # (10.6 MiB download, 79.9 MiB unpacked) Pour LLM optimisée GPU/iGPU
     ffmpeg            # taille ?
     groff             # taille ?
     imagemagick       # taille ?
