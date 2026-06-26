@@ -7,8 +7,8 @@
 {
   # --- 0. NIXOS ---
   nixpkgs.config.allowUnfree = true;
-  system.stateVersion  = vars.nixosVersion; # hérité de variables.nix
-  networking.hostName  = vars.hostname; # hérité de variables.nix
+  system.stateVersion  = vars.nixosVersion;                                     # hérité de variables.nix
+  networking.hostName  = vars.hostname;                                         # hérité de variables.nix
 
   # --- 1. BOOTLOADER & KERNEL ---
   boot.loader.systemd-boot.enable = true;
@@ -44,8 +44,8 @@
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true; # Vulkan
   networking.networkmanager.enable = true;
-  services.upower.enable = true; # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light
-  services.power-profiles-daemon.enable = true; # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light. Ne pas utiliser tlp, pas pris dans plusieurs D.E.
+  services.upower.enable = true;                                                # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light
+  services.power-profiles-daemon.enable = true;                                 # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light. Ne pas utiliser tlp, pas pris dans plusieurs D.E.
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -89,7 +89,7 @@
   systemd.tmpfiles.rules = [
     "R /var/cache/* - - - - -"
     "R /var/spool/cups/* - - - - -"
-    "e /var/tmp 1777 root root 30d -"   # On nettoie /var/tmp s'il n'est pas touché pendant 30 jours
+    "e /var/tmp 1777 root root 30d -"                                           # On nettoie /var/tmp s'il n'est pas touché pendant 30 jours
   ];
 
   # Sécurité : données sudo en tmpfs, pas conservées sur disque ---
@@ -112,34 +112,40 @@
     };
 
   # --- 8. DEFINITION UTILISATEUR ---
-  users.users.${vars.username} = {  # hérité de variables.nix
+  users.users.${vars.username} = {                                              # hérité de variables.nix
     shell = pkgs.bash;
     isNormalUser = true;
-    description = vars.usernameDisplay;  # hérité de variables.nix
+    description = vars.usernameDisplay;                                         # hérité de variables.nix
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "kvm" ];
-    uid = 1000; # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
-    hashedPassword = vars.hashedPassword;  # hérité de variables.nix
+    uid = 1000;                                                                 # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
+    hashedPassword = vars.hashedPassword;                                       # hérité de variables.nix
   };
 
   # --- 9. CONFIGURATION LOGICIELLE COMMUNE ---
 
-  security.apparmor.enable = true; # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
-  # services.fwupd.enable = true; # service de mise à jour de firmwares. Si besoin de flasher un firmware.
-  services.orca.enable = false; # requires speechd
-  services.speechd.enable = false; # voice files are big and fat
+  security.apparmor.enable = true;                                              # l'impact d'apparmor sur les performances est imperceptible. Les flatpaks prennet en charge nativement apparmor.
+  # services.fwupd.enable = true;                                               # service de mise à jour de firmwares. Si besoin de flasher un firmware.
+  services.orca.enable = false;                                                 # requires speechd
+  services.speechd.enable = false;                                              # voice files are big and fat
 
   environment.systemPackages = with pkgs; [
     # Utilitaires du système de base, nécessaires.
-    powertop          # Vital pour optimiser la batterie
-    compsize          # utilitaire analyse Btrfs
-    git               # versionning, et interface avec repos en ligne
-    dialog            # outil boites de dialogue scripts
-    zenity            # outil boites de dialogue scripts (GTK)
-    libnotify	      # outil boites de dialogue scripts
-    glow              # visualisateur fichiers markdown
-    hunspell          # vérificateur orthographe, utilisé à l'échelle du système
-    hunspellDicts.fr-any        # dictionaire français, utilisé à l'échelle du système
-    hunspellDicts.fr-moderne    # dictionnaire francais, utilisé à l'échelle du système
-    llama-cpp-vulkan  # (10.6 MiB download, 79.9 MiB unpacked) Pour LLM optimisée GPU/iGPU
+    powertop                                                                    # Vital pour optimiser la batterie
+    compsize                                                                    # utilitaire analyse Btrfs
+    git                                                                         # versionning, et interface avec repos en ligne
+    dialog                                                                      # outil boites de dialogue scripts
+    zenity                                                                      # outil boites de dialogue scripts (GTK)
+    libnotify	                                                                # outil boites de dialogue scripts
+    hunspell                                                                    # vérificateur orthographe, utilisé à l'échelle du système
+    hunspellDicts.fr-any                                                        # dictionaire français, utilisé à l'échelle du système
+    hunspellDicts.fr-moderne                                                    # dictionnaire francais, utilisé à l'échelle du système
+    llama-cpp-vulkan                                                            # (10.6 MiB download, 79.9 MiB unpacked) Pour LLM optimisée GPU/iGPU
+    nerd-fonts.jetbrains-mono
   ];
+
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+  ];
+
+
 }

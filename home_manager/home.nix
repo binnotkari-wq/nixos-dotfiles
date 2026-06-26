@@ -24,12 +24,12 @@ in
     _module.args = { inherit vars; };
     imports = [
       ./options/git.nix
-      ./options/glow.nix
       ./options/gnome.nix
       ./options/kitty.nix
       ./options/newsboat.nix
       ./options/pyradio.nix
       ./options/shell.nix
+      ./options/yazi.nix
       ./options/vim.nix
     ];
     

@@ -7,33 +7,41 @@
   };
 
   environment.systemPackages = with pkgs; [
-    superfile         # explorateur de fichiers esthétique
-    kitty             # console accelerée GPU, esthétique
-    fzf               # recherche intelligente
-    ranger            # gestionnaire de fichiers esthétique
-    tldr              # astuces et conseil d'utilisation des logiciels
-    dust              # analyse graphique de l'espace disque
-    bat               # better cat. Visualisation esthetique
-    browsh            # browser texte esthétique
-    lynx              # browser texte basique
-    tmux              # Terminal multiplexé
-    mdcat             # Lecture de documentation Markdown
-    mc                # Gestionnaire de fichiers interactif
-    zellij            # Ton multiplexeur de terminal (TUI Desktop)
-    vim               # Editeur avancé
-    duf               # Visualisation rapide de l'espace disque
-    tree              # visualisation d'arborence (peut être redirigé ver sune sortie fichier texte)
-    htop              # Le classique immanquable
-    btop              # Version "esthétique" de htop (confort visuel)
-    musikcube         # Lecteur mp3 esthétique
-    # aerc            # client mail
-    newsboat          # lecteur RSS
-    # yazi            # explorateur de fichiers esthétique. Mais superfile est mieux.
-    mplayer           # nécessaire à pyradio
-    pyradio           # radio web
-    yt-dlp            # téléchargement de fichiers sur youtube (complet, juste audio, etc...)
-    gophertube        # chercher, regarder et télécharger des vidéos depuis youtube
-    w3m               # navigateur internet
-    # atuin           # analyse de l'historique bash. Mais par rappor à la confidentialité ....non (synchro de l'historique en ligne, etc...)
+    kitty                      # console accelerée GPU, esthétique
+    yazi                       # explorateur de fichiers TUI modulaire
+    yaziPlugins.mount
+    yaziPlugins.chmod
+    yaziPlugins.compress
+    yaziPlugins.full-border
+    yaziPlugins.recycle-bin
+    # superfile                 # explorateur de fichiers esthétique
+    fzf                         # recherche intelligente
+    ranger                      # gestionnaire de fichiers esthétique
+    tldr                        # astuces et conseil d'utilisation des logiciels
+    dust                        # analyse graphique de l'espace disque
+    bat                         # better cat. Visualisation esthetique
+    browsh                      # browser texte esthétique
+    lynx                        # browser texte basique
+    tmux                        # Terminal multiplexé
+    # mdcat                     # Lecture de documentation Markdown
+    md-tui                      # visualisateur Markdown. Winner : le plus agréable. Permet d'editer, de rechercher...
+    mc                          # Gestionnaire de fichiers interactif
+    zellij                      # Ton multiplexeur de terminal (TUI Desktop)
+    vim                         # Editeur avancé
+    duf                         # Visualisation rapide de l'espace disque
+    tree                        # visualisation d'arborence (peut être redirigé ver sune sortie fichier texte)
+    htop                        # Le classique immanquable
+    btop                        # Version "esthétique" de htop (confort visuel)
+    musikcube                   # Lecteur mp3 esthétique
+    # aerc                      # client mail
+    newsboat                    # lecteur RSS
+    mplayer                     # nécessaire à pyradio
+    pyradio                     # radio web
+    python313Packages.dbus-fast # permet le contrôle de pyradio avec les touches multimédia du clavier
+    yt-dlp                      # téléchargement de fichiers sur youtube (complet, juste audio, etc...)
+    gophertube                  # chercher, regarder et télécharger des vidéos depuis youtube
+    w3m                         # navigateur internet
+    cliphist                    # Visualisation de l'historique du presse-papier
+    # atuin                     # analyse de l'historique bash. Mais par rappor à la confidentialité ....non (synchro de l'historique en ligne, etc...)
   ];
 }

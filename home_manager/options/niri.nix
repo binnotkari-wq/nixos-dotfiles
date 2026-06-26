@@ -3,7 +3,7 @@
 { config, pkgs, ... }:
 {
 
-xdg.configFile."niri/config.kdl".source = ./prefs_niri.kdl;
+# xdg.configFile."niri/config.kdl".source = ./niri.kdl;
 
 
   # ─── Curseur ──────────────────────────────────────────────────────────────
@@ -35,10 +35,10 @@ xdg.configFile."niri/config.kdl".source = ./prefs_niri.kdl;
     };
 
     gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = false;
+      gtk-application-prefer-dark-theme = true;
     };
     gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = false;
+      gtk-application-prefer-dark-theme = true;
     };
   };
 
@@ -60,21 +60,4 @@ fonts.fontconfig = {
     # nerd-fonts.jetbrains-mono
     adwaita-fonts
   ];
-
-
-# laisser cela à kitty.nix
-# programs.kitty = {
-#   enable = true;
-#   settings = {
-#     hide_window_decorations = "yes";
-#     # Optionnel : thème, police, etc.
-#     dynamic_background_opacity = true;
-#     enable_audio_bell = false;
-#     mouse_hide_wait = "-1.0";
-#     window_padding_width = 10;
-#     background_opacity = "0.5";
-#     background_blur = 5;
-#   };
-# };
-
 }
