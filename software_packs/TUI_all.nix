@@ -37,7 +37,6 @@
     newsboat                    # lecteur RSS
     mplayer                     # nécessaire à pyradio
     pyradio                     # radio web
-    python313Packages.dbus-fast # permet le contrôle de pyradio avec les touches multimédia du clavier
     yt-dlp                      # téléchargement de fichiers sur youtube (complet, juste audio, etc...)
     gophertube                  # chercher, regarder et télécharger des vidéos depuis youtube
     w3m                         # navigateur internet

@@ -1,10 +1,23 @@
 { config, pkgs, ... }:
 
+# A utiliser en tant qu'import home manager.
+
 {
   programs.yazi = {
     enable = true;
+    enableBashIntegration = true;
+    settings = {
+      mgr = {
+        show_hidden = true;
+        sort_by = "alphabetical";
+        sort_dir_first = true;
+        linemode = "mtime";
+        show_symlink = true;
+      };
+    };
     plugins = {
       inherit (pkgs.yaziPlugins) mount;
+      inherit (pkgs.yaziPlugins) full-border;
     };
     keymap = {
       mgr.prepend_keymap = [
@@ -25,5 +38,11 @@
       dark  = "gruvbox-material"
       light = "gruvbox-material"
     '';
+
+    # Le plugin full border nécessite d'être référencé dans le fichier init.lua
+    "yazi/init.lua".text = ''
+      require("full-border"):setup()
+    '';
+
   };
 }

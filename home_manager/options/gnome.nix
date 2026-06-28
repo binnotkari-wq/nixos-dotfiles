@@ -73,9 +73,10 @@
 
       # Shell : extensions et barre des tâches
       "org/gnome/shell" = {
-        enabled-extensions     = [ "dash-to-panel@jderose9.github.com" ];
+        enabled-extensions     = [ "dash-to-panel@jderose9.github.com" "tilingshell@ferrarodomenico.com" ];
         disable-user-extensions = false;
         favorite-apps = [
+          "kitty.desktop"
           "firefox.desktop"
           "org.gnome.Nautilus.desktop"
           "org.gnome.Console.desktop"
@@ -92,6 +93,24 @@
         hotkeys-overlay-combo    = "TEMPORARILY";
         window-preview-title-position = "TOP";
       };
+
+      # Tiling Shell
+    "org/gnome/shell/extensions/tilingshell" = {
+      edge-tiling-mode =                              "default";
+      enable-autotiling =                             true;
+      enable-blur-selected-tilepreview =              false;
+      enable-blur-snap-assistant =                    false;
+      enable-screen-edges-windows-suggestions =       true;
+      enable-snap-assistant-windows-suggestions =     true;
+      enable-tiling-system-windows-suggestions =      true;
+      inner-gaps =                                    lib.hm.gvariant.mkUint32 16;
+      last-version-name-installed =                   "17.3";
+      outer-gaps =                                    lib.hm.gvariant.mkUint32 16;
+      show-indicator =                                false;
+      snap-assist-sync-layout =                       true;
+      window-border-width =                           lib.hm.gvariant.mkUint32 2;
+      window-use-custom-border-color =                false;
+    };
 
       # Nautilus
       "org/gnome/nautilus/preferences" = {
