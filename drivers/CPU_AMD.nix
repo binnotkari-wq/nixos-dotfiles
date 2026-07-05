@@ -9,7 +9,10 @@
     "amd-pstate"
     "msr"
     "hwmon"
-    "k10temp" # Température du processeur Ryzen
+    "k10temp" # Température du processeur Ryzen. Ne pas utiliser zenpower, qui n'est pas intégré au kernel, et qui n'a pa splus de fonctions.
+    "kvm-amd"
   ];
   powerManagement.cpuFreqGovernor = lib.mkDefault "schedutil";
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  hardware.cpu.amd.updateMicrocode = true;
 }

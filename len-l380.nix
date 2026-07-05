@@ -26,7 +26,9 @@ in
   };
 
   # --- TUNINGS SPECIFIQUES ---
-  
+
+  powerManagement.powertop.enable = true; # met en place un service qui applique automatiquement les réglages appliqués. Utiliser seulement sur PC portables.
+
   # --- OPTIMISATIONS BTRFS SOUS-VOLUME POUR LES MACHINE SANS SSD SECONDAIRE
   fileSystems."/mnt/cargo".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
 

@@ -44,6 +44,7 @@
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true; # Vulkan
   networking.networkmanager.enable = true;
+  services.fstrim.enable = true;                                                # activé de facto, mais on le déclare explicitement
   services.upower.enable = true;                                                # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light
   services.power-profiles-daemon.enable = true;                                 # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light. Ne pas utiliser tlp, pas pris dans plusieurs D.E.
   # Enable sound with pipewire.

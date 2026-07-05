@@ -15,7 +15,7 @@ in
       ./drivers/GPU_AMD.nix # pointer vers divers GPU adapté
       ./home_manager/home.nix # optionnel
       ./modules/impermanence.nix # optionnel
-      ./modules/prefs_firefox.nix # optionnel
+      ./modules/firefox.nix # optionnel
       ./modules/SteamOS.nix # optionnel
       ./software_packs/dev_experiments.nix # optionnel
       ./software_packs/gaming.nix # optionnel
@@ -30,9 +30,11 @@ in
     text = "658437cc7c2542a5b5dc2c93c1af3705\n";
   };
 
-    # --- TUNINGS SPECIFIQUES ---
+  # --- TUNINGS SPECIFIQUES ---
 
   boot.consoleLogLevel = 0; # pour désactiver les messages concernant les tables ACPI non documentées, lors du démarrage
+
+  powerManagement.powertop.enable = true; # met en place un service qui applique automatiquement les réglages appliqués. Utiliser seulement sur PC portables.
 
   # Montage du disque secondaire CARGO (actuellement formaté en ext4)
   fileSystems."/CARGO" =

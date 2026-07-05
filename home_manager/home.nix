@@ -24,6 +24,7 @@ in
     _module.args = { inherit vars; };
     imports = [
       ./options/btop.nix
+      ./options/distrobox.nix
       ./options/git.nix
       ./options/gnome.nix
       ./options/kitty.nix

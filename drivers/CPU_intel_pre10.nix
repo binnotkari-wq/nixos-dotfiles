@@ -28,6 +28,11 @@
   #   };
   # };
 
+  boot.kernelModules = ["kvm-intel"];
+  hardware.cpu.intel.updateMicrocode = true;
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
+
   # 3. Paramètres du Kernel pour forcer Intel P-State si nécessaire
   boot.kernelParams = [ "intel_pstate=active" ];
 

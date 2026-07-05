@@ -8,25 +8,28 @@
 
   environment.systemPackages = with pkgs; [
     kitty                      # console accelerée GPU, esthétique
-    yazi                       # explorateur de fichiers TUI modulaire
+    yazi                       # gestionnaire de fichiers TUI modulaire
     yaziPlugins.mount
     yaziPlugins.chmod
     yaziPlugins.compress
     yaziPlugins.full-border
     yaziPlugins.recycle-bin
-    # superfile                 # explorateur de fichiers esthétique
+    # superfile                 # gestionnaire de fichiers esthétique
+    # ranger                    # gestionnaire de fichiers esthétique
+    fd                          # recherche
+    television                  # interface TUI à fd
     fzf                         # recherche intelligente
-    ranger                      # gestionnaire de fichiers esthétique
     tldr                        # astuces et conseil d'utilisation des logiciels
     dust                        # analyse graphique de l'espace disque
     bat                         # better cat. Visualisation esthetique
     browsh                      # browser texte esthétique
     lynx                        # browser texte basique
-    tmux                        # Terminal multiplexé
+    w3m                         # navigateur internet
     # mdcat                     # Lecture de documentation Markdown
     md-tui                      # visualisateur Markdown. Winner : le plus agréable. Permet d'editer, de rechercher...
     mc                          # Gestionnaire de fichiers interactif
-    zellij                      # Ton multiplexeur de terminal (TUI Desktop)
+    zellij                      # multiplexeur de terminal
+    # tmux                        # multiplexeur de terminal
     vim                         # Editeur avancé
     duf                         # Visualisation rapide de l'espace disque
     tree                        # visualisation d'arborence (peut être redirigé ver sune sortie fichier texte)
@@ -39,7 +42,6 @@
     pyradio                     # radio web
     yt-dlp                      # téléchargement de fichiers sur youtube (complet, juste audio, etc...)
     gophertube                  # chercher, regarder et télécharger des vidéos depuis youtube
-    w3m                         # navigateur internet
     cliphist                    # Visualisation de l'historique du presse-papier
     # atuin                     # analyse de l'historique bash. Mais par rappor à la confidentialité ....non (synchro de l'historique en ligne, etc...)
   ];

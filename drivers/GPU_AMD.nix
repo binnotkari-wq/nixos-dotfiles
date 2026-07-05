@@ -7,6 +7,7 @@
 
   # La nouvelle manière officielle de débloquer l'overclocking/undervolting
   hardware.amdgpu.overdrive.enable = true;
+  hardware.amdgpu.initrd.enable = true;
 
   # Monitoring
   environment.systemPackages = with pkgs; [

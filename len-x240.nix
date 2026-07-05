@@ -12,7 +12,10 @@
     text = "813a1841e6d14827827edc58b5269bf1\n";
   };
 
-  # --- TUNING ---
+  # --- TUNINGS SPECIFIQUES ---
+
+  powerManagement.powertop.enable = true; # met en place un service qui applique automatiquement les réglages appliqués. Utiliser seulement sur PC portables.
+
   # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le boost est maintenu, avec une température de moins de 70 degrés!)
   services.undervolt = {
     enable = true;
