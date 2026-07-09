@@ -30,6 +30,7 @@ in
       ../../software_packs/GTK_base.nix                                             # optionnel
       # ../../software_packs/TUI_all.nix                                            # optionnel
       ../../software_packs/TUI_base.nix                                             # optionnel
+      ../../software_packs/unwanted.nix                                             # optionnel
     ];
 
   boot.initrd.kernelModules = [ "virtio_gpu" ];

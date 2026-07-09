@@ -1,3 +1,0 @@
-https://github.com/alyraffauf/bazznix/tree/master/hwModules/common
-
-On voit des optimisation noyau, gpu, ssd ...
