@@ -27,10 +27,8 @@ in
       ./options/distrobox.nix
       ./options/git.nix
       ./options/gnome.nix
-      ./options/kitty.nix
       ./options/newsboat.nix
       ./options/pyradio.nix
-      ./options/shell.nix
       ./options/vim.nix
       ./options/yazi.nix
     ];
