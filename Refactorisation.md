@@ -59,13 +59,13 @@
 
 #### adapter le script d'installation :
 
-[ ] déplacement de hardware-configuration.nix dans le bon sous-dossier hosts/$(hostname)/
+[x] déplacement de hardware-configuration.nix dans le bon sous-dossier hosts/$(hostname)/
 
-[ ] suppression de configuration.nix
+[x] suppression de configuration.nix
 
-[ ] suppression de /etc/nixos
+[x] suppression de /etc/nixos
 
-[ ] création du lien symbolique juste avant l'exécution de nixos-install
+[x] création du lien symbolique juste avant l'exécution de nixos-install
 
 
 ```bash
