@@ -1,10 +1,3 @@
-# A FAIRE :
-# - objectifs : tous les nix dans un seul endroit
-# - recolaliser hardware-configuration.nix (on peut le renommer en lui faisant contenir le hostname) et le classer dans un sous dossier)et l'importer dans $(hostname).nix
-# - supprimer configuration.nix de etc/nixos
-# - créer un lien depuis /nixos/dotfile/hosts/$(hostname)/ vers
-# importer les modules homes manager un par un dans $(hostname).nix
-
 # L'installation doit avoir été faite par le script, notamment :
 # - les options du volume encrypté, qui est créé par le script
 # - pour les différents sous-volumes btrfs, créés par le script
@@ -20,7 +13,7 @@ in
 
   imports =
     [
-      ./hardware-configuration.nix                                              # obligatoire
+      ./hardware-configuration.nix                                                  # obligatoire
       ../../OS/standard_configuration.nix                                           # obligatoire
       ../../OS/OS_options.nix                                                       # optionnel
       ../../OS/performance_addons.nix                                               # optionnel
@@ -29,7 +22,7 @@ in
       ../../home_manager/home.nix                                                   # optionnel
       ../../modules/impermanence.nix                                                # optionnel
       ../../modules/firefox.nix                                                     # optionnel
-      ../../modules/shell.nix                                                     # optionnel
+      ../../modules/shell.nix                                                       # optionnel
       ../../modules/SteamOS.nix                                                     # optionnel
       ../../software_packs/dev_experiments.nix                                      # optionnel
       ../../software_packs/gaming.nix                                               # optionnel
