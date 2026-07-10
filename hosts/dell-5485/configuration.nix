@@ -5,7 +5,7 @@
 { config, pkgs, vars, ... }:
 
 let
-  vars = import ../../variables.nix;
+  vars = import ../../common/variables.nix;
 in
 
 {
@@ -14,14 +14,14 @@ in
   imports =
     [
       ./hardware-configuration.nix                                                  # obligatoire
-      ../../OS/standard_configuration.nix                                           # obligatoire
-      ../../OS/OS_options.nix                                                       # optionnel
-      ../../OS/performance_addons.nix                                               # optionnel
-      ../../drivers/CPU_AMD.nix                                                     # pointer vers divers CPU adapté
-      ../../drivers/GPU_AMD.nix                                                     # pointer vers divers GPU adapté
+      ../../common/standard_configuration.nix                                       # obligatoire
+      ../../drivers/CPU_AMD.nix                                                     # optionnel
+      ../../drivers/GPU_AMD.nix                                                     # optionnel
       ../../home_manager/home.nix                                                   # optionnel
       ../../modules/impermanence.nix                                                # optionnel
       ../../modules/firefox.nix                                                     # optionnel
+      ../../modules/OS_options.nix                                                  # optionnel
+      ../../modules/performance_addons.nix                                          # optionnel
       ../../modules/shell.nix                                                       # optionnel
       ../../modules/SteamOS.nix                                                     # optionnel
       ../../software_packs/dev_experiments.nix                                      # optionnel
