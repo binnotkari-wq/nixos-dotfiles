@@ -1,37 +1,63 @@
-# Dans /etc/nixos
+# Oragnisation des .nix
 
-Ces deux fichiers restent dans /etc/nixos/ pour simplifier les commandes nixos, dont on aura pas besoin de modifier la cible.
+## Structure générale
 
-## hardware-configuration.nix
+```bash
+.
+├── common
+├── drivers
+├── home_manager
+│   └── options
+├── hosts
+│   ├── hostname1
+│   ├── hostname2
+│   └── hostname...
+├── modules
+└── software_packs
+```
 
-Généré par le script d'installation avec nixos-generate-config avec pour contenu le scan du matériel
 
-## configuration.nix
+## common
 
-Créé par le script d'installation avec cat, avec pour seul contenu l'import de hardware configuration et de main.nix
+Contient les .nix minimaux obligatoires à un système utilisable. Tous les autres .nix en dehors de ce dossier sont facultatifs. 
 
+### standard_configuration.nix
 
+Reprend le contenu d'un configuration.nix tel que généré lors d'une installation graphique Calamares dans l'environnement live Gnome.
+C'est une base garantie de bon fonctionnement. Il contient la configuration coeur du système.
 
-
-
-# Dans /$HOME/Mes-Donnees/Git/nixos-dotfiles/
-
-## variable.nix
-
-Contient les principales données que l'ont personnalise lors d'une installation (et ne contient que ça)
-
+### variables.nix
+Ce fichier est généré à la volée par le script d'installation. Il rassemble toutes les variables personnalisées choisies à l'installation ( (et ne contient que ça) : nom d'utilisateur, hash de mot de passe, hostname....
 Ces données sont héritées dans les fichiers .nix concernés, sous forme de variables que nixos appelle depuis variables.nix au moment de l'évaluation.
-Les fichiers .nix ne contiennet donc aucun paramètre personnel.
 
---> en excluant variables.nix dans .gitignore, on a un repo github anonymisé, aucun paramètre personnel
+Bénéfices :
 
---> en regroupant les variables dans variable.nix, le reste des fichiers .nix deviennent un sanctuaire, jamais modifiés même si on installe sur une autre mahcine, avec un autre nom d'utilisateur, etc ...
+- Les fichiers .nix ne sont donc jamais modifiés, quelles que soient les valeurs choisies lors d'une installation, seul variables.nix est adapté.
+- Cela permet également d'anonymiser le repo git, puisque le seul fichier qui contient des informations d'identification est ignoré par git. On a un repo github anonymisé, aucune donnée personnelle
 
-## main.nix
 
-Il contient la configuration coeur du système.
-il se charge également de propager les vars de variables.nix vers ses imports.
 
-On peut build avec ce seul fichier, hardware-configuration.nix (généré par le script d'installation), "hostname".nix, et variable.nix  (généré par le script d'installation)
+## drivers
 
-Tous les autres fichiers .nix sont optionnels.
+Contient des .nix de réglages additionnels spécifiques CPU et GPU. Ces .nix ne sont pas obligatoires. Il s'agit d'option qui ne sont pas déclarées lors d'une installation standard de Nixos.
+
+## home_manager
+
+## hosts/hostname...
+
+### hardware-configuration.nix
+
+Généré par le script d'installation avec nixos-generate-config avec pour contenu le scan du matériel. Le contenu de ce fichier est spécifiques à chaque machine, chaque host a le sien.
+
+### configuration.nix
+
+- centralise tous les imports des .nix. on peut ainsi construire sur-mesure chaque machine, en ajoutant ou retirant des imports. Ceux-ci sont indépendants les uns des autres et idempotents.
+- se charge de propager les vars de variables.nix vers ses imports.
+- déclare des options spécifiques à la machine
+
+
+## modules
+
+## software_packs
+
+
