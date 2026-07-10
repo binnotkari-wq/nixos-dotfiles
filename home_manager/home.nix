@@ -103,15 +103,22 @@ in
       home.file."${config.home.homeDirectory}/Modèles/Script.sh" = {
         executable = true;
         text = ''
+        ########################
+        # Descriptif du script #
+        ########################
+
         #!/usr/bin/env bash
+        
         '';
       };
       
       home.file."${config.home.homeDirectory}/Modèles/Fichier nix.nix" = {
         text = ''
+        #############################
+        # Descriptif du fichier nix #
+        #############################
+        
         { config, pkgs, lib, ... }:
-
-        # Fichier nix
 
         {
 

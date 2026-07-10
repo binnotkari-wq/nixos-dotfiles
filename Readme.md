@@ -1,4 +1,7 @@
-# Oragnisation des .nix
+# Organisation des .nix
+
+> Seuls 4 fichiers sont nécessaires : standard_configuration.nix, variables.nix, hardware-configuration.nix, configuration.nix.
+> Tout le reste peux être ignoré, ou tous importés, ou importés selon n'importe quelle combinaison.
 
 ## Structure générale
 
@@ -43,6 +46,9 @@ Contient des .nix de réglages additionnels spécifiques CPU et GPU. Ces .nix ne
 
 ## home_manager
 
+Les fichiers décrivent les options de l'environnement utilisateur et les préférences utilisateur des logiciels. Ces .nix ne sont pas obligatoires.
+Ils ne contiennent que des déclarations spécifiques à home-manager : pas de mélange des déclaration système et des déclarations home-manager, pour conserver une cohérence système / utilisateur, et garantir l'indépendance et l'idempotence.
+
 ## hosts/hostname...
 
 ### hardware-configuration.nix
@@ -58,6 +64,22 @@ Généré par le script d'installation avec nixos-generate-config avec pour cont
 
 ## modules
 
+firefox.nix
+flatpak.nix
+impermanence.nix
+OS_options.nix
+performance_addons.nix
+pseudo_impermanence.nix
+shell.nix
+SteamOS.nix
+
+
 ## software_packs
 
+Contient des .nix qui proposent une selection de logiciels GTK, TUI et CLI par thèmes, cohérents et testés. Ces fichiers peuvent être importés ou non, indépendemment.
+
+- peu de dépendances
+- taille raisonnable
+- éprouvés
+- aucune dépendance qt
 
