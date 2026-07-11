@@ -28,7 +28,7 @@ configurer_wifi() {
     echo "  Étape 1/6 : Configuration du wifi"
     echo "══════════════════════════════════════════"
     read -rp "Configurer le wifi ? (oui) : " CONFIRM
-    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 1; }
+    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
     echo ""
     echo "Réseaux WiFi disponibles :"
@@ -77,7 +77,7 @@ configurer_disque() {
     echo "  Étape 2/6 : Configuration des disques"
     echo "══════════════════════════════════════════"
     read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
-    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 1; }
+    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
     # ─── 1. Sélection du disque ──────────────────────────────────────────
     echo "Disques disponibles :"
@@ -223,7 +223,7 @@ installer_Nixos() {
     echo "  Étape 3/6 : Installation NixOS"
     echo "══════════════════════════════════════════"
     read -rp "Prêt à installer NixOS ? (oui) : " CONFIRM
-    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 1; }
+    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
     # ─── 1. Collecte des informations ────────────────────────────────────
     echo ""
@@ -335,7 +335,7 @@ migrer_fichiers_persistants() {
     echo "  Valider uniquement si l'impermanence est à mettre en place"
     echo "══════════════════════════════════════════"
     read -rp "Prêt à migrer les fichiers à persister ? (oui) : " CONFIRM
-    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 1; }
+    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
     # --- Couleurs -----------------------------------------------------------
     RED='\033[0;31m'
@@ -451,7 +451,7 @@ provisionner_cargo() {
     echo "  Étape 5/6 : Dataset essentiel sur @cargo"
     echo "══════════════════════════════════════════"
     read -rp "Prêt à télécharger LLM et .zim ? (oui) : " CONFIRM
-    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 1; }
+    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
     # ─── 1. Téléchargement des LLM ────────────────────────────────────────
     echo "Installation de aria2..."
