@@ -27,6 +27,8 @@ in
       # "com.valvesoftware.Steam.CompatibilityTool.Proton-GE"
       # "io.github.flattool.Warehouse"
       # "com.github.tchx84.Flatseal"
+      # "net.retrodeck.retrodeck"
+      # "org.libretro.RetroArch"
     ];
     uninstallUnmanaged = true;
   };
