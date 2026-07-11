@@ -5,7 +5,7 @@
 { config, pkgs, vars, ... }:
 
 let
-  vars = import ../../variables.nix;
+  vars = import ../../common/variables.nix;
 in
 
 {
@@ -14,31 +14,34 @@ in
   imports =
     [
       ./hardware-configuration.nix                                                  # obligatoire
-      ../../OS/standard_configuration.nix                                           # obligatoire
-      ../../OS/OS_options.nix                                                       # optionnel
-      ../../OS/performance_addons.nix                                               # optionnel
-      # ../../drivers/CPU_AMD.nix                                                   # pointer vers divers CPU adapté
-      # ../../drivers/GPU_AMD.nix                                                   # pointer vers divers GPU adapté
-      ../../home_manager/home.nix                                                   # optionnel
-      ../../modules/impermanence.nix                                                # optionnel
+      ../../common/standard_configuration.nix                                       # obligatoire
+      # ../../drivers/CPU_AMD.nix                                                     # optionnel
+      # ../../drivers/GPU_AMD.nix                                                     # optionnel
+      # ../../home_manager/home.nix                                                   # optionnel
       ../../modules/firefox.nix                                                     # optionnel
+      # ../../modules/flatpak.nix                                                   # optionnel
+      ../../modules/impermanence.nix                                                # optionnel
+      ../../modules/OS_options.nix                                                  # optionnel
+      ../../modules/performance_addons.nix                                          # optionnel
       ../../modules/shell.nix                                                       # optionnel
-      # ../../modules/SteamOS.nix                                                   # optionnel
-      # ../../software_packs/dev_experiments.nix                                    # optionnel
-      # ../../software_packs/gaming.nix                                             # optionnel
-      # ../../software_packs/GTK_all.nix                                            # optionnel
-      ../../software_packs/GTK_base.nix                                             # optionnel
-      # ../../software_packs/TUI_all.nix                                            # optionnel
-      ../../software_packs/TUI_base.nix                                             # optionnel
+      # ../../modules/SteamOS.nix                                                     # optionnel
+      # ../../software_packs/dev_experiments.nix                                      # optionnel
+      # ../../software_packs/gaming.nix                                               # optionnel
+      # ../../software_packs/GTK_all.nix                                              # optionnel
+      # ../../software_packs/GTK_base.nix                                             # optionnel
+      # ../../software_packs/TUI_all.nix                                              # optionnel
+      # ../../software_packs/TUI_base.nix                                             # optionnel
       ../../software_packs/unwanted.nix                                             # optionnel
     ];
 
-  boot.initrd.kernelModules = [ "virtio_gpu" ];
-
-# Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
+  # Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
   environment.etc."machine-id" = {
     text = "538b4138c8ab40a988d92bcb21f2e605\n";
   };
+
+  # --- TUNINGS SPECIFIQUES ---
+
+  boot.initrd.kernelModules = [ "virtio_gpu" ];
 
   # Optimisations spécifiques pour les invités QEMU/KVM
   services.qemuGuest.enable = true;

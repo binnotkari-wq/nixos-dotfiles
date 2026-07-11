@@ -18,8 +18,9 @@ in
       ../../drivers/CPU_AMD.nix                                                     # optionnel
       ../../drivers/GPU_AMD.nix                                                     # optionnel
       ../../home_manager/home.nix                                                   # optionnel
-      ../../modules/impermanence.nix                                                # optionnel
       ../../modules/firefox.nix                                                     # optionnel
+      # ../../modules/flatpak.nix                                                   # optionnel
+      ../../modules/impermanence.nix                                                # optionnel
       ../../modules/OS_options.nix                                                  # optionnel
       ../../modules/performance_addons.nix                                          # optionnel
       ../../modules/shell.nix                                                       # optionnel
