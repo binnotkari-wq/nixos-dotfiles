@@ -103,12 +103,12 @@ in
       home.file."${config.home.homeDirectory}/Modèles/Script.sh" = {
         executable = true;
         text = ''
+        #!/usr/bin/env bash
+        
         ########################
         # Descriptif du script #
         ########################
 
-        #!/usr/bin/env bash
-        
         '';
       };
       

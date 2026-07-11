@@ -42,8 +42,8 @@ in
 
   powerManagement.powertop.enable = true;                                       # met en place un service qui applique automatiquement les réglages appliqués. Utiliser seulement sur PC portables.
 
-  # Montage du disque secondaire CARGO (actuellement formaté en ext4)
-  fileSystems."/CARGO" =
+  # Montage du disque secondaire cargo (actuellement formaté en ext4)
+  fileSystems."/cargo" =
     { device = "/dev/disk/by-uuid/1615eb5d-4346-4106-ba33-dbecf0b75b31";
       fsType = "ext4";
       options = [ "defaults" "nofail" "noatime" ];                              # nofail = le système boote même si le disque est absent

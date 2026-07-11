@@ -15,9 +15,9 @@
     bkp     = "$HOME/Mes-Donnees/Git/scripts/backup.sh";
     bh      = "$HOME/Mes-Donnees/Git/scripts/bash-history-export.sh";
     gt      = "$HOME/Mes-Donnees/Git/scripts/git-sync.sh";
-    gemma   = ''llama-cli --model "/CARGO/local_cache/LLM/gemma-3-4b-it-Q8_0.gguf" --conversation --system-prompt "Tu es un assistant compréhensif pour la vie quotidienne : ménage, jardin, travaux, mécanique." --no-mmap --ctx-size 4096'';
-    qwen    = ''llama-cli --model "/CARGO/local_cache/LLM/Qwen2.5-Coder-3B-Instruct-abliterated-Q4_K_M.gguf" --conversation --system-prompt "Tu es un assistant concis en ingénierie des systèmes linux, scripting, développement." --no-mmap --ctx-size 4096'';
-    llama   = ''llama-cli --model "/CARGO/local_cache/LLM/Llama-3.2-3B-Instruct-Q4_K_M.gguf" --conversation --system-prompt "Tu es un assistant personnel pour m'aider à explorer de nouveaux concepts." --no-mmap --ctx-size 4096'';
+    gemma   = ''llama-cli --model "/cargo/local_cache/LLM/gemma-3-4b-it-Q8_0.gguf" --conversation --system-prompt "Tu es un assistant compréhensif pour la vie quotidienne : ménage, jardin, travaux, mécanique." --no-mmap --ctx-size 4096'';
+    qwen    = ''llama-cli --model "/cargo/local_cache/LLM/Qwen2.5-Coder-3B-Instruct-abliterated-Q4_K_M.gguf" --conversation --system-prompt "Tu es un assistant concis en ingénierie des systèmes linux, scripting, développement." --no-mmap --ctx-size 4096'';
+    llama   = ''llama-cli --model "/cargo/local_cache/LLM/Llama-3.2-3B-Instruct-Q4_K_M.gguf" --conversation --system-prompt "Tu es un assistant personnel pour m'aider à explorer de nouveaux concepts." --no-mmap --ctx-size 4096'';
   };
 
   # ── Historique (variables d'environnement globales) ─────────────────────
