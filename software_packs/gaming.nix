@@ -9,6 +9,7 @@
     mangohud
     warzone2100
     hydralauncher
+    retroarch-full
   ];
 
   programs.steam = {

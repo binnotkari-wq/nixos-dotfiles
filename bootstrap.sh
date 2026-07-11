@@ -2,10 +2,10 @@
 
 ##################################################################################################
 # bootstrap.sh — Configuration du live USB et lancement de l'installation NixOS.                 #
-#                                                                                                  #
-# Usage : sudo ./bootstrap.sh                                                                     #
-# Pour passer le clavier en français avant de lancer le script :                                  #
-#   gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]" && sudo ./bootstrap.sh #
+#                                                                                                #
+# Usage : sudo ./bootstrap.sh                                                                    #
+# Pour passer le clavier en français avant de lancer le script :                                 #
+# gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]" && sudo ./bootstrap.sh #
 ##################################################################################################
 
 set -euo pipefail

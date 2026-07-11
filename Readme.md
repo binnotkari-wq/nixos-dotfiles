@@ -1,3 +1,11 @@
+# Déploiement
+
+```bash
+gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]"
+curl -fsSL -o bootstrap.sh https://raw.githubusercontent.com/binnotkari-wq/nixos-dotfiles/main/bootstrap.sh
+chmod +x bootstrap.sh
+```
+
 # Organisation des .nix
 
 > Seuls 4 fichiers sont nécessaires : standard_configuration.nix, variables.nix, hardware-configuration.nix, configuration.nix.
