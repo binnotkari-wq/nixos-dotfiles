@@ -9,6 +9,7 @@
 ##################################################################################################
 
 set -euo pipefail
+timedatectl set-timezone Europe/Paris
 
 # ─── VÉRIFICATION DES DROITS ────────────────────────────────────────────────
 if [[ $EUID -ne 0 ]]; then
@@ -18,25 +19,17 @@ fi
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  ÉTAPE 1/6 — PRÉPARATION DE L'ENVIRONNEMENT
-#  Fuseau horaire et connexion réseau.
+#  ÉTAPE 1/6 — CONFIGURATION DE LA CONNEXION WIFI
 # ═══════════════════════════════════════════════════════════════════════════
-preparer_environnement() {
+configurer_wifi() {
 
     echo ""
     echo "══════════════════════════════════════════"
-    echo "  Étape 1/6 : Configuration de l'environnement"
+    echo "  Étape 1/6 : Configuration du wifi"
     echo "══════════════════════════════════════════"
-    read -rp "Prêt à configurer l'environnement ? (oui) : " CONFIRM
+    read -rp "Configurer le wifi ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 1; }
 
-    # ─── 1. Fuseau horaire ───────────────────────────────────────────────
-    echo ""
-    echo "Configuration du fuseau horaire..."
-    timedatectl set-timezone Europe/Paris
-    echo "✓ Fuseau horaire : Europe/Paris"
-
-    # ─── 2. Connexion WiFi ───────────────────────────────────────────────
     echo ""
     echo "Réseaux WiFi disponibles :"
     nmcli device wifi list
@@ -563,7 +556,7 @@ finaliser() {
 # ═══════════════════════════════════════════════════════════════════════════
 #  SÉQUENCE D'EXÉCUTION
 # ═══════════════════════════════════════════════════════════════════════════
-preparer_environnement
+configurer_wifi
 configurer_disque
 installer_Nixos
 migrer_fichiers_persistants
