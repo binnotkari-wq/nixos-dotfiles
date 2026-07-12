@@ -90,8 +90,8 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
     #  thunderbird
-    hashedPassword = vars.hashedPassword;                                       # hérité de variables.nix. Par défaut : Calamares créé un fichier password. Mais ce n'est pas déclaratif.
     ];
+    hashedPassword = vars.hashedPassword;                                       # hérité de variables.nix. Par défaut : Calamares créé un fichier password. Mais ce n'est pas déclaratif.
   };
 
   # Install firefox.
