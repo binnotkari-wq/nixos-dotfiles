@@ -18,12 +18,12 @@ in
       # ../../drivers/CPU_AMD.nix                                                     # optionnel
       # ../../drivers/GPU_AMD.nix                                                     # optionnel
       # ../../home_manager/home.nix                                                   # optionnel
-      ../../modules/firefox.nix                                                     # optionnel
+      # ../../modules/firefox.nix                                                     # optionnel
       # ../../modules/flatpak.nix                                                   # optionnel
       ../../modules/impermanence.nix                                                # optionnel
-      ../../modules/OS_options.nix                                                  # optionnel
+      # ../../modules/OS_options.nix                                                  # optionnel
       ../../modules/performance_addons.nix                                          # optionnel
-      ../../modules/shell.nix                                                       # optionnel
+      # ../../modules/shell.nix                                                       # optionnel
       # ../../modules/SteamOS.nix                                                     # optionnel
       # ../../software_packs/dev_experiments.nix                                      # optionnel
       # ../../software_packs/gaming.nix                                               # optionnel
@@ -31,7 +31,7 @@ in
       # ../../software_packs/GTK_base.nix                                             # optionnel
       # ../../software_packs/TUI_all.nix                                              # optionnel
       # ../../software_packs/TUI_base.nix                                             # optionnel
-      ../../software_packs/unwanted.nix                                             # optionnel
+      # ../../software_packs/unwanted.nix                                             # optionnel
     ];
 
   # Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
