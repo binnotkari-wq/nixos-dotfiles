@@ -52,7 +52,6 @@
     shell = pkgs.bash;
     extraGroups = [ "libvirtd" "kvm" ];
     uid = 1000;                                                                 # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
-    hashedPassword = vars.hashedPassword;                                       # hérité de variables.nix
   };
 
   # --- 9. CONFIGURATION LOGICIELLE COMMUNE ---

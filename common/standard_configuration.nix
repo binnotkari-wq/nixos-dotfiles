@@ -46,11 +46,11 @@
   };
 
   # Enable the X11 windowing system.
-  # services.xserver.enable = true;                             # par défaut : décommenté
+  # services.xserver.enable = true;                                          # par défaut : décommenté
 
   # Enable the GNOME Desktop Environment.
-  services.desktopManager.gnome.enable = true;                  # syntaxe corrigée
-  services.displayManager.gdm.enable = true;                    # syntaxe corrigée
+  services.desktopManager.gnome.enable = true;                               # syntaxe corrigée
+  services.displayManager.gdm.enable = true;                                 # syntaxe corrigée
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -62,7 +62,7 @@
   console.keyMap = "fr";
 
   # Enable CUPS to print documents.
-  services.printing.enable = false;                             # par défaut : true
+  services.printing.enable = false;                                           # par défaut : true
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -90,6 +90,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
     #  thunderbird
+    hashedPassword = vars.hashedPassword;                                       # hérité de variables.nix. Par défaut : Calamares créé un fichier password. Mais ce n'est pas déclaratif.
     ];
   };
 
