@@ -48,7 +48,6 @@
   # --- 8. DEFINITION UTILISATEUR ---
   users.users.${vars.username} = {                                              # hérité de variables.nix
     shell = pkgs.bash;
-    extraGroups = [ "libvirtd" "kvm" ];
     uid = 1000;                                                                 # pour s'assurer qu'on sera bien bénéficiaire des droits sur /home dans le cas d'une réinstallation où /home est conservé
   };
 

@@ -2,11 +2,38 @@
 
 {
   # --- 2. OPTIONS PERFORMANCES LUKS ---
-  boot.initrd.luks.devices."cryptroot" = {
-    allowDiscards = true;
-    bypassWorkqueues = true;
+  # boot.initrd.luks.devices."cryptroot" = {
+  #   allowDiscards = true;
+  #   bypassWorkqueues = true;
+  # };
+
+
+  # boot.initrd.luks.devices = lib.mapAttrs (name: dev: {
+  #   allowDiscards = true;
+  #   bypassWorkqueues = true;
+  # }) config.boot.initrd.luks.devices;
+
+  # Définit les options à passer par défaut à tout volume LUKS. La configuration est agnostique.
+  options.boot.initrd.luks.devices = lib.mkOption {
+    type = lib.types.attrsOf (lib.types.submodule {
+      config = {
+        allowDiscards = lib.mkDefault true;
+        bypassWorkqueues = lib.mkDefault true;
+      };
+    });
   };
 
+  # Définit les options à passer par défaut à tout système de fichier BTRFS. La configuration est agnostique.
+  options.fileSystems = lib.mkOption {
+    type = lib.types.attrsOf (lib.types.submodule ({ config, ... }: {
+      config = lib.mkIf (config.fsType == "btrfs") {
+        options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+      };
+    }));
+  };
+
+
+config = {
   # --- 3. SWAP / ZRAM --- 
   # Avec 8 Go de RAM, un ZRAM bien dimensionné suffit largement pour une machine de bureau ou un laptop classique. Cela rend le swap sur dique inutile
   zramSwap.enable = true;
@@ -18,12 +45,25 @@
   };
 
   # --- 4. OPTIMISATIONS BTRFS (https://wiki.nixos.org/wiki/Btrfs) ---
+  boot.kernelParams = [ 
+    "btrfs.clear_cache" 
+  ];
+  
   services.fstrim.enable = true;                                                # activé de facto, mais on le déclare explicitement
-  fileSystems."/".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-  fileSystems."/nix".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-  fileSystems."/home".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
-  
-  
+  # les filesystems /, /nix et /home sont également créés par Calamares. -> grâce à options.fileSystems = lib.mkOption ces déclaration ne sont plus nécessaires.
+  #fileSystems."/".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+  #fileSystems."/nix".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+  #fileSystems."/home".options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+
+  # tout disque BTRFS secondaire monté ultérieurement par udev (gestionnaire de fichier) bénéficiera de ces options :
+  services.udisks2.settings = {
+    "mount_options.conf" = {
+      defaults = {
+        btrfs_defaults = "nosuid,nodev,noatime,compress=zstd,ssd,discard=async";
+      };
+    };
+  };
+
   ##############################################################################
   # NTSync — accélère les primitives de synchronisation NT utilisées par
   # Wine/Proton (équivalent moderne de esync/fsync). Gain de FPS mesurable
@@ -52,5 +92,5 @@
   # of optimisation features and configurations.
   ##############################################################################
   programs.gamemode.enable = true;
-  
+};  
 }

@@ -1,8 +1,9 @@
-{ config, pkgs, ... }:
+{ config, pkgs, vars, ... }:
 
 {
   environment.systemPackages = with pkgs; [
     # GUI
+    gnome-boxes # (33.7 MiB download, 187.2 MiB unpacked)
     distroshelf # (2.8 MiB download, 15.2 MiB unpacked)
 
     # CLI
@@ -28,4 +29,9 @@
   # --- VIRTUALISATION ---
   virtualisation.libvirtd.enable = true;
   virtualisation.spiceUSBRedirection.enable = true;
+
+  users.users.${vars.username} = {                                              # hérité de variables.nix
+    extraGroups = [ "libvirtd" "kvm" ];                                         # pour donner l'accès aux fonction avancées de virtualisation
+  };
+
 }

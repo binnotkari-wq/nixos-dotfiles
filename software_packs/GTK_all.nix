@@ -2,7 +2,6 @@
 
 {
   environment.systemPackages = with pkgs; [
-    gnome-boxes # (33.7 MiB download, 187.2 MiB unpacked)
     handbrake # (60.7 MiB download, 288.1 MiB unpacked)
     gimp # (61.0 MiB download, 353.5 MiB unpacked)
     morphosis # (26.9 MiB download, 208.9 MiB unpacked) (parmis les dépendance : pandoc, qui prend le plus de place)
