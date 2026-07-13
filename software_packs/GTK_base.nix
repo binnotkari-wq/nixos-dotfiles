@@ -1,8 +1,13 @@
+##############################################################################
+# 100% agnostique, applicable à toute configuration
+##############################################################################
+
 { config, pkgs, ... }:
 
 {
   environment.systemPackages = with pkgs; [
     gnomeExtensions.dash-to-panel
+    gnomeExtensions.tiling-shell
     fragments
     gnome-secrets
     shortwave

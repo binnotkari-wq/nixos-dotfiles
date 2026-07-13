@@ -274,22 +274,23 @@ installer_Nixos() {
 EOF
     echo "✓ variables.nix généré."
 
-    # ─── 5. Génération de hardware-configuration.nix ─────────────────────
+    # ─── 5. Liaison symbolique de hardware-configuration.nix ─────────────────────
     echo ""
     echo "Génération de hardware-configuration.nix et déplacement vers le dépôt git..."
     nixos-generate-config --root /mnt
     mkdir -p "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hosts/${HOSTNAME}/"
     mv /mnt/etc/nixos/hardware-configuration.nix "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hosts/${HOSTNAME}/"
-    echo "✓ hardware-configuration.nix généré."
+    echo "Création du lien symbolique depuis le dépôt git vers /etc/nixos..."
+    ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hosts/${HOSTNAME}/hardware-configuration.nix" /mnt/etc/nixos/hardware-configuration.nix
+    echo "✓ hardware-configuration.nix généré, et liaison crée entre dépôt git et /etc/nixos/hardware-configuration.nix ."
 
-    # ─── 6. Remplacement de /etc/nixos par un lien symbolique ────────────
-    # hardware-configuration.nix a déjà été déplacé, et le configuration.nix
-    # généré par nixos-generate-config ne sera pas utilisé.
+    # ─── 6. Liaison symbolique de configuration.nix ─────────────────────
     echo ""
-    echo "Remplacement de /etc/nixos par un lien symbolique vers le dépôt git..."
-    rm -rf /mnt/etc/nixos
-    ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hosts/${HOSTNAME}" /mnt/etc/nixos
-    echo "✓ Lien symbolique créé."
+    echo "configuration.nix généré par nixos-generate-config ne sera pas utilisé : suppression."
+    rm /mnt/etc/nixos/configuration.nix
+    echo "Création du liens symbolique depuis le dépôt git vers /etc/nixos..."
+    ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hosts/${HOSTNAME}/configuration.nix" /mnt/etc/nixos/configuration.nix
+    echo "✓ Liaison crée entre dépôt git et /etc/nixos/configuration.nix ."
 
     # ─── 7. Confirmation avant installation ──────────────────────────────
     echo ""

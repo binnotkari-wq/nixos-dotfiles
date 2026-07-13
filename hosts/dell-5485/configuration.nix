@@ -20,19 +20,19 @@ in
       ../../modules/home-manager.nix                                                # optionnel
       ../../modules/firefox.nix                                                     # optionnel
       # ../../modules/flatpak.nix                                                   # optionnel
-      ../../modules/impermanence.nix                                                # optionnel
-      ../../modules/OS_options.nix                                                  # optionnel
-      ../../modules/performance_addons.nix                                          # optionnel
+      ../../modules/impermanence.nix                                                # optionnel - intégrable sous conditions
+      ../../modules/OS_options.nix                                                  # optionnel - intégrable sans aucune condition
+      ../../modules/performance_addons.nix                                          # optionnel - intégrable sans aucune condition
       ../../modules/shell.nix                                                       # optionnel
-      ../../modules/SteamOS.nix                                                     # optionnel
-      ../../software_packs/dev_experiments.nix                                      # optionnel
-      ../../software_packs/firmwares.nix                                            # optionnel
-      ../../software_packs/gaming.nix                                               # optionnel
-      ../../software_packs/GTK_all.nix                                              # optionnel
-      ../../software_packs/GTK_base.nix                                             # optionnel
-      ../../software_packs/TUI_all.nix                                              # optionnel
-      ../../software_packs/TUI_base.nix                                             # optionnel
-      ../../software_packs/unwanted.nix                                             # optionnel
+      ../../modules/SteamOS.nix                                                     # optionnel - intégrable sans aucune condition (GPU AMD)
+      ../../software_packs/dev_experiments.nix                                      # optionnel - intégrable sans aucune condition
+      ../../software_packs/firmwares.nix                                            # optionnel - intégrable sans aucune condition
+      ../../software_packs/gaming.nix                                               # optionnel - intégrable sans aucune condition
+      ../../software_packs/GTK_all.nix                                              # optionnel - intégrable sans aucune condition
+      ../../software_packs/GTK_base.nix                                             # optionnel - intégrable sans aucune condition
+      ../../software_packs/TUI_all.nix                                              # optionnel - intégrable sans aucune condition
+      ../../software_packs/TUI_base.nix                                             # optionnel - intégrable sans aucune condition
+      ../../software_packs/unwanted.nix                                             # optionnel - intégrable sans aucune condition
     ];
 
   # toutes les lignes de cette section sont à commenter si on utilise pas home manager.
@@ -42,7 +42,7 @@ in
     [
       ../../modules/HM_options/btop.nix                                               # optionnel
       ../../modules/HM_options/distrobox.nix                                          # optionnel
-      ../../modules/HM_options/git.nix                                                # optionnel
+      ../../modules/HM_options/git.nix                                                # optionnel - intégrable sous conditions
       ../../modules/HM_options/gnome.nix                                              # optionnel
       ../../modules/HM_options/newsboat.nix                                           # optionnel
       ../../modules/HM_options/pyradio.nix                                            # optionnel
@@ -55,6 +55,18 @@ in
   environment.etc."machine-id" = {
     text = "658437cc7c2542a5b5dc2c93c1af3705\n";
   };
+
+
+  ##############################################################################################################
+  # Un service systemd se charge de créer un lien vers les .nix du repo git : ainsi, la commande nixos-rebuild
+  # n'a pas besoin d'un chemin personnalisé. Cette création est exécutée à chaque démarrage : donc tout à fait
+  # adapté à l'impermanence.
+  ##############################################################################################################
+  systemd.tmpfiles.rules = [
+    "L+ /etc/nixos/configuration.nix - - - - /home/${vars.username}/Mes-Donnees/Git/nixos-dotfiles/hosts/${vars.hostname}/configuration.nix"
+    "L+ /etc/nixos/hardware-configuration.nix - - - - /home/${vars.username}/Mes-Donnees/Git/nixos-dotfiles/hosts/${vars.hostname}/hardware-configuration.nix"
+  ];
+
 
   # --- TUNINGS SPECIFIQUES ---
 

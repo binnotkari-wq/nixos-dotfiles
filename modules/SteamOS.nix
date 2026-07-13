@@ -1,3 +1,7 @@
+##############################################################################
+# 100% agnostique, applicable à toute configuration GPU AMD
+##############################################################################
+
 { config, pkgs, lib, ... }:
 
 # infos : si la session steam ne démarre pas, et qu'au bout d'un moment on revient au gestionnaire de login...en fait il faut confgurer
@@ -41,6 +45,8 @@ in
 
   programs.gamescope.enable = true;
   programs.steam = {
+    enable = true;
+    extraPackages = with pkgs; [ mangohud ];    # On injecte MangoHud directement dans Steam pour MangoApp
     gamescopeSession.enable = false; # on utilise la session custom à la place
   };
 

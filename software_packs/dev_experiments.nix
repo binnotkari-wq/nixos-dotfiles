@@ -1,4 +1,8 @@
-{ config, pkgs, vars, ... }:
+##############################################################################
+# 100% agnostique, applicable à toute configuration
+##############################################################################
+
+{ config, pkgs, ... }:
 
 {
   environment.systemPackages = with pkgs; [
@@ -29,9 +33,4 @@
   # --- VIRTUALISATION ---
   virtualisation.libvirtd.enable = true;
   virtualisation.spiceUSBRedirection.enable = true;
-
-  users.users.${vars.username} = {                                              # hérité de variables.nix
-    extraGroups = [ "libvirtd" "kvm" ];                                         # pour donner l'accès aux fonction avancées de virtualisation
-  };
-
 }
