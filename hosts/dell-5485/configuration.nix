@@ -18,12 +18,12 @@ in
       ../../drivers/CPU_AMD.nix                                                     # optionnel
       ../../drivers/GPU_AMD.nix                                                     # optionnel
       ../../modules/home-manager.nix                                                # optionnel
-      ../../modules/firefox.nix                                                     # optionnel
+      ../../modules/firefox.nix                                                     # optionnel - intégrable sans aucune condition
       # ../../modules/flatpak.nix                                                   # optionnel
       ../../modules/impermanence.nix                                                # optionnel - intégrable sous conditions
       ../../modules/OS_options.nix                                                  # optionnel - intégrable sans aucune condition
       ../../modules/performance_addons.nix                                          # optionnel - intégrable sans aucune condition
-      ../../modules/shell.nix                                                       # optionnel
+      ../../modules/shell.nix                                                       # optionnel - intégrable sans aucune condition
       ../../modules/SteamOS.nix                                                     # optionnel - intégrable sans aucune condition (GPU AMD)
       ../../software_packs/dev_experiments.nix                                      # optionnel - intégrable sans aucune condition
       ../../software_packs/firmwares.nix                                            # optionnel - intégrable sans aucune condition

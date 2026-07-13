@@ -32,4 +32,9 @@ in
     ];
     uninstallUnmanaged = true;
   };
+
+  # gnome-software fait partie des paquets installés automatiquement avec flatpak. Mais on en a pas besoin.
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-software
+  ];
 }
