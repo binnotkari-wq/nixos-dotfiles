@@ -17,7 +17,7 @@ in
       ../../common/standard_configuration.nix                                       # obligatoire
       ../../drivers/CPU_AMD.nix                                                     # optionnel
       ../../drivers/GPU_AMD.nix                                                     # optionnel
-      ../../home_manager/home.nix                                                   # optionnel
+      ../../modules/home-manager.nix                                                # optionnel
       ../../modules/firefox.nix                                                     # optionnel
       # ../../modules/flatpak.nix                                                   # optionnel
       ../../modules/impermanence.nix                                                # optionnel
@@ -26,12 +26,29 @@ in
       ../../modules/shell.nix                                                       # optionnel
       ../../modules/SteamOS.nix                                                     # optionnel
       ../../software_packs/dev_experiments.nix                                      # optionnel
+      ../../software_packs/firmwares.nix                                            # optionnel
       ../../software_packs/gaming.nix                                               # optionnel
       ../../software_packs/GTK_all.nix                                              # optionnel
       ../../software_packs/GTK_base.nix                                             # optionnel
       ../../software_packs/TUI_all.nix                                              # optionnel
       ../../software_packs/TUI_base.nix                                             # optionnel
       ../../software_packs/unwanted.nix                                             # optionnel
+    ];
+
+  # toutes les lignes de cette section sont à commenter si on utilise pas home manager.
+  # cette section permet d'importer chez nix de façon selective pour chaque machine
+  # au lieu de tout importer via home.nix (ainsi home.nix n'est jamais modifié)
+  home-manager.users.${vars.username}.imports =
+    [
+      ../../modules/HM_options/btop.nix                                               # optionnel
+      ../../modules/HM_options/distrobox.nix                                          # optionnel
+      ../../modules/HM_options/git.nix                                                # optionnel
+      ../../modules/HM_options/gnome.nix                                              # optionnel
+      ../../modules/HM_options/newsboat.nix                                           # optionnel
+      ../../modules/HM_options/pyradio.nix                                            # optionnel
+      ../../modules/HM_options/vim.nix                                                # optionnel
+      ../../modules/HM_options/xdg.nix                                                # optionnel
+      ../../modules/HM_options/yazi.nix                                               # optionnel
     ];
 
   # Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'

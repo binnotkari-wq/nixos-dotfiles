@@ -6,6 +6,11 @@
     enableBashIntegration = true;
   };
 
+  environment.interactiveShellInit = ''
+    # Intégration zoxide
+    eval "$(zoxide init bash)"
+  '';
+
   environment.systemPackages = with pkgs; [
     kitty                      # console accelerée GPU, esthétique
     yazi                       # gestionnaire de fichiers TUI modulaire

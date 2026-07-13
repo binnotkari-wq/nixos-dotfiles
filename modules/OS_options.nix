@@ -7,8 +7,6 @@
   boot.consoleLogLevel = 0;                                                     # pour désactiver les messages concernant les tables ACPI non documentées, lors du démarrage
 
   # --- 5. INTERFACES HARDWARE ---
-  hardware.enableRedistributableFirmware = true;                                # pour avoir des firmware supplémentaire open-source (wifi...)
-  # hardware.enableAllFirmware = true;                                          # pour avoir des firmware closed source (matériel spécifique...)
   hardware.bluetooth.enable = true;
   hardware.graphics.enable = true;                                              # Vulkan
   services.upower.enable = true;                                                # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light

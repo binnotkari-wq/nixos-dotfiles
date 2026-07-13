@@ -33,9 +33,6 @@
   environment.interactiveShellInit = ''
     export PATH="$HOME/Mes-Donnees/Git/scripts:$PATH"
 
-    # Intégration zoxide
-    eval "$(zoxide init bash)"
-
     # Prompt façon GNOME Terminal
     PS1='\[\e[01;32m\][\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[01;32m\]]\$\[\e[00m\] '
 
