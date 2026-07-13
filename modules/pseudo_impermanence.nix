@@ -1,3 +1,7 @@
+##############################################################################
+# 100% agnostique, applicable à toute configuration
+##############################################################################
+
 # Permet de se rapprocher d'une impermanence, mais sans avoir à définir un schéma de partitionnement adapté
 # ou une mise en place en pré-installation. On peut activer ou desactiver ce module quand on veut et quel
 # que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation avec Calamares

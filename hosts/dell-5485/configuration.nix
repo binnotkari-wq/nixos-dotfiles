@@ -19,7 +19,7 @@ in
       ../../drivers/GPU_AMD.nix                                                     # optionnel
       ../../modules/home-manager.nix                                                # optionnel
       ../../modules/firefox.nix                                                     # optionnel - intégrable sans aucune condition
-      # ../../modules/flatpak.nix                                                   # optionnel
+      # ../../modules/flatpak.nix                                                   # optionnel - intégrable sans aucune condition
       ../../modules/impermanence.nix                                                # optionnel - intégrable sous conditions
       ../../modules/OS_options.nix                                                  # optionnel - intégrable sans aucune condition
       ../../modules/performance_addons.nix                                          # optionnel - intégrable sans aucune condition
