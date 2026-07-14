@@ -15,9 +15,9 @@ in
     [
       ./hardware-configuration.nix                                                  # obligatoire
       ../../common/standard_configuration.nix                                       # obligatoire
-      ../../drivers/CPU_AMD.nix                                                     # optionnel
-      ../../drivers/GPU_AMD.nix                                                     # optionnel
-      ../../modules/home-manager.nix                                                # optionnel
+      ../../drivers/CPU_AMD.nix                                                     # optionnel - intégrable sous conditions (CPU AMD)
+      ../../drivers/GPU_AMD.nix                                                     # optionnel - intégrable sous conditions (GPU AMD)
+      ../../modules/home-manager.nix                                                # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
       ../../modules/firefox.nix                                                     # optionnel - intégrable sans aucune condition
       # ../../modules/flatpak.nix                                                   # optionnel - intégrable sans aucune condition
       ../../modules/impermanence.nix                                                # optionnel - intégrable sous conditions
@@ -42,7 +42,7 @@ in
     [
       ../../modules/HM_options/btop.nix                                               # optionnel
       ../../modules/HM_options/distrobox.nix                                          # optionnel
-      ../../modules/HM_options/git.nix                                                # optionnel - intégrable sous conditions
+      ../../modules/HM_options/git.nix                                                # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
       ../../modules/HM_options/gnome.nix                                              # optionnel
       ../../modules/HM_options/newsboat.nix                                           # optionnel
       ../../modules/HM_options/pyradio.nix                                            # optionnel

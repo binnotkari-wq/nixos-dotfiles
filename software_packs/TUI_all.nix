@@ -35,10 +35,9 @@
     lynx                        # browser texte basique
     w3m                         # navigateur internet
     # mdcat                     # Lecture de documentation Markdown
-    md-tui                      # visualisateur Markdown. Winner : le plus agréable. Permet d'editer, de rechercher...
     mc                          # Gestionnaire de fichiers interactif
     zellij                      # multiplexeur de terminal
-    # tmux                        # multiplexeur de terminal
+    # tmux                      # multiplexeur de terminal
     vim                         # Editeur avancé
     duf                         # Visualisation rapide de l'espace disque
     tree                        # visualisation d'arborence (peut être redirigé ver sune sortie fichier texte)
@@ -53,5 +52,9 @@
     gophertube                  # chercher, regarder et télécharger des vidéos depuis youtube
     cliphist                    # Visualisation de l'historique du presse-papier
     # atuin                     # analyse de l'historique bash. Mais par rappor à la confidentialité ....non (synchro de l'historique en ligne, etc...)
+    ffmpeg                              # taille ?
+    groff                               # taille ?
+    imagemagick                         # taille ?
+    pandoc                              # taille ?
   ];
 }

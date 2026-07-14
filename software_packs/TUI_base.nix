@@ -25,6 +25,7 @@
     shellcheck                          # contrôle de syntaxe scripts bash
     compsize                            # utilitaire analyse Btrfs
     git                                 # versionning, et interface avec repos en ligne
+    md-tui                              # visualisateur Markdown. Winner : le plus agréable. Permet d'editer, de rechercher...
     dialog                              # outil boites de dialogue scripts
     zenity                              # outil boites de dialogue scripts (GTK)
     libnotify                           # outil boites de dialogue scripts
@@ -36,10 +37,6 @@
     # --- Services & Contenu ---
     kiwix-tools                         # (3.0 MiB download, 12.6 MiB unpacked) wikipedia offline
     llama-cpp-vulkan                    # (10.6 MiB download, 79.9 MiB unpacked) Pour LLM optimisée GPU/iGPU
-    ffmpeg                              # taille ?
-    groff                               # taille ?
-    imagemagick                         # taille ?
-    pandoc                              # taille ?
   ];
 
   fonts.packages = with pkgs; [

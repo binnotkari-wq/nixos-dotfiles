@@ -92,3 +92,27 @@ Contient des .nix qui proposent une selection de logiciels GTK, TUI et CLI par t
 - éprouvés
 - aucune dépendance qt
 
+
+# Utilisation des ressources
+
+| Modules                            | Disque   |  Ram |
+| :--------------------------------- | -------: | ----: |
+| common/standard_configuration.nix  | 7200,00 Mio | $1600 |
+| modules/performance_addons.nix     |    1,00 Mio | $     |
+| modules/OS_options.nix             |   20,00 Mio | $     |
+| modules/firefox.nix                |    1,50 Mio | $     |
+| modules/shell.nix                  |    0,03 Mio | $     |
+| modules/flatpak.nix                |   15,00 Mio | $     |
+| modules/pseudo_impermanence.nix    |    0,00 Mio | $     |
+| modules/impermanence.nix           |    0,00 Mio | $     |
+| modules/SteamOS.nix                | 1400,00 Mio | $1600 |
+| modules/home-manager.nix           |    0,00 Mio | $     |
+| modules/HM_options/gnome.nix       |    0,00 Mio | $     |
+| modules/HM_options/xdg.nix         |    0,00 Mio | $     |
+| software_packs/dev_experiments.nix | 1800,00 Mio | $1600 |
+| zebra stripes |   are neat    |    $1 |
+| zebra stripes |   are neat    |    $1 |
+| zebra stripes |   are neat    |    $1 |
+| zebra stripes |   are neat    |    $1 |
+
+modules/performance_addons.nix 
