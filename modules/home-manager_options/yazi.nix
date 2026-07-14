@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 # A utiliser en tant qu'import home manager.
+# Des données propre à l'utilisateur sont générées.
+# -> c'est donc à home-manager qu'on confie cette opération.
 
 {
   programs.yazi = {

@@ -17,39 +17,40 @@ in
       ../../common/standard_configuration.nix                                       # obligatoire
       ../../drivers/CPU_AMD.nix                                                     # optionnel - intégrable sous conditions (CPU AMD)
       ../../drivers/GPU_AMD.nix                                                     # optionnel - intégrable sous conditions (GPU AMD)
-      ../../modules/home-manager.nix                                                # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
+      ../../modules/btop.nix                                                        # optionnel - intégrable sans aucune condition
       ../../modules/firefox.nix                                                     # optionnel - intégrable sans aucune condition
       # ../../modules/flatpak.nix                                                   # optionnel - intégrable sans aucune condition
+      ../../modules/git.nix                                                         # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
+      ../../modules/gnome-dconf.nix                                                 # optionnel - intégrable sans aucune condition
+      # ../../modules/home-manager.nix                                              # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
       ../../modules/impermanence.nix                                                # optionnel - intégrable sous conditions
+      ../../modules/kitty.nix                                                       # optionnel - intégrable sans aucune condition
       ../../modules/OS_options.nix                                                  # optionnel - intégrable sans aucune condition
       ../../modules/performance_addons.nix                                          # optionnel - intégrable sans aucune condition
       ../../modules/shell.nix                                                       # optionnel - intégrable sans aucune condition
       ../../modules/SteamOS.nix                                                     # optionnel - intégrable sans aucune condition (GPU AMD)
+      ../../modules/xdg.nix                                                         # optionnel - intégrable sans aucune condition
       ../../software_packs/dev_experiments.nix                                      # optionnel - intégrable sans aucune condition
-      ../../software_packs/firmwares.nix                                            # optionnel - intégrable sans aucune condition
+      ../../software_packs/firmwares.nix                                            # optionnel - intégrable sans aucune condition. iwlwifi est utilisé par le wifi intel 8260 (dell-5485).
       ../../software_packs/gaming.nix                                               # optionnel - intégrable sans aucune condition
       ../../software_packs/GTK_all.nix                                              # optionnel - intégrable sans aucune condition
       ../../software_packs/GTK_base.nix                                             # optionnel - intégrable sans aucune condition
-      ../../software_packs/TUI_all.nix                                              # optionnel - intégrable sans aucune condition
-      ../../software_packs/TUI_base.nix                                             # optionnel - intégrable sans aucune condition
+      ../../software_packs/CLI_all.nix                                              # optionnel - intégrable sans aucune condition
+      ../../software_packs/CLI_base.nix                                             # optionnel - intégrable sans aucune condition
+      # ../../software_packs/TUI.nix                                                # optionnel - intégrable sans aucune condition
       ../../software_packs/unwanted.nix                                             # optionnel - intégrable sans aucune condition
     ];
 
   # toutes les lignes de cette section sont à commenter si on utilise pas home manager.
   # cette section permet d'importer chez nix de façon selective pour chaque machine
   # au lieu de tout importer via home.nix (ainsi home.nix n'est jamais modifié)
-  home-manager.users.${vars.username}.imports =
-    [
-      ../../modules/HM_options/btop.nix                                               # optionnel
-      ../../modules/HM_options/distrobox.nix                                          # optionnel
-      ../../modules/HM_options/git.nix                                                # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
-      ../../modules/HM_options/gnome.nix                                              # optionnel
-      ../../modules/HM_options/newsboat.nix                                           # optionnel
-      ../../modules/HM_options/pyradio.nix                                            # optionnel
-      ../../modules/HM_options/vim.nix                                                # optionnel
-      ../../modules/HM_options/xdg.nix                                                # optionnel
-      ../../modules/HM_options/yazi.nix                                               # optionnel
-    ];
+  # home-manager.users.${vars.username}.imports =
+    # [
+      # ../../modules/home-manager_options/btop.nix                                 # optionnel
+      # ../../modules/home-manager_options/newsboat.nix                             # optionnel
+      # ../../modules/home-manager_options/pyradio.nix                              # optionnel
+      # ../../modules/home-manager_options/yazi.nix                                 # optionnel
+    # ];
 
   # Permet d'avoir un machine id déclaratif. Généré grâce à systemd-id128 new | tr -d '-'
   environment.etc."machine-id" = {
@@ -72,11 +73,11 @@ in
 
   powerManagement.powertop.enable = true;                                       # met en place un service qui applique automatiquement les réglages appliqués. Utiliser seulement sur PC portables.
 
-  # Montage du disque secondaire cargo (actuellement formaté en ext4)
+  # Montage du disque secondaire cargo (actuellement formaté en btrfs)
   fileSystems."/cargo" =
-    { device = "/dev/disk/by-uuid/1615eb5d-4346-4106-ba33-dbecf0b75b31";
-      fsType = "ext4";
-      options = [ "defaults" "nofail" "noatime" ];                              # nofail = le système boote même si le disque est absent
+    { device = "/dev/disk/by-uuid/6790e467-032e-4021-b1b7-330fc873378f";
+      fsType = "btrfs";
+      options = [ "nofail" "noatime" "compress=zstd" "ssd" "discard=async" ];                              # nofail = le système boote même si le disque est absent
     };
 
   environment.systemPackages = with pkgs; [

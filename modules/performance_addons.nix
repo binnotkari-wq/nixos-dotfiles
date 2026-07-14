@@ -89,6 +89,8 @@
       "mount_options.conf" = {
         defaults = {
           btrfs_defaults = "nosuid,nodev,noatime,compress=zstd,ssd,discard=async";
+          # ssd,discard=async sont retirés, au cas où il y ait un disque non ssd
+          # btrfs_defaults = "nosuid,nodev,noatime,compress=zstd";
         };
       };
     };

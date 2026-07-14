@@ -25,7 +25,7 @@
     shellcheck                          # contrôle de syntaxe scripts bash
     compsize                            # utilitaire analyse Btrfs
     git                                 # versionning, et interface avec repos en ligne
-    md-tui                              # visualisateur Markdown. Winner : le plus agréable. Permet d'editer, de rechercher...
+    mdcat                               # Lecture de documentation Markdown
     dialog                              # outil boites de dialogue scripts
     zenity                              # outil boites de dialogue scripts (GTK)
     libnotify                           # outil boites de dialogue scripts

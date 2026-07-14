@@ -7,7 +7,7 @@
 {
   environment.systemPackages = with pkgs; [
     gnomeExtensions.dash-to-panel
-    gnomeExtensions.tiling-shell
+    # gnomeExtensions.tiling-shell      # le tiling de base de gnome est tout à fait suffisant
     fragments                           # (103 MiB download, 357,4 MiB unpacked) dont 310 Mib de dépendances qui servent au reste des logiciels.
     gnome-secrets                       # (9.3 MiB download, 38.3 MiB unpacked)
     shortwave                           # (4.3 MiB download, 17.4 MiB unpacked)
