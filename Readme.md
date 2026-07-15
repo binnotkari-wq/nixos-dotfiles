@@ -139,12 +139,12 @@ Contient des .nix qui proposent une selection de logiciels GTK, TUI et CLI par t
 
 | Modules                                      | Disque      |  Ram        | Intégration | Conditions pour éval nix | Remarques                                                                       |
 | :------------------------------------------- | ----------: | ----------: | :---------: | :----------------------: | :------------------------------------------------------------------------------ |
-| /etc/nixos/configuration.nix                 | 7200,00 Mio | 1200,00 Mio | Obligatoire | Calamares                | Base système générée via Calamares, cible de nixos-rebuild                      |
-| /etc/nixos/hardware-configuration.nix        |    0,00 Mio |    0,00 Mio | Obligatoire | Calamares                | Base système générée via Calamares, propre au PC                                |
+| /etc/nixos/configuration.nix                 | 7200,00 Mio | 1200,00 Mio | Obligatoire | Aucune                   | Base système générée via Calamares, cible de nixos-rebuild                      |
+| /etc/nixos/hardware-configuration.nix        |    0,00 Mio |    0,00 Mio | Obligatoire | Aucune                   | Base système générée via Calamares, propre au PC                                |
 |        ou :                                  |             |             |             |                          |                                                                                 |
-| ./configuration.nix                          | 7200,00 Mio | 1200,00 Mio | Obligatoire | Script + variables.nix   | Base système pour déploiement scripté. Calqué sur configuration.nix Calamares   |
-|  ./variables.nix                             |    0,00 Mio |    0,00 Mio | Obligatoire | Script                   | Base système générée via script, propre à chaque PC. Ignoré par git             |
-| ./hardware-configuration.nix                 |         Mio |         Mio | Obligatoire | Script                   | Base système générée via script, propre à chaque PC. Ignoré par git             |
+| ./configuration.nix                          | 7200,00 Mio | 1200,00 Mio | Obligatoire | variables.nix ou edition | Base système pour déploiement scripté. Calqué sur configuration.nix Calamares   |
+|  ./variables.nix                             |    0,00 Mio |    0,00 Mio | Obligatoire | Aucune                   | Base système générée via script, propre à chaque PC. Ignoré par git             |
+| ./hardware-configuration.nix                 |         Mio |         Mio | Obligatoire | Aucune                   | Base système générée via script, propre à chaque PC. Ignoré par git             |
 |        et :                                  |             |             |             |                          |                                                                                 |
 | ./hosts/$hostname/modules_selection.nix      |      qq Mio |         Mio | Recommandée | Aucune                   | 100% agnostique. Permet l'import selectif d'options et packages pour chaque machine |
 | ./hosts/$hostname/machine_features.nix       |      qq Mio |         Mio | Recommandée | Aucune                   | 100% agnostique. Déclare uniquement ce qui ne peut concerner une autre machine. |
@@ -162,8 +162,8 @@ Contient des .nix qui proposent une selection de logiciels GTK, TUI et CLI par t
 | ./modules/flatpak.nix                        |   15,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique                                                                 |
 | ./modules/git.nix                            |    0,00 Mio |    0,00 Mio | Facultative | variables.nix ou edition | 100% agnostique. Prefs système. Inutile si git n'est pas installé               |
 | ./modules/gnome-dconf.nix                    |    0,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique                                                                 |
-| ./modules/home-manager.nix                   |    0,00 Mio |    0,00 Mio | Facultative | variables.nix ou edition | Fichier de configuration : module commnautaire Home-Manager. Inutile si newsboat, pyradio et yazi ne sont pas installés (TUI_all.nix) |
-| ./modules/impermanence.nix                   |    0,00 Mio |    0,00 Mio | Facultative | Config disque adaptée    | Fichier de configuration : module commnautaire Impermanence                     |
+| ./modules/home-manager.nix                   |    0,00 Mio |    0,00 Mio | Facultative | variables.nix ou edition | Fichier de configuration home-manager. Inutile si newsboat, pyradio et yazi ne sont pas installés (TUI_all.nix) |
+| ./modules/impermanence.nix                   |    0,00 Mio |    0,00 Mio | Facultative | Config disque adaptée    | Fichier de configuration impermanence                                           |
 | ./modules/kitty.nix                          |    0,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Inutile si Kitty n'est pas installé                            |
 | ./modules/pseudo_impermanence.nix            |    0,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Inutile lorsqu'on active impermanence.nix                      |
 | ./modules/shell.nix                          |    0,03 Mio |    0,00 Mio | Facultative | Aucune                   | Génère des alias vers scripts personnalisés et outils de TUI_base.nix           |

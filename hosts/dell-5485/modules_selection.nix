@@ -3,7 +3,7 @@
 # Permet d'importer les d'options et packages .nix de façon selective                   #
 #########################################################################################
 
-{ config, pkgs, vars, ... }:
+{ config, pkgs, ... }:
 
 {
   imports =
