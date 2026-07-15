@@ -2,13 +2,40 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, vars, ... }:
+{ config, pkgs, ... }:
+
+#################################################################################################################
+# Partie personnalisée. Import des .nix et création des liens vers les .nix du repo git par un service systemd. #
+# Grâce à ces liens symboliques la commande nixos-rebuild n'a pas besoin d'un chemin personnalisé.              #
+# Cette création est exécutée à chaque démarrage : donc tout à fait adapté à l'impermanence.                    #
+#################################################################################################################
+let
+  vars = import ./variables.nix { };                                            # généré par cat. Hors git (.gitignore) pour confidentialité
+in
 
 {
-  # imports =                                                           # les imports sont tous gérés dans hostname.nix
-  #   [ # Include the results of the hardware scan.
-  #     ./hardware-configuration.nix
-  #   ];
+  _module.args.vars = vars;
+
+  imports =
+    [
+      ./hardware-configuration.nix                                              # généré par nixos-generate-config. Hors git (.gitignore) car change d'une machine à l'autre
+      ./hosts/${vars.hostname}/modules_selection.nix                            # Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
+    ];
+
+  systemd.tmpfiles.rules = [
+    "L+ /etc/nixos/configuration.nix - - - - /home/${vars.username}/Mes-Donnees/Git/nixos-dotfiles/configuration.nix"
+    "L+ /etc/nixos/hardware-configuration.nix - - - - /home/${vars.username}/Mes-Donnees/Git/nixos-dotfiles/hardware-configuration.nix"
+  ];
+
+#################################################################################################################
+# Fin de la partie personnalisée.                                                                               #
+#################################################################################################################
+
+# {
+  # imports =
+  # [ # Include the results of the hardware scan.
+  #   ./hardware-configuration.nix
+  # ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -46,11 +73,11 @@
   };
 
   # Enable the X11 windowing system.
-  # services.xserver.enable = true;                                          # par défaut : décommenté
+  # services.xserver.enable = true;                                             # par défaut : décommenté
 
   # Enable the GNOME Desktop Environment.
-  services.desktopManager.gnome.enable = true;                               # syntaxe corrigée
-  services.displayManager.gdm.enable = true;                                 # syntaxe corrigée
+  services.desktopManager.gnome.enable = true;                                  # syntaxe corrigée
+  services.displayManager.gdm.enable = true;                                    # syntaxe corrigée
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -62,7 +89,7 @@
   console.keyMap = "fr";
 
   # Enable CUPS to print documents.
-  services.printing.enable = false;                                           # par défaut : true
+  services.printing.enable = false;                                             # par défaut : true
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;

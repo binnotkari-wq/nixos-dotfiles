@@ -1,7 +1,7 @@
 ##############################################################################
 # PAS AGNOSTIQUE. Prérequis :
 # - variables.nix existe et est renseigné
-# - ou édition manuelle de tous les vars. et commenter les inherits et 
+# - ou édition manuelle de tous les vars + commenter les inherits et 
 #   imports de variables.nix
 ##############################################################################
 
