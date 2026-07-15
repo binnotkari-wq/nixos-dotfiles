@@ -17,6 +17,19 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  SEQUENCE D'EXECUTION
+# ═══════════════════════════════════════════════════════════════════════════
+
+executer() {
+
+    configurer_wifi
+    configurer_disque
+    installer_Nixos
+    migrer_fichiers_persistants
+    provisionner_cargo
+    finaliser
+}
 
 # ═══════════════════════════════════════════════════════════════════════════
 #  ÉTAPE 1/6 — CONFIGURATION DE LA CONNEXION WIFI
@@ -235,7 +248,7 @@ installer_Nixos() {
     echo ""
     read -rsp "Confirmer le mot de passe : " PASSWORD_CONFIRM
     echo ""
-    read -rp "Nom d'utilisateur github (nécessaire pour télécharger les .nix) : " GIT_USERNAME
+    read -rp "Nom d'utilisateur github (optionnel, peut être laissé vide) : " GIT_USERNAME
     read -rp "Adresse mail github (optionnel, peut être laissé vide) : " GIT_USERMAIL
     echo ""
 
@@ -249,18 +262,22 @@ installer_Nixos() {
     echo ""
     echo "Téléchargement des dotfiles..."
     mkdir -p "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles"
-    git clone "https://github.com/${GIT_USERNAME}/nixos-dotfiles.git" "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles"
+    git clone "https://github.com/binnotkari-wq/nixos-dotfiles.git" "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles"
     echo "✓ Dotfiles téléchargés dans /mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/."
 
     # ─── 4. Génération de variables.nix ──────────────────────────────────
     echo ""
     echo "Génération de variables.nix..."
-    cat > "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/common/variables.nix" << EOF
-# Généré par bootstrap.sh d'après les informations saisies lors de l'installation.
-# Ces valeurs sont héritées dans les fichiers de config .nix.
-# Ceci permet d'anonymiser les fichiers de configuration (dépôt github public
-# avec un gitignore sur variables.nix) et de les figer, puisqu'ils ne
-# contiennent que le nom de la variable et non sa valeur.
+    cat > "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/variables.nix" << EOF
+#########################################################################################
+# Généré par le script de déploiement d'après les infos saisie lors de l'intallation.   #
+# Ceci permet d'anonymsier tous les autres fichiers .nix (gitignore sur variables.nix)  #
+# et de les figer puisqu'ils ne contiennent que le nom de la variable et non sa valeur. #
+# Lorsque ce fichier est importé, les vars sont propagées dans tous les autres modules  #
+# qui font appel à vars (quels que soient les niveaux d'imports).                       #
+#########################################################################################
+
+{ ... }:
 
 {
   username        = "${USERNAME}";
@@ -278,10 +295,10 @@ EOF
     echo ""
     echo "Génération de hardware-configuration.nix et déplacement vers le dépôt git..."
     nixos-generate-config --root /mnt
-    mkdir -p "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hosts/${HOSTNAME}/"
-    mv /mnt/etc/nixos/hardware-configuration.nix "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hosts/${HOSTNAME}/"
+    mkdir -p "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/"
+    mv /mnt/etc/nixos/hardware-configuration.nix "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/"
     echo "Création du lien symbolique depuis le dépôt git vers /etc/nixos..."
-    ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hosts/${HOSTNAME}/hardware-configuration.nix" /mnt/etc/nixos/hardware-configuration.nix
+    ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hardware-configuration.nix" /mnt/etc/nixos/hardware-configuration.nix
     echo "✓ hardware-configuration.nix généré, et liaison crée entre dépôt git et /etc/nixos/hardware-configuration.nix ."
 
     # ─── 6. Liaison symbolique de configuration.nix ─────────────────────
@@ -289,7 +306,7 @@ EOF
     echo "configuration.nix généré par nixos-generate-config ne sera pas utilisé : suppression."
     rm /mnt/etc/nixos/configuration.nix
     echo "Création du liens symbolique depuis le dépôt git vers /etc/nixos..."
-    ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hosts/${HOSTNAME}/configuration.nix" /mnt/etc/nixos/configuration.nix
+    ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/configuration.nix" /mnt/etc/nixos/configuration.nix
     echo "✓ Liaison crée entre dépôt git et /etc/nixos/configuration.nix ."
 
     # ─── 7. Confirmation avant installation ──────────────────────────────
@@ -536,7 +553,7 @@ finaliser() {
     echo ""
     echo "Téléchargement des scripts utiles..."
     mkdir -p "/mnt/home/${USERNAME}/Mes-Donnees/Git/scripts"
-    git clone "https://github.com/${GIT_USERNAME}/scripts.git" "/mnt/home/${USERNAME}/Mes-Donnees/Git/scripts/"
+    git clone "https://github.com/binnotkari-wq/scripts.git" "/mnt/home/${USERNAME}/Mes-Donnees/Git/scripts/"
     echo "✓ Scripts téléchargés dans /mnt/home/${USERNAME}/Mes-Donnees/Git/scripts/."
 
     # ─── 2. Correction des permissions ────────────────────────────────────
@@ -555,11 +572,6 @@ finaliser() {
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  SÉQUENCE D'EXÉCUTION
+#  EXÉCUTION
 # ═══════════════════════════════════════════════════════════════════════════
-configurer_wifi
-configurer_disque
-installer_Nixos
-migrer_fichiers_persistants
-provisionner_cargo
-finaliser
+executer

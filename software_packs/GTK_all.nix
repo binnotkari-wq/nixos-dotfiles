@@ -13,9 +13,9 @@
     libreoffice-fresh                                                   # (303.4 MiB download, 1.6 GiB unpacked)
   ];
 
-  # Pour ne pas installer ABiword et Gnumeric qui sont inutiles lorsqu'on installe libreoffice : 
+  # Pour ne pas installer ABiword et Gnumeric qui sont inutiles lorsqu'on installe
+  # libreoffice, on override le contenu des paquets en déclarant qu'ils sont vides
   nixpkgs.config.packageOverrides = pkgs: {
-    # On vide virtuellement les paquets pour ce profil en les remplaçant par un paquet vide
     abiword = pkgs.emptyDirectory;
     gnumeric = pkgs.emptyDirectory;
   };

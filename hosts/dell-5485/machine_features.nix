@@ -1,6 +1,6 @@
 #########################################################################################
-# Spécifique au Dell-5485                                                               #
-# Déclare ce qui ne peut concerner uniquement cette machine.                            #
+# Spécifique à la machine.                                                              #
+# Déclare uniquement ce qui ne peut concerner une autre machine.                        #
 #########################################################################################
 
 { config, pkgs, ... }:

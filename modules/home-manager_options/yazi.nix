@@ -1,8 +1,10 @@
-{ config, pkgs, ... }:
+################################################################################
+# A utiliser en tant qu'import home manager. Yazi n'a aucune configuration     #
+# au niveau du système, uniquement dans l'environnement utilisateur.           #
+# -> la configuration est donc déclarée par home-manager                       #
+################################################################################
 
-# A utiliser en tant qu'import home manager.
-# Des données propre à l'utilisateur sont générées.
-# -> c'est donc à home-manager qu'on confie cette opération.
+{ config, pkgs, ... }:
 
 {
   programs.yazi = {
@@ -45,6 +47,5 @@
     "yazi/init.lua".text = ''
       require("full-border"):setup()
     '';
-
   };
 }

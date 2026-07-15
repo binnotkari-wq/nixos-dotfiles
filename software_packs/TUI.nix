@@ -1,5 +1,5 @@
 ##############################################################################
-# 100% agnostique, applicable à toute configuration
+# 100% agnostique, applicable à toute configuration                          #
 ##############################################################################
 
 { config, pkgs, ... }:

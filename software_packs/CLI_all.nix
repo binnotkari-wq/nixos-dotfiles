@@ -5,7 +5,7 @@
 { config, pkgs, ... }:
 
 {
-  programs.zoxide = { # cd intelligent. Commencer par lancer zoxide add "le répertoire à intégrer dans la base de données". Puis, z remplace cd (pas immédiat, il faut déjà se promener un peu dans les dossiers)
+  programs.zoxide = {           # cd intelligent. Commencer par lancer zoxide add "le répertoire à intégrer dans la base de données". Puis, z remplace cd (pas immédiat, il faut déjà se promener un peu dans les dossiers)
     enable = true;
     enableBashIntegration = true;
   };
@@ -26,6 +26,7 @@
     mc                          # Gestionnaire de fichiers interactif
     # vim                       # Editeur avancé
     duf                         # Visualisation rapide de l'espace disque
+    # stow                      # Gestion des dotfiles personnels (inutile lorsqu'on déclare les préférences en .nix)
     tree                        # visualisation d'arborence (peut être redirigé ver sune sortie fichier texte)
     yt-dlp                      # téléchargement de fichiers sur youtube (complet, juste audio, etc...)
     cliphist                    # Visualisation de l'historique du presse-papier
