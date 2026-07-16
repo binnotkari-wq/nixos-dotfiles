@@ -18,7 +18,13 @@
 
   # --- TDP ---
   powerManagement.powertop.enable = true;                                                       # met en place un service qui applique automatiquement les réglages appliqués. Utiliser seulement sur PC portables.
+
+
+
+
   environment.systemPackages = [ pkgs.ryzenadj ];                                               # spécifique aux APU Ryzen
+
+
 
   environment.shellAliases = {
     ryzen-low = "sudo ryzenadj --stapm-limit=15000 --fast-limit=15000 --slow-limit=15000";      # TDP : 15W

@@ -55,16 +55,17 @@ Contient les .nix minimaux obligatoires à un système utilisable.
 
 Obligatoire. Reprend le contenu d'un configuration.nix tel que généré lors d'une installation graphique Calamares dans l'environnement live Gnome.
 C'est une base garantie de bon fonctionnement. Il contient la configuration coeur du système.
-Il se charge de propager les vars de variables.nix vers ses imports.
+Il se charge de propager les vars de variables.nix vers ses imports. Conditions : si variables.nix n'est pas utilisé, il faut éditer manuellement le fichier pour remplacer les vars par les valeurs souhaitées.
 
 ### hardware-configuration.nix
 
-Obligatoire.Généré par le script d'installation avec nixos-generate-config avec pour contenu le scan du matériel. Ce fichier est spécifiques à chaque machine, et reste isolé en local (.gitignore).
+Obligatoire. Ce fichier est généré par le script d'installation avec nixos-generate-config et a pour contenu le scan du matériel. Ce fichier est spécifiques à chaque machine, et reste isolé en local (.gitignore).
 
 ### variables.nix
 
-Obligatoire. Ce fichier est généré par le script d'installation. Il rassemble toutes les variables personnalisées choisies à l'installation ( (et ne contient que ça) : nom d'utilisateur, hash de mot de passe, hostname....
+Obligatoire. Ce fichier est généré par le script d'installation avec un cat. Il rassemble toutes les variables personnalisées choisies à l'installation ( (et ne contient que ça) : nom d'utilisateur, hash de mot de passe, hostname....
 Lors d'une évaluation ces données sont propagées vers les fichiers .nix qui en ont besoin.
+Ce fichier est spécifiques à chaque machine, et reste isolé en local (.gitignore).
 
 Bénéfices :
 
@@ -77,6 +78,8 @@ RECOMMANDE
 Contient des .nix de réglages additionnels spécifiques CPU et GPU. Ces .nix ne sont pas obligatoires. Il s'agit d'options qui ne sont pas déclarées lors d'une installation standard de Nixos, mais leur activation permet l'accès à toute la ressource matérielle.
 
 ## hosts/hostname...
+
+**15/07/2026 : OK le contenu des nix est propre et standard. Aucune dépendance à un autre nix, aucun serpent qui se mords la queue. L'ensemble est agnostique**
 
 Fichiers de paramétrage (options, packages...) distinct pour chaque machine.
 
@@ -95,11 +98,11 @@ OS_options.nix et performance_addons.nix sont recommandés, puisqu'ils apportent
 
 FACULTATIF ET SOUS CONDITIONS
 - impermanence.nix : fichier de configuration et mise en place de l'impermanence. Conditions : le système de fichier doit être adapté et les fichiers à persister doivent avoir été migrés au préalable (ces opérations sont faites automatiquement lors du déploiement par bootstrap.sh).
-- btop.nix : préférences de btop (déclarées à l'échelle du système, et non à l'échelle de l'utilisateur). Conditions : si variables.nix n'est pas utilisé, il faut éditer manuellement le fichier pour remplacer les vars par les valeurs souhaitées.
 - git.nix : préférences de git (déclarées à l'échelle du système, et non à l'échelle de l'utilisateur). Conditions : si variables.nix n'est pas utilisé, il faut éditer manuellement le fichier pour remplacer les vars par les valeurs souhaitées.
 - home-manager : fichier de configuration du module communautaire Home-Manager (gestion déclarative de l'environnement utilisateur). Conditions : si variables.nix n'est pas utilisé, il faut éditer manuellement le fichier pour remplacer les vars par les valeurs souhaitées.
 
 FACULTATIF
+- btop.nix : préférences de btop (déclarées à l'échelle du système, et non à l'échelle de l'utilisateur).
 - firefox.nix : préférences de Firefox (déclarées à l'échelle du système, et non à l'échelle de l'utilisateur).
 - flatpak.nix : fichier de configuration et mise en place du service Flatpak et du module communautaire de gestion déclarative des Flatpaks.
 - gnome-dconf.nix : préférences de Gnome (déclarées à l'échelle du système, et non à l'échelle de l'utilisateur).
