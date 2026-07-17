@@ -36,6 +36,8 @@
 # cp -ra /etc/passwd /nix/persist/etc/ (dans le cas d'une définition impérative, avec Calamares)
 # cp -ra /etc/group /nix/persist/etc/ (dans le cas d'une définition impérative, avec Calamares)
 
+# Il se peut que plusieurs copies échouent, si des dossier n'existent pas encore des /etc ou /var. Cela n'aura pas de conséquences sur la suite : les cibles sont quand même prêtes pour un futur contenu.
+
 # 3. importer ce fichier .nix, et nixos-rebuild boot (ne pas faire nixos-rebuild switch : le démontage / remontage de / en tmpfs en live peut mal se passer)
 
 
@@ -45,6 +47,13 @@
 #     "L+ /etc/nixos/configuration.nix - - - - /home/${vars.username}/Mes-Donnees/Git/nixos-dotfiles/configuration.nix"
 #     "L+ /etc/nixos/hardware-configuration.nix - - - - /home/${vars.username}/Mes-Donnees/Git/nixos-dotfiles/hardware-configuration.nix"
 #   ];
+
+
+
+
+# autre méthode au lieu de spécifier des symlinks :
+# préciser l'emplacement du fichier ( https://grahamc.com/blog/erase-your-darlings/ ) :
+# environment.etc.<name>.source =
 
 
 { config, lib, ... }:
@@ -138,4 +147,14 @@ in
   # 3. Ordonnancement explicite : tmpfiles-setup doit finir avant chaque mount unit concerné
   systemd.services.systemd-tmpfiles-setup.before =
     map mountUnitOf persistedDirs;
+
+
+
+  fileSystems."/" = lib.mkForce {
+    device = "none";
+    fsType = "tmpfs";
+    options = [ "defaults" "size=2G" "mode=0755" ];
+  };
+
+
 }
