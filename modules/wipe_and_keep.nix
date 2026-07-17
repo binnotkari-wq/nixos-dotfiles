@@ -2,7 +2,23 @@
 # 0. terminal root (pour eviter les erreur lors des éventuelles operations sur /etc/shadow  et /etc/passwd
 # sudo -i
 #
-# 2. Copier les données (liste non exhaustive) -r : créé l'arborescence sur la cible si elle n'existe pas déjà. -a : preserve les propriété et attributs existantes
+
+# 2. Créer les dossiers dans nix/persist
+# mkdir -p /nix/persist/etc/lact
+# mkdir -p /nix/persist/etc/nixos
+# mkdir -p /nix/persist/etc/NetworkManager
+# mkdir -p /nix/persist/etc/ssh
+# mkdir -p /nix/persist/var/lib/AccountsService
+# mkdir -p /nix/persist/var/lib/bluetooth
+# mkdir -p /nix/persist/var/lib/cups
+# mkdir -p /nix/persist/var/lib/flatpak
+# mkdir -p /nix/persist/var/lib/NetworkManager
+# mkdir -p /nix/persist/var/lib/nixos
+# mkdir -p /nix/persist/var/lib/systemd
+# mkdir -p /nix/persist/var/log
+
+
+# 3. Copier les données (liste non exhaustive) -r : créé l'arborescence sur la cible si elle n'existe pas déjà. -a : preserve les propriété et attributs existantes
 # cp -ra /etc/lact /nix/persist/etc/
 # cp -ra /etc/nixos /nix/persist/etc/
 # cp -ra /etc/NetworkManager /nix/persist/etc/
