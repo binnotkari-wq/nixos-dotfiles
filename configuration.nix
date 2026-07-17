@@ -22,11 +22,6 @@ in
       ./hosts/${vars.hostname}/modules_selection.nix                            # Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
     ];
 
-  systemd.tmpfiles.rules = [
-    "L+ /etc/nixos/configuration.nix - - - - /home/${vars.username}/Mes-Donnees/Git/nixos-dotfiles/configuration.nix"
-    "L+ /etc/nixos/hardware-configuration.nix - - - - /home/${vars.username}/Mes-Donnees/Git/nixos-dotfiles/hardware-configuration.nix"
-  ];
-
 #################################################################################################################
 # Fin de la partie personnalisée.                                                                               #
 #################################################################################################################
