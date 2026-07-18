@@ -303,6 +303,8 @@ installer_Nixos() {
     # ─── 4. Récupération des dotfiles ────────────────────────────────────
     echo ""
     echo "Téléchargement des dotfiles..."
+    # git refuse le téléchargement s'il exite des fichiers dans le dossier cible. On supprime les éventuelles fichiers existants.
+    rm -rf "/mnt/home/${USERNAME}/Git/nixos-dotfiles"
     mkdir -p "/mnt/home/${USERNAME}/Git/nixos-dotfiles"
     git clone "https://github.com/binnotkari-wq/nixos-dotfiles.git" "/mnt/home/${USERNAME}/Git/nixos-dotfiles"
     echo "✓ Dotfiles téléchargés dans /mnt/home/${USERNAME}/Git/nixos-dotfiles/."
