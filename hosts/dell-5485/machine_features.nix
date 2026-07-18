@@ -6,9 +6,6 @@
 { config, pkgs, ... }:
 
 {
-  # --- IDENTIFIANT MACHINE DECLARATIF ---
-  environment.etc."machine-id".text = "658437cc7c2542a5b5dc2c93c1af3705\n";                     # Généré grâce à systemd-id128 new | tr -d '-'
-
   # --- DISQUE SECONDAIRE ---
   fileSystems."/cargo" =
     { device = "/dev/disk/by-uuid/6790e467-032e-4021-b1b7-330fc873378f";

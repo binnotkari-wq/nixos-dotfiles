@@ -108,12 +108,11 @@ in
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${vars.username} = {                                              # hérité de variables.nix
     isNormalUser = true;
-    description = vars.usernameDisplay;                                         # hérité de variables.nix
+    description = vars.fullname;                                                # hérité de variables.nix
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
     #  thunderbird
     ];
-    hashedPassword = vars.hashedPassword;                                       # hérité de variables.nix. Par défaut : Calamares créé un fichier password. Mais ce n'est pas déclaratif.
   };
 
   # Install firefox.

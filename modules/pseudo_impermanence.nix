@@ -7,9 +7,27 @@
 # que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation avec Calamares
 # Ne pas activer si on a activé l'impermanence, qui efface ces éléments à chaque redémarrage.
 
-{ config, pkgs, ... }:
+{ config, pkgs, vars, ... }:
 
 {
+
+# Calamares créé un fichier password. Mais ce n'est pas déclaratif.
+# déclaration :
+# - machine id
+# - mdp
+# - mutableuser false
+# - rendre déclaratif des fichiers de etc environment.etc."systemd/network/10-lan.link".text = ''...''; 
+
+
+# Les vars sont hérités de variables.nix. Si on n'utilise pas les variables, remplacer :
+# - ${vars.machineid} par le résultat de : systemd-id128 new | tr -d '-'
+# - ${vars.username} par le nom de l'utilisateur
+# - vars.hashedPassword par le résultat de : mkpasswd lemotdepasse (par défaut ce hash sera généré avec l'algorythme yescrypt).
+
+  # --- IDENTIFIANT MACHINE DECLARATIF ---
+  environment.etc."machine-id".text = "${vars.machineid}\n";
+  users.users.${vars.username}.hashedPassword = vars.hashedPassword;
+
 
   # Sécurité : données sudo en tmpfs, pas conservées sur disque ---
   fileSystems = {

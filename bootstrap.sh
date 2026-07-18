@@ -111,32 +111,55 @@ configurer_disque() {
 
     OPTS="noatime,compress=zstd,space_cache=v2,ssd,discard=async"
 
-    # ─── 2. Détection de @home / @cargo ──────────────────────────────────
+# ─── 2. Détection de home / cargo existants ──────────────────────────
+    # On accepte les deux conventions de nommage (transition en cours) :
+    #   - ancienne : @home, @cargo (préfixe @)
+    #   - nouvelle : home, cargo (convention Calamares, sans préfixe)
     USER_DATA_FOUND=false
+    HOME_SUBVOL_NAME=""
+    CARGO_SUBVOL_NAME=""
+    LUKS_UUID=""
+    LUKS_NAME=""
 
-    # On tente d'ouvrir le conteneur LUKS existant pour inspecter les sous-volumes.
     if cryptsetup isLuks "$PART_LUKS" 2>/dev/null; then
         echo ""
-        echo "Partition LUKS détectée. Ouverture pour inspection..."
-        cryptsetup open "$PART_LUKS" cryptroot_inspect
-        mount -o "$OPTS,subvol=/" /dev/mapper/cryptroot_inspect /mnt
+        echo "Partition LUKS détectée. Récupération de son UUID..."
+        LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
+        LUKS_NAME="luks-${LUKS_UUID}"
 
-        if btrfs subvolume show /mnt/@home &>/dev/null || btrfs subvolume show /mnt/@cargo &>/dev/null; then
+        echo "Ouverture pour inspection (mapper : $LUKS_NAME)..."
+        cryptsetup open "$PART_LUKS" "$LUKS_NAME"
+        mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
+
+        for name in home @home; do
+            if btrfs subvolume show "/mnt/$name" &>/dev/null; then
+                HOME_SUBVOL_NAME="$name"
+                break
+            fi
+        done
+        for name in cargo @cargo; do
+            if btrfs subvolume show "/mnt/$name" &>/dev/null; then
+                CARGO_SUBVOL_NAME="$name"
+                break
+            fi
+        done
+
+        if [[ -n "$HOME_SUBVOL_NAME" ]] || [[ -n "$CARGO_SUBVOL_NAME" ]]; then
             USER_DATA_FOUND=true
-            echo "Données utilisateur détectées. Elles seront conservées."
+            echo "Données utilisateur détectées (home: ${HOME_SUBVOL_NAME:-absent}, cargo: ${CARGO_SUBVOL_NAME:-absent}). Elles seront conservées."
         else
             echo "Aucune donnée utilisateur détectée. Le disque sera entièrement effacé."
         fi
 
         umount /mnt
-        cryptsetup close cryptroot_inspect
+        cryptsetup close "$LUKS_NAME"
     fi
 
-    # ─── 3A. Chemin "@home absent" → zap complet ─────────────────────────
+    # ─── 3A. Chemin "aucune donnée" → zap complet ────────────────────────
     if [[ "$USER_DATA_FOUND" == false ]]; then
 
         echo ""
-        echo "Aucun @home à préserver. $DISK va être entièrement effacé."
+        echo "Aucune donnée utilisateur à préserver. $DISK va être entièrement effacé."
         read -rp "Confirmer ? (oui) : " CONFIRM
         [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
 
@@ -148,30 +171,32 @@ configurer_disque() {
 
         echo "Chiffrement LUKS de $PART_LUKS..."
         cryptsetup luksFormat --type luks2 "$PART_LUKS"
-        cryptsetup open "$PART_LUKS" cryptroot
+        LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
+        LUKS_NAME="luks-${LUKS_UUID}"
+        cryptsetup open "$PART_LUKS" "$LUKS_NAME"
 
-        mkfs.btrfs -L nixos /dev/mapper/cryptroot
+        mkfs.btrfs -L nixos "/dev/mapper/$LUKS_NAME"
 
-        mount /dev/mapper/cryptroot /mnt
-        btrfs subvolume create /mnt/@
-        btrfs subvolume create /mnt/@nix
-        btrfs subvolume create /mnt/@home
+        mount "/dev/mapper/$LUKS_NAME" /mnt
+        btrfs subvolume create /mnt/root
+        btrfs subvolume create /mnt/nix
+        btrfs subvolume create /mnt/home
 
-    # ─── 3B. Chemin "@home présent" → réinitialisation douce ─────────────
+    # ─── 3B. Chemin "données présentes" → réinitialisation douce ─────────
     else
 
         echo ""
-        echo "@home et/ou @cargo seront conservés. Les sous-volumes @ et @nix vont être recréés."
+        echo "Home et/ou cargo seront conservés. Les sous-volumes root et nix vont être recréés."
         read -rp "Confirmer ? (oui) : " CONFIRM
         [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
 
-        cryptsetup open "$PART_LUKS" cryptroot
-        mount -o "$OPTS,subvol=/" /dev/mapper/cryptroot /mnt
+        cryptsetup open "$PART_LUKS" "$LUKS_NAME"
+        mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
 
-        # Suppression des anciens sous-volumes (on laisse @home et @cargo intacts).
-        for SUBVOL in @ @nix; do
+        # Suppression des anciens root/nix, ancienne ou nouvelle convention,
+        # en laissant home et cargo intacts quel que soit leur nom actuel.
+        for SUBVOL in root nix @ @nix; do
             if btrfs subvolume show "/mnt/$SUBVOL" &>/dev/null; then
-                # Supprimer les sous-volumes imbriqués d'abord.
                 btrfs subvolume list -o "/mnt/$SUBVOL" 2>/dev/null |
                     awk '{print $NF}' |
                     while read -r child; do
@@ -182,9 +207,8 @@ configurer_disque() {
             fi
         done
 
-        # Recréation propre.
-        btrfs subvolume create /mnt/@
-        btrfs subvolume create /mnt/@nix
+        btrfs subvolume create /mnt/root
+        btrfs subvolume create /mnt/nix
 
     fi
 
@@ -197,27 +221,25 @@ configurer_disque() {
 
         echo ""
         read -rp "Entrez le nom souhaité du sous-volume à créer : " SUP_SUBVOL_NAME
-        btrfs subvolume create /mnt/@"$SUP_SUBVOL_NAME"
+        btrfs subvolume create /mnt/"$SUP_SUBVOL_NAME"
     done
 
     # ─── 5. Montage final (commun aux deux chemins) ──────────────────────
-    # Démontage propre des montages temporaires effectués lors de la création des sous-volumes.
     umount /mnt
 
-    mount -o "$OPTS,subvol=@" /dev/mapper/cryptroot /mnt
+    mount -o "$OPTS,subvol=root" "/dev/mapper/$LUKS_NAME" /mnt
 
     for subvol in $(btrfs subvolume list /mnt | awk '{print $NF}'); do
-        [[ "$subvol" == "@" ]] && continue
+        [[ "$subvol" == "root" ]] && continue
 
         target="/mnt/${subvol#@}"
         mkdir -p "$target"
-        mount -o "$OPTS,subvol=$subvol" /dev/mapper/cryptroot "$target"
+        mount -o "$OPTS,subvol=$subvol" "/dev/mapper/$LUKS_NAME" "$target"
     done
 
     mkdir -p /mnt/boot
     mount "$PART_BOOT" /mnt/boot -o umask=0077
 
-    # ─── Résumé ───────────────────────────────────────────────────────────
     echo ""
     echo "✓ Disque prêt. Structure montée :"
     findmnt --target /mnt --submounts
@@ -255,17 +277,21 @@ installer_Nixos() {
     [[ "$PASSWORD" == "$PASSWORD_CONFIRM" ]] || { echo "Les mots de passe ne correspondent pas."; exit 1; }
 
     # ─── 2. Génération du hash du mot de passe ───────────────────────────
+    # mkpasswd utilise l'algorythme yescrypt par défaut.
     HASHED_PASSWORD=$(mkpasswd "$PASSWORD")
     unset PASSWORD PASSWORD_CONFIRM
 
-    # ─── 3. Récupération des dotfiles ────────────────────────────────────
+    # ─── 3. Génération du machine-id ─────────────────────────────────────
+    MACHINEID=$(systemd-id128 new | tr -d '-')
+
+    # ─── 4. Récupération des dotfiles ────────────────────────────────────
     echo ""
     echo "Téléchargement des dotfiles..."
     mkdir -p "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles"
     git clone "https://github.com/binnotkari-wq/nixos-dotfiles.git" "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles"
     echo "✓ Dotfiles téléchargés dans /mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/."
 
-    # ─── 4. Génération de variables.nix ──────────────────────────────────
+    # ─── 5. Génération de variables.nix ──────────────────────────────────
     echo ""
     echo "Génération de variables.nix..."
     cat > "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/variables.nix" << EOF
@@ -284,6 +310,8 @@ installer_Nixos() {
   usernameDisplay = "${USERNAME_DISPLAY}";
   hashedPassword  = "${HASHED_PASSWORD}";
   hostname        = "${HOSTNAME}";
+  machineid       = "${MACHINEID}";
+  luksUuid        = "${LUKS_UUID}";
   nixosVersion    = "${NIXOS_VERSION}";
   gitUsername     = "${GIT_USERNAME}";
   gitUsermail     = "${GIT_USERMAIL}";
@@ -291,7 +319,7 @@ installer_Nixos() {
 EOF
     echo "✓ variables.nix généré."
 
-    # ─── 5. Liaison symbolique de hardware-configuration.nix ─────────────────────
+    # ─── 6. Liaison symbolique de hardware-configuration.nix ─────────────────────
     echo ""
     echo "Génération de hardware-configuration.nix et déplacement vers le dépôt git..."
     nixos-generate-config --root /mnt
@@ -301,7 +329,7 @@ EOF
     ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hardware-configuration.nix" /mnt/etc/nixos/hardware-configuration.nix
     echo "✓ hardware-configuration.nix généré, et liaison crée entre dépôt git et /etc/nixos/hardware-configuration.nix ."
 
-    # ─── 6. Liaison symbolique de configuration.nix ─────────────────────
+    # ─── 7. Liaison symbolique de configuration.nix ─────────────────────
     echo ""
     echo "configuration.nix généré par nixos-generate-config ne sera pas utilisé : suppression."
     rm /mnt/etc/nixos/configuration.nix
@@ -309,7 +337,7 @@ EOF
     ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/configuration.nix" /mnt/etc/nixos/configuration.nix
     echo "✓ Liaison crée entre dépôt git et /etc/nixos/configuration.nix ."
 
-    # ─── 7. Confirmation avant installation ──────────────────────────────
+    # ─── 8. Confirmation avant installation ──────────────────────────────
     echo ""
     echo "══════════════════════════════════════════"
     echo "  Récapitulatif avant installation"
@@ -325,7 +353,7 @@ EOF
     read -rp "Lancer nixos-install ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
 
-    # ─── 8. Installation ──────────────────────────────────────────────────
+    # ─── 9. Installation ──────────────────────────────────────────────────
     echo ""
     echo "Lancement de nixos-install..."
     nixos-install --root /mnt --no-root-passwd

@@ -56,7 +56,7 @@
 # environment.etc.<name>.source =
 
 
-{ config, lib, ... }:
+{ config, lib, vars, ... }:
 
 let
   persistRoot = "/nix/persist";
@@ -149,6 +149,17 @@ let
 in
 
 {
+
+      # --- 2. GESTION COMPTES DECLARATIVE ---
+    users.mutableUsers = false;                                                   # Rigueur des comptes (Source de vérité = Code). Attention, si = false, le mot de passe utilisateur doit être déclaratif.
+    
+
+  users.users.${vars.username} = {                                              # hérité de variables.nix
+    hashedPassword = vars.hashedPassword;                                       # hérité de variables.nix. Par défaut : Calamares créé un fichier password. Mais ce n'est pas déclaratif.
+  };
+
+
+
 
   # Passage des attributs à fileSystems
   fileSystems = persistedFileSystems // rootTmpfs;
