@@ -19,11 +19,10 @@ in
   imports =
     [
       ./hardware-configuration.nix                                              # généré par nixos-generate-config. Hors git (.gitignore) car change d'une machine à l'autre
-      /home/${vars.username}/Git/nixos-dotfiles/hosts/${vars.hostname}/modules_selection.nix    # Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
+      ../../home/${vars.username}/Git/nixos-dotfiles/hosts/${vars.hostname}/modules_selection.nix    # Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
     ];
 
   environment.etc."machine-id".text = "${vars.machineid}\n";                    # gestion déclarative fixe de l'identifiant machine
-  users.users.${vars.username}.hashedPassword = vars.hashedPassword;            # gestion déclarative fixe des informations de compte utilisateur
   users.mutableUsers = false;                                                   # gestion déclarative fixe des informations de compte utilisateur
 #################################################################################################################
 # Fin de la partie personnalisée.                                                                               #
@@ -116,6 +115,7 @@ in
     packages = with pkgs; [
     #  thunderbird
     ];
+    hashedPassword = vars.hashedPassword;                                       # gestion déclarative fixe des informations de compte utilisateur
   };
 
   # Install firefox.
