@@ -15,9 +15,9 @@
     nrb     = "sudo nixos-rebuild boot";
     nrt     = "sudo nixos-rebuild test";
     garbage = "nix-collect-garbage -d";
-    bkp     = "$HOME/Mes-Donnees/Git/scripts/backup.sh";
-    bh      = "$HOME/Mes-Donnees/Git/scripts/bash-history-export.sh";
-    gt      = "$HOME/Mes-Donnees/Git/scripts/git-sync.sh";
+    bkp     = "$HOME/Git/scripts/backup.sh";
+    bh      = "$HOME/Git/scripts/bash-history-export.sh";
+    gs      = "$HOME/Git/scripts/git-sync.sh";
     gemma   = ''llama-cli --model "/cargo/local_cache/LLM/gemma-3-4b-it-Q8_0.gguf" --conversation --system-prompt "Tu es un assistant compréhensif pour la vie quotidienne : ménage, jardin, travaux, mécanique." --no-mmap --ctx-size 4096'';
     qwen    = ''llama-cli --model "/cargo/local_cache/LLM/Qwen2.5-Coder-3B-Instruct-abliterated-Q4_K_M.gguf" --conversation --system-prompt "Tu es un assistant concis en ingénierie des systèmes linux, scripting, développement." --no-mmap --ctx-size 4096'';
     llama   = ''llama-cli --model "/cargo/local_cache/LLM/Llama-3.2-3B-Instruct-Q4_K_M.gguf" --conversation --system-prompt "Tu es un assistant personnel pour m'aider à explorer de nouveaux concepts." --no-mmap --ctx-size 4096'';
@@ -34,7 +34,7 @@
   # NB: interactiveShellInit -> équivalent de bashrcExtra
   #     loginShellInit       -> équivalent de profileExtra
   environment.interactiveShellInit = ''
-    export PATH="$HOME/Mes-Donnees/Git/scripts:$PATH"
+    export PATH="$HOME/Git/scripts:$PATH"
 
     # Prompt façon GNOME Terminal
     PS1='\[\e[01;32m\][\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[01;32m\]]\$\[\e[00m\] '

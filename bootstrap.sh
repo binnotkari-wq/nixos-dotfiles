@@ -287,14 +287,14 @@ installer_Nixos() {
     # ─── 4. Récupération des dotfiles ────────────────────────────────────
     echo ""
     echo "Téléchargement des dotfiles..."
-    mkdir -p "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles"
-    git clone "https://github.com/binnotkari-wq/nixos-dotfiles.git" "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles"
-    echo "✓ Dotfiles téléchargés dans /mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/."
+    mkdir -p "/mnt/home/${USERNAME}/Git/nixos-dotfiles"
+    git clone "https://github.com/binnotkari-wq/nixos-dotfiles.git" "/mnt/home/${USERNAME}/Git/nixos-dotfiles"
+    echo "✓ Dotfiles téléchargés dans /mnt/home/${USERNAME}/Git/nixos-dotfiles/."
 
     # ─── 5. Génération de variables.nix ──────────────────────────────────
     echo ""
     echo "Génération de variables.nix..."
-    cat > "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/variables.nix" << EOF
+    cat > "/mnt/home/${USERNAME}/Git/nixos-dotfiles/variables.nix" << EOF
 #########################################################################################
 # Généré par le script de déploiement d'après les infos saisie lors de l'intallation.   #
 # Ceci permet d'anonymsier tous les autres fichiers .nix (gitignore sur variables.nix)  #

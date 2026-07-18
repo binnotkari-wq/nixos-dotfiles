@@ -40,7 +40,7 @@
     (pkgs.makeDesktopItem {
       name = "llm-start";
       desktopName = "Démarrer LLM";
-      exec = "sh -c \"~/Mes-Donnees/Git/scripts/start_llm.sh\"";
+      exec = "sh -c \"~/Git/scripts/start_llm.sh\"";
       terminal = true;
       icon = "media-playback-start";
       type = "Application";
@@ -51,7 +51,7 @@
     (pkgs.makeDesktopItem {
       name = "llm-stop";
       desktopName = "Arrêter LLM";
-      exec = "sh -c \"~/Mes-Donnees/Git/scripts/stop_llm.sh\"";
+      exec = "sh -c \"~/Git/scripts/stop_llm.sh\"";
       terminal = false;
       icon = "media-playback-stop";
       type = "Application";
@@ -62,7 +62,7 @@
     (pkgs.makeDesktopItem {
       name = "kiwix";
       desktopName = "Démarrer Kiwix";
-      exec = "sh -c \"~/Mes-Donnees/Git/scripts/kiwix-launcher.sh\"";
+      exec = "sh -c \"~/Git/scripts/kiwix-launcher.sh\"";
       terminal = false;
       icon = "accessories-dictionary";
       type = "Application";
