@@ -117,7 +117,37 @@ identifier_disque() {
         echo "Partition LUKS détectée. Récupération de son UUID..."
         LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
         LUKS_NAME="luks-${LUKS_UUID}"
+    fi
 
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  ÉTAPE 3/6 — PARTITIONNEMENT DU DISQUE
+#  Préparation d'un disque avec préservation de home et cargo (si existants).
+#
+#  Dans le chemin "réinitialisation douce", le volume btrfs est monté à sa
+#  racine (subvol=/) plutôt qu'à un sous-volume spécifique, ce qui donne
+#  accès à tous les sous-volumes pour pouvoir supprimer les sous-volumes
+#  root et nix individuellement sans toucher à home.
+#
+#  Convention de nommage : sous-volumes nix et home comme le fait Calamares,
+#  ainsi que root que l'on ajoute pour pouvoir gérer plus simplement 
+#  (Calamares ne créé pas de sous-volume pour /).
+#  Pour information, d'autres distribution nomment les sous-volumes btrfs
+#  en commançant par @.
+# ═══════════════════════════════════════════════════════════════════════════
+partitionner_disque() {
+
+    echo ""
+    echo "══════════════════════════════════════════"
+    echo "  Étape 3/6 : Partionnement du disque"
+    echo "══════════════════════════════════════════"
+    read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
+    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
+
+    echo ""
+    echo "Inspection des partitions de $DISK ."
+    if cryptsetup isLuks "$PART_LUKS" 2>/dev/null; then
         echo "Ouverture pour inspection (mapper : $LUKS_NAME)..."
         cryptsetup open "$PART_LUKS" "$LUKS_NAME"
         mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
@@ -145,31 +175,7 @@ identifier_disque() {
         umount /mnt
         cryptsetup close "$LUKS_NAME"
     fi
-}
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  ÉTAPE 3/6 — PARTITIONNEMENT DU DISQUE
-#  Préparation d'un disque avec préservation de home et cargo (si existants).
-#
-#  Dans le chemin "réinitialisation douce", le volume btrfs est monté à sa
-#  racine (subvol=/) plutôt qu'à un sous-volume spécifique, ce qui donne
-#  accès à tous les sous-volumes pour pouvoir supprimer les sous-volumes
-#  root et nix individuellement sans toucher à home.
-#
-#  Convention de nommage : sous-volumes nix et home comme le fait Calamares,
-#  ainsi que root que l'on ajoute pour pouvoir gérer plus simplement 
-#  (Calamares ne créé pas de sous-volume pour /).
-#  Pour information, d'autres distribution nomment les sous-volumes btrfs
-#  en commançant par @.
-# ═══════════════════════════════════════════════════════════════════════════
-partitionner_disque() {
-
-    echo ""
-    echo "══════════════════════════════════════════"
-    echo "  Étape 3/6 : Partionnement du disque"
-    echo "══════════════════════════════════════════"
-    read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
-    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
     # ─── 3A. Chemin "aucune donnée" → zap complet ────────────────────────
     if [[ "$USER_DATA_FOUND" == false ]]; then
