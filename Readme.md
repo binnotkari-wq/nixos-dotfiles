@@ -4,10 +4,11 @@
 
 ```bash
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]"
-curl -fsSL -o bootstrap.sh https://raw.githubusercontent.com/binnotkari-wq/nixos-dotfiles/custom_deploy/bootstrap.sh
+curl -fsSL -o bootstrap.sh https://github.com/binnotkari-wq/nixos-dotfiles/blob/main/custom_deploy/bootstrap.sh
 chmod +x bootstrap.sh
 sudo ./bootstrap.sh
 ```
+
 ## Fonctionnement du script d'installation
 
 - recueille les variables utilisées pour le déploiement et le paramétrage du système
