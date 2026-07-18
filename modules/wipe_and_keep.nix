@@ -122,10 +122,21 @@ let
 
   mountUnitOf = dir:
     "${lib.replaceStrings [ "/" ] [ "-" ] (lib.removePrefix "/" dir)}.mount";
-in
-{
-  # 1. Bind mounts : @ (root, jetable, tmpfs) <- /nix/persist (persistant)
-  fileSystems = lib.listToAttrs (map (dir: {
+
+
+  # Attributs qui seront passés à fileSystems : 
+
+  # Pour le montage de root en tmpfs
+  rootTmpfs = {
+    "/" = lib.mkForce {
+      device = "none";
+      fsType = "tmpfs";
+      options = [ "defaults" "size=2G" "mode=0755" ];
+    };
+  };
+
+  # Pour la création des bind mounts des dossiers à persister, à chaque démarrage entre root (jetable) et /nix/persist (persistant)
+  persistedFileSystems = lib.listToAttrs (map (dir: {
     name = dir;
     value = {
       device = "${persistRoot}${dir}";
@@ -134,6 +145,14 @@ in
       neededForBoot = true;
     };
   }) persistedDirs);
+
+in
+
+{
+
+  # Passage des attributs à fileSystems
+  fileSystems = persistedFileSystems // rootTmpfs;
+
 
   # 2. Garantie auto-réparatrice de l'existence + permissions des dossiers sources
   #    et création des liens symboliques vers les fichiers persistés (exemple : L+ /etc/machine-id - - - - /nix/persist/etc/machine-id)
@@ -147,14 +166,6 @@ in
   # 3. Ordonnancement explicite : tmpfiles-setup doit finir avant chaque mount unit concerné
   systemd.services.systemd-tmpfiles-setup.before =
     map mountUnitOf persistedDirs;
-
-
-
-  fileSystems."/" = lib.mkForce {
-    device = "none";
-    fsType = "tmpfs";
-    options = [ "defaults" "size=2G" "mode=0755" ];
-  };
 
 
 }
