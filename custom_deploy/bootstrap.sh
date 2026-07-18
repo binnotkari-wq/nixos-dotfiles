@@ -24,7 +24,8 @@ fi
 executer() {
 
     configurer_wifi
-    configurer_disque
+    identifier_disque
+    partitionner_disque
     installer_Nixos
     migrer_fichiers_persistants
     provisionner_cargo
@@ -63,7 +64,6 @@ configurer_wifi() {
     echo "✓ Connexion établie."
 }
 
-
 # ═══════════════════════════════════════════════════════════════════════════
 #  ÉTAPE 2/6 — CONFIGURATION DU DISQUE
 #  Préparation d'un disque avec préservation de @home et @cargo (si existants).
@@ -71,26 +71,17 @@ configurer_wifi() {
 #  Logique générale :
 #  La détection se fait avant toute action destructive : on ouvre le
 #  conteneur LUKS en lecture, on sonde @home avec btrfs subvolume show,
-#  puis on referme proprement. Ce n'est qu'après cette inspection que le
-#  script choisit son chemin (zap complet ou réinitialisation douce).
+#  puis on referme proprement. 
 #
-#  Dans le chemin "réinitialisation douce", le volume btrfs est monté à sa
-#  racine (subvol=/) plutôt qu'à un sous-volume spécifique, ce qui donne
-#  accès à tous les sous-volumes pour pouvoir supprimer @ et @nix
-#  individuellement sans toucher à @home.
-#
-#  Convention de nommage : les sous-volumes commencent par @. C'est une
-#  convention répandue (que l'installateur Calamares ne suit pas, à titre
-#  de comparaison), pas une contrainte technique de btrfs.
+# Après cette étape d'inspection, le script choisit en étape 3 son chemin
+# (zap complet ou réinitialisation douce).
 # ═══════════════════════════════════════════════════════════════════════════
-configurer_disque() {
+identifier_disque() {
 
     echo ""
     echo "══════════════════════════════════════════"
-    echo "  Étape 2/6 : Configuration des disques"
+    echo "  Étape 2/6 : Identifier le disque cible"
     echo "══════════════════════════════════════════"
-    read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
-    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
     # ─── 1. Sélection du disque ──────────────────────────────────────────
     echo "Disques disponibles :"
@@ -111,7 +102,7 @@ configurer_disque() {
 
     OPTS="noatime,compress=zstd,space_cache=v2,ssd,discard=async"
 
-# ─── 2. Détection de home / cargo existants ──────────────────────────
+    # ─── 2. Détection de home / cargo existants ──────────────────────────
     # On accepte les deux conventions de nommage (transition en cours) :
     #   - ancienne : @home, @cargo (préfixe @)
     #   - nouvelle : home, cargo (convention Calamares, sans préfixe)
@@ -154,6 +145,31 @@ configurer_disque() {
         umount /mnt
         cryptsetup close "$LUKS_NAME"
     fi
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  ÉTAPE 3/6 — PARTITIONNEMENT DU DISQUE
+#  Préparation d'un disque avec préservation de home et cargo (si existants).
+#
+#  Dans le chemin "réinitialisation douce", le volume btrfs est monté à sa
+#  racine (subvol=/) plutôt qu'à un sous-volume spécifique, ce qui donne
+#  accès à tous les sous-volumes pour pouvoir supprimer les sous-volumes
+#  root et nix individuellement sans toucher à home.
+#
+#  Convention de nommage : sous-volumes nix et home comme le fait Calamares,
+#  ainsi que root que l'on ajoute pour pouvoir gérer plus simplement 
+#  (Calamares ne créé pas de sous-volume pour /).
+#  Pour information, d'autres distribution nomment les sous-volumes btrfs
+#  en commançant par @.
+# ═══════════════════════════════════════════════════════════════════════════
+partitionner_disque() {
+
+    echo ""
+    echo "══════════════════════════════════════════"
+    echo "  Étape 3/6 : Partionnement du disque"
+    echo "══════════════════════════════════════════"
+    read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
+    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
     # ─── 3A. Chemin "aucune donnée" → zap complet ────────────────────────
     if [[ "$USER_DATA_FOUND" == false ]]; then
