@@ -6,9 +6,6 @@
 { config, pkgs, ... }:
 
 {
-  # --- IDENTIFIANT MACHINE DECLARATIF ---
-  environment.etc."machine-id".text = "538b4138c8ab40a988d92bcb21f2e605\n";                     # Généré grâce à systemd-id128 new | tr -d '-'
-
   # --- SOUS-VOLUME BTRFS SUPPLEMENTAIRE ---
   fileSystems."/cargo" =
     {
