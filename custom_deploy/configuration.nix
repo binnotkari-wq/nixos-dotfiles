@@ -4,13 +4,13 @@
 
 { config, pkgs, ... }:
 
-#################################################################################################################
-# Partie personnalisée. Import des .nix et création des liens vers les .nix du repo git par un service systemd. #
-# Grâce à ces liens symboliques la commande nixos-rebuild n'a pas besoin d'un chemin personnalisé.              #
-# Cette création est exécutée à chaque démarrage : donc tout à fait adapté à l'impermanence.                    #
-#################################################################################################################
+###########################################################################################################
+# Partie personnalisée. Import de variables.nix (seule source d'informations d'ientification) et des .nix #
+# optionnels de configuration de la machine.                                                              #
+# Déclaration des options d'ienditifactions machine et du compte utilisateur.                             #
+###########################################################################################################
 let
-  vars = import ./variables.nix { };                                            # généré par cat. Hors git (.gitignore) pour confidentialité
+  vars = import ./variables.nix { };                                            # copié dans /etc/nixos/ puis renseigné par le script d'installation
 in
 
 {
@@ -19,9 +19,12 @@ in
   imports =
     [
       ./hardware-configuration.nix                                              # généré par nixos-generate-config. Hors git (.gitignore) car change d'une machine à l'autre
-      /home/${vars.username}/Git/nixos-dotfiles/hosts/${vars.hostname}/modules_selection.nix                            # Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
+      /home/${vars.username}/Git/nixos-dotfiles/hosts/${vars.hostname}/modules_selection.nix    # Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
     ];
 
+  environment.etc."machine-id".text = "${vars.machineid}\n";                    # gestion déclarative fixe de l'identifiant machine
+  users.users.${vars.username}.hashedPassword = vars.hashedPassword;            # gestion déclarative fixe des informations de compte utilisateur
+  users.mutableUsers = false;                                                   # gestion déclarative fixe des informations de compte utilisateur
 #################################################################################################################
 # Fin de la partie personnalisée.                                                                               #
 #################################################################################################################

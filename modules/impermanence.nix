@@ -117,7 +117,7 @@ in
   
     # Commenter les éléments qui font l'objet d'une gestion déclarative.
     files = [
-      # "/chemin/du/fichier"
+      # "/exemple/de/fichier"
     ];
   };
 }

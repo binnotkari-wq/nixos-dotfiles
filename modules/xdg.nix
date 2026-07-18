@@ -93,7 +93,8 @@ environment.etc = {
     Texte aléatoire
     Encadré par ```
     ```
-    [Markdown Cheatsheet.md] ($HOME/Mes-Donnees/03_Ressources_Externes/Utilisation du syst%C3%A8me/Markdown Cheatsheet.md)
+    https://github.com/im-luka/markdown-cheatsheet  
+    https://github.com/im-luka/markdown-cheatsheet/blob/main/complete-markdown-cheatsheet.pdf  
   '';
 
   "skel/Modèles/Fichier texte.txt".text = "";

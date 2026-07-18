@@ -291,51 +291,37 @@ installer_Nixos() {
     git clone "https://github.com/binnotkari-wq/nixos-dotfiles.git" "/mnt/home/${USERNAME}/Git/nixos-dotfiles"
     echo "✓ Dotfiles téléchargés dans /mnt/home/${USERNAME}/Git/nixos-dotfiles/."
 
-    # ─── 5. Génération de variables.nix ──────────────────────────────────
+    # ─── 5. Génération de hardware-configuration.nix ─────────────────────
     echo ""
-    echo "Génération de variables.nix..."
-    cat > "/mnt/home/${USERNAME}/Git/nixos-dotfiles/variables.nix" << EOF
-#########################################################################################
-# Généré par le script de déploiement d'après les infos saisie lors de l'intallation.   #
-# Ceci permet d'anonymsier tous les autres fichiers .nix (gitignore sur variables.nix)  #
-# et de les figer puisqu'ils ne contiennent que le nom de la variable et non sa valeur. #
-# Lorsque ce fichier est importé, les vars sont propagées dans tous les autres modules  #
-# qui font appel à vars (quels que soient les niveaux d'imports).                       #
-#########################################################################################
-
-{ ... }:
-
-{
-  username        = "${USERNAME}";
-  usernameDisplay = "${USERNAME_DISPLAY}";
-  hashedPassword  = "${HASHED_PASSWORD}";
-  hostname        = "${HOSTNAME}";
-  machineid       = "${MACHINEID}";
-  luksUuid        = "${LUKS_UUID}";
-  nixosVersion    = "${NIXOS_VERSION}";
-  gitUsername     = "${GIT_USERNAME}";
-  gitUsermail     = "${GIT_USERMAIL}";
-}
-EOF
-    echo "✓ variables.nix généré."
-
-    # ─── 6. Liaison symbolique de hardware-configuration.nix ─────────────────────
-    echo ""
-    echo "Génération de hardware-configuration.nix et déplacement vers le dépôt git..."
+    echo "Génération de hardware-configuration.nix..."
+    mkdir -p "/mnt/etc/nixos"
     nixos-generate-config --root /mnt
-    mkdir -p "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/"
-    mv /mnt/etc/nixos/hardware-configuration.nix "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/"
-    echo "Création du lien symbolique depuis le dépôt git vers /etc/nixos..."
-    ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/hardware-configuration.nix" /mnt/etc/nixos/hardware-configuration.nix
-    echo "✓ hardware-configuration.nix généré, et liaison crée entre dépôt git et /etc/nixos/hardware-configuration.nix ."
+    echo "✓ hardware-configuration.nix généré."
 
-    # ─── 7. Liaison symbolique de configuration.nix ─────────────────────
+    # ─── 6. Mise en place de configuration.nix ─────────────────────
     echo ""
     echo "configuration.nix généré par nixos-generate-config ne sera pas utilisé : suppression."
     rm /mnt/etc/nixos/configuration.nix
-    echo "Création du liens symbolique depuis le dépôt git vers /etc/nixos..."
-    ln -sr "/mnt/home/${USERNAME}/Mes-Donnees/Git/nixos-dotfiles/configuration.nix" /mnt/etc/nixos/configuration.nix
-    echo "✓ Liaison crée entre dépôt git et /etc/nixos/configuration.nix ."
+    echo "Copie de configuration.nix depuis le dépôt git vers /etc/nixos..."
+    cp -ra "/mnt/home/${USERNAME}/Git/nixos-dotfiles/configuration.nix" "/mnt/etc/nixos/"
+    echo "✓ configuration.nix mis en place."
+
+    # ─── 7. Génération de variables.nix ──────────────────────────────────
+    echo ""
+    echo "Injection des informations collectée et mise en place de variables.nix..."
+    cp -ra "/mnt/home/${USERNAME}/Git/nixos-dotfiles/custom_deploy/variables.nix" "/mnt/etc/nixos/"
+    sed -i \
+        -e "s|@@username@@|${USERNAME}|g" \
+        -e "s|@@fullname@@|${USERNAME_DISPLAY}|g" \
+        -e "s|@@hashedPassword@@|${HASHED_PASSWORD}|g" \
+        -e "s|@@hostname@@|${HOSTNAME}|g" \
+        -e "s|@@machineid@@|${MACHINEID}|g" \
+        -e "s|@@luksUuid@@|${LUKS_UUID}|g" \
+        -e "s|@@nixosversion@@|${NIXOS_VERSION}|g" \
+        -e "s|@@gitUsername @@|${GIT_USERNAME}|g" \
+        -e "s|@@gitUsermail@@|${GIT_USERMAIL}|g" \
+        "/mnt/etc/nixos/variables.nix"
+    echo "✓ variables.nix mis en place."
 
     # ─── 8. Confirmation avant installation ──────────────────────────────
     echo ""
@@ -345,6 +331,7 @@ EOF
     echo "  Version              : $NIXOS_VERSION"
     echo "  Utilisateur          : $USERNAME ($USERNAME_DISPLAY)"
     echo "  Hostname             : $HOSTNAME"
+    echo "  Machine-id           : $NIXOS_VERSION"
     echo "  Utilisateur github   : $GIT_USERNAME"
     echo "  Adresse mail github  : $GIT_USERMAIL"
     echo "  Cible                : /mnt"
@@ -580,9 +567,9 @@ finaliser() {
     # ─── 1. Récupération des scripts utiles ───────────────────────────────
     echo ""
     echo "Téléchargement des scripts utiles..."
-    mkdir -p "/mnt/home/${USERNAME}/Mes-Donnees/Git/scripts"
-    git clone "https://github.com/binnotkari-wq/scripts.git" "/mnt/home/${USERNAME}/Mes-Donnees/Git/scripts/"
-    echo "✓ Scripts téléchargés dans /mnt/home/${USERNAME}/Mes-Donnees/Git/scripts/."
+    mkdir -p "/mnt/home/${USERNAME}/Git/scripts"
+    git clone "https://github.com/binnotkari-wq/scripts.git" "/mnt/home/${USERNAME}/Git/scripts/"
+    echo "✓ Scripts téléchargés dans /mnt/home/${USERNAME}/Git/scripts/."
 
     # ─── 2. Correction des permissions ────────────────────────────────────
     echo ""
