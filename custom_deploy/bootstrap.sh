@@ -303,7 +303,7 @@ installer_Nixos() {
     echo "configuration.nix généré par nixos-generate-config ne sera pas utilisé : suppression."
     rm /mnt/etc/nixos/configuration.nix
     echo "Copie de configuration.nix depuis le dépôt git vers /etc/nixos..."
-    cp -ra "/mnt/home/${USERNAME}/Git/nixos-dotfiles/configuration.nix" "/mnt/etc/nixos/"
+    cp -ra "/mnt/home/${USERNAME}/Git/nixos-dotfiles/custom_deploy/configuration.nix" "/mnt/etc/nixos/"
     echo "✓ configuration.nix mis en place."
 
     # ─── 7. Génération de variables.nix ──────────────────────────────────
