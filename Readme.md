@@ -4,7 +4,7 @@
 
 ```bash
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]"
-curl -fsSL -o bootstrap.sh https://github.com/binnotkari-wq/nixos-dotfiles/blob/main/custom_deploy/bootstrap.sh
+curl -fsSL https://raw.githubusercontent.com/binnotkari-wq/nixos-dotfiles/main/custom_deploy/bootstrap.sh -o bootstrap.sh
 chmod +x bootstrap.sh
 sudo ./bootstrap.sh
 ```
