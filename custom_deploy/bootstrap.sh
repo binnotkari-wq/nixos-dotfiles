@@ -100,8 +100,6 @@ identifier_disque() {
         PART_LUKS="${DISK}2"
     fi
 
-    OPTS="noatime,compress=zstd,space_cache=v2,ssd,discard=async"
-
     # ─── 2. Détection de home / cargo existants ──────────────────────────
     # On accepte les deux conventions de nommage (transition en cours) :
     #   - ancienne : @home, @cargo (préfixe @)
@@ -144,6 +142,8 @@ partitionner_disque() {
     echo "══════════════════════════════════════════"
     read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
+
+    OPTS="noatime,compress=zstd,space_cache=v2"
 
     echo ""
     echo "Inspection des partitions de $DISK ."
