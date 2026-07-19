@@ -65,8 +65,7 @@ configurer_wifi() {
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  ÉTAPE 2/6 — CONFIGURATION DU DISQUE
-#  Préparation d'un disque avec préservation de @home et @cargo (si existants).
+#  ÉTAPE 2/6 — IDENTIFICATION DU DISQUE
 #
 #  Logique générale :
 #  La détection se fait avant toute action destructive : on ouvre le
@@ -83,7 +82,6 @@ identifier_disque() {
     echo "  Étape 2/6 : Identifier le disque cible"
     echo "══════════════════════════════════════════"
 
-    # ─── 1. Sélection du disque ──────────────────────────────────────────
     echo "Disques disponibles :"
     lsblk -d -o NAME,SIZE,MODEL
 
@@ -91,7 +89,6 @@ identifier_disque() {
     read -rp "Entrez le disque cible (ex: sda, nvme0n1) : " DISK
     DISK="/dev/$DISK"
 
-    # Noms des partitions (gère /dev/sda1 et /dev/nvme0n1p1)
     if [[ "$DISK" == *nvme* ]]; then
         PART_BOOT="${DISK}p1"
         PART_LUKS="${DISK}p2"
@@ -100,10 +97,8 @@ identifier_disque() {
         PART_LUKS="${DISK}2"
     fi
 
-    # ─── 2. Détection de home / cargo existants ──────────────────────────
-    # On accepte les deux conventions de nommage (transition en cours) :
-    #   - ancienne : @home, @cargo (préfixe @)
-    #   - nouvelle : home, cargo (convention Calamares, sans préfixe)
+    OPTS="noatime,compress=zstd,space_cache=v2"
+
     USER_DATA_FOUND=false
     HOME_SUBVOL_NAME=""
     CARGO_SUBVOL_NAME=""
@@ -116,7 +111,6 @@ identifier_disque() {
         LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
         LUKS_NAME="luks-${LUKS_UUID}"
     fi
-
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -143,11 +137,10 @@ partitionner_disque() {
     read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
-    OPTS="noatime,compress=zstd,space_cache=v2"
-
+    # ─── 1. Inspection (une seule ouverture, gardée pour la suite) ───────
     echo ""
     echo "Inspection des partitions de $DISK ."
-    if cryptsetup isLuks "$PART_LUKS" 2>/dev/null; then
+    if [[ -n "$LUKS_NAME" ]] && cryptsetup isLuks "$PART_LUKS" 2>/dev/null; then
         echo "Ouverture pour inspection (mapper : $LUKS_NAME)..."
         cryptsetup open "$PART_LUKS" "$LUKS_NAME"
         mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
@@ -172,18 +165,25 @@ partitionner_disque() {
             echo "Aucune donnée utilisateur détectée. Le disque sera entièrement effacé."
         fi
 
-        umount /mnt
-        cryptsetup close "$LUKS_NAME"
+        # Pas de umount/close ici : on reste monté pour la suite.
     fi
 
-
-    # ─── 3A. Chemin "aucune donnée" → zap complet ────────────────────────
+    # ─── 2A. Chemin "aucune donnée" → zap complet ─────────────────────────
     if [[ "$USER_DATA_FOUND" == false ]]; then
 
         echo ""
         echo "Aucune donnée utilisateur à préserver. $DISK va être entièrement effacé."
         read -rp "Confirmer ? (oui) : " CONFIRM
         [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
+
+        # Si l'inspection avait ouvert/monté un LUKS existant, on referme
+        # proprement avant de tout reformater à zéro.
+        if mountpoint -q /mnt; then
+            umount -R /mnt
+        fi
+        if [[ -n "$LUKS_NAME" ]] && cryptsetup status "$LUKS_NAME" &>/dev/null; then
+            cryptsetup close "$LUKS_NAME"
+        fi
 
         sgdisk --zap-all "$DISK"
         sgdisk --new=1:0:+512M --typecode=1:ef00 --change-name=1:"boot" "$DISK"
@@ -200,12 +200,11 @@ partitionner_disque() {
         mkfs.btrfs -L nixos "/dev/mapper/$LUKS_NAME"
 
         mount "/dev/mapper/$LUKS_NAME" /mnt
-        btrfs subvolume sync /mnt
         btrfs subvolume create /mnt/root
         btrfs subvolume create /mnt/nix
         btrfs subvolume create /mnt/home
 
-    # ─── 3B. Chemin "données présentes" → réinitialisation douce ─────────
+    # ─── 2B. Chemin "données présentes" → réinitialisation douce ─────────
     else
 
         echo ""
@@ -213,11 +212,7 @@ partitionner_disque() {
         read -rp "Confirmer ? (oui) : " CONFIRM
         [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
 
-        cryptsetup open "$PART_LUKS" "$LUKS_NAME"
-        mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
-
-        # Suppression des anciens root/nix, ancienne ou nouvelle convention,
-        # en laissant home et cargo intacts quel que soit leur nom actuel.
+        # Déjà ouvert et monté depuis l'inspection — pas de reopen.
         for SUBVOL in root nix @ @nix; do
             if btrfs subvolume show "/mnt/$SUBVOL" &>/dev/null; then
                 btrfs subvolume list -o "/mnt/$SUBVOL" 2>/dev/null |
@@ -231,12 +226,13 @@ partitionner_disque() {
         done
 
         btrfs subvolume sync /mnt
+
         btrfs subvolume create /mnt/root
         btrfs subvolume create /mnt/nix
 
     fi
 
-    # ─── 4. Sous-volume supplémentaire (optionnel) ───────────────────────
+    # ─── 3. Sous-volume supplémentaire (optionnel) ────────────────────────
     while true; do
         read -rp "Créer un sous-volume supplémentaire ? (oui/non) : " reponse
         if [[ "${reponse,,}" == "non" ]]; then
@@ -248,7 +244,7 @@ partitionner_disque() {
         btrfs subvolume create /mnt/"$SUP_SUBVOL_NAME"
     done
 
-    # ─── 5. Montage final (commun aux deux chemins) ──────────────────────
+    # ─── 4. Montage final (commun aux deux chemins) ───────────────────────
     umount /mnt
 
     mount -o "$OPTS,subvol=root" "/dev/mapper/$LUKS_NAME" /mnt
@@ -268,7 +264,6 @@ partitionner_disque() {
     echo "✓ Disque prêt. Structure montée :"
     findmnt --target /mnt --submounts
 }
-
 
 # ═══════════════════════════════════════════════════════════════════════════
 #  ÉTAPE 3/6 — INSTALLATION DE NIXOS
