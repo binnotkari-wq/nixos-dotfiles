@@ -16,8 +16,9 @@
       # ../../modules/flatpak.nix                                                   # optionnel - intégrable sans aucune condition
       ../../modules/git.nix                                                         # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
       ../../modules/gnome-dconf.nix                                                 # optionnel - intégrable sans aucune condition
-      ../../modules/home-manager.nix                                              # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
-      ../../modules/impermanence.nix                                                # optionnel - intégrable sous conditions
+      # ../../modules/home-manager.nix                                              # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
+      # ../../modules/impermanence_module_communautaire.nix                         # optionnel - intégrable sous conditions
+      ../../modules/impermanence_native.nix                                         # optionnel - intégrable sous conditions
       ../../modules/kitty.nix                                                       # optionnel - intégrable sans aucune condition
       ../../modules/OS_options.nix                                                  # optionnel - intégrable sans aucune condition
       ../../modules/performance_addons.nix                                          # optionnel - intégrable sans aucune condition
@@ -31,7 +32,7 @@
       ../../software_packs/GTK_base.nix                                             # optionnel - intégrable sans aucune condition
       ../../software_packs/CLI_all.nix                                              # optionnel - intégrable sans aucune condition
       ../../software_packs/CLI_base.nix                                             # optionnel - intégrable sans aucune condition
-      ../../software_packs/TUI.nix                                                # optionnel - intégrable sans aucune condition
+      ../../software_packs/TUI.nix                                                  # optionnel - intégrable sans aucune condition
       ../../software_packs/unwanted.nix                                             # optionnel - intégrable sans aucune condition
     ];
 
@@ -39,10 +40,10 @@
   # On importe ici au lieu d'importer dans home.nix (ainsi home.nix n'est jamais modifié quelle que soit la selection souhaitée par machine)
   # sharedModules est une option de home manager. Tout module ajouté à cette liste sera évalué pour tout utilisateur déclarés dans home manager.
   # On n'est donc pas obligé de déclarer ici le nom de l'utilisateur ou d'importer des variables.
-  home-manager.sharedModules = 
-    [
-      ../../modules/home-manager_options/newsboat.nix                             # optionnel
-      ../../modules/home-manager_options/pyradio.nix                              # optionnel
-      ../../modules/home-manager_options/yazi.nix                                 # optionnel
-    ];
+  # home-manager.sharedModules = 
+    # [
+      # ../../modules/home-manager_options/newsboat.nix                             # optionnel
+      # ../../modules/home-manager_options/pyradio.nix                              # optionnel
+      # ../../modules/home-manager_options/yazi.nix                                 # optionnel
+    # ];
 }
