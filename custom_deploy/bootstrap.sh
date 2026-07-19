@@ -155,6 +155,8 @@ configurer_disque() {
 
         echo "Chiffrement LUKS de $PART_LUKS..."
         cryptsetup luksFormat --type luks2 "$PART_LUKS"
+        LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
+        LUKS_NAME="luks-${LUKS_UUID}"
         cryptsetup open "$PART_LUKS" "$LUKS_NAME"
 
         mkfs.btrfs -L nixos "/dev/mapper/$LUKS_NAME"
@@ -163,6 +165,7 @@ configurer_disque() {
         btrfs subvolume create /mnt/root
         btrfs subvolume create /mnt/nix
         btrfs subvolume create /mnt/home
+
 
     # ─── 3B. Chemin "données présentes" → réinitialisation douce ─────────
     else
