@@ -172,8 +172,8 @@ configurer_disque() {
         read -rp "Confirmer ? (oui) : " CONFIRM
         [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
 
-        cryptsetup open "$PART_LUKS" cryptroot
-        mount -o "$OPTS,subvol=/" /dev/mapper/cryptroot /mnt
+        cryptsetup open "$PART_LUKS" "$LUKS_NAME"
+        mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
 
         # Suppression des anciens sous-volumes (on laisse @home et @cargo intacts).
         for SUBVOL in root nix @ @nix; do
