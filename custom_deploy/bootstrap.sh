@@ -27,18 +27,17 @@ executer() {
     configurer_disque
     installer_Nixos
     migrer_fichiers_persistants
-    provisionner_cargo
     finaliser
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  ÉTAPE 1/6 — CONFIGURATION DE LA CONNEXION WIFI
+#  ÉTAPE 1/5 — CONFIGURATION DE LA CONNEXION WIFI
 # ═══════════════════════════════════════════════════════════════════════════
 configurer_wifi() {
 
     echo ""
     echo "══════════════════════════════════════════"
-    echo "  Étape 1/6 : Configuration du wifi"
+    echo "  Étape 1/5 : Configuration du wifi"
     echo "══════════════════════════════════════════"
     read -rp "Configurer le wifi ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
@@ -64,15 +63,15 @@ configurer_wifi() {
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  ÉTAPE 2/6 — IDENTIFICATION DU DISQUE
+#  ÉTAPE 2/5 — IDENTIFICATION DU DISQUE
 #
 #  Logique générale :
 #  La détection se fait avant toute action destructive : on ouvre le
-#  conteneur LUKS en lecture, on sonde @home avec btrfs subvolume show,
+#  conteneur LUKS en lecture, on sonde home avec btrfs subvolume show,
 #  puis on referme proprement. 
 #
-#  Après cette étape d'inspection, le script choisit en étape 3 son chemin
-#  (zap complet ou réinitialisation douce).
+#  Après cette étape d'inspection, le script choisit son chemin : zap complet
+#  ou réinitialisation douce.
 #  Dans le chemin "réinitialisation douce", le volume btrfs est monté à sa
 #  racine (subvol=/) plutôt qu'à un sous-volume spécifique, ce qui donne
 #  accès à tous les sous-volumes pour pouvoir supprimer les sous-volumes
@@ -88,7 +87,7 @@ configurer_disque() {
 
     echo ""
     echo "══════════════════════════════════════════"
-    echo "  Étape 2/6 : Configuration des disques"
+    echo "  Étape 2/5 : Configuration des disques"
     echo "══════════════════════════════════════════"
     read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
@@ -128,7 +127,7 @@ configurer_disque() {
         mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME"_inspect /mnt
 
 
-        if btrfs subvolume show /mnt/@home &>/dev/null || btrfs subvolume show /mnt/@cargo &>/dev/null; then
+        if btrfs subvolume show /mnt/home &>/dev/null || btrfs subvolume show /mnt/cargo &>/dev/null; then
             USER_DATA_FOUND=true
             echo "Données utilisateur détectées. Elles seront conservées."
         else
@@ -178,8 +177,8 @@ configurer_disque() {
         cryptsetup open "$PART_LUKS" "$LUKS_NAME"
         mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
 
-        # Suppression des anciens sous-volumes (on laisse @home et @cargo intacts).
-        for SUBVOL in root nix @ @nix; do
+        # Suppression des anciens sous-volumes (on laisse home et cargo intacts).
+        for SUBVOL in root nix; do
             if btrfs subvolume show "/mnt/$SUBVOL" &>/dev/null; then
                 # Supprimer les sous-volumes imbriqués d'abord.
                 btrfs subvolume list -o "/mnt/$SUBVOL" 2>/dev/null |
@@ -218,7 +217,7 @@ configurer_disque() {
     for subvol in $(btrfs subvolume list /mnt | awk '{print $NF}'); do
         [[ "$subvol" == "root" ]] && continue
 
-        target="/mnt/${subvol#@}"
+        target="/mnt/${subvol}"
         mkdir -p "$target"
         mount -o "$OPTS,subvol=$subvol" "/dev/mapper/$LUKS_NAME" "$target"
     done
@@ -241,7 +240,7 @@ installer_Nixos() {
 
     echo ""
     echo "══════════════════════════════════════════"
-    echo "  Étape 3/6 : Installation NixOS"
+    echo "  Étape 3/5 : Installation NixOS"
     echo "══════════════════════════════════════════"
     read -rp "Prêt à installer NixOS ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
@@ -334,9 +333,8 @@ installer_Nixos() {
     nixos-install --root /mnt --no-root-passwd
 }
 
-
 # ═══════════════════════════════════════════════════════════════════════════
-#  ÉTAPE 4/6 — MIGRATION DES FICHIERS PERSISTANTS (IMPERMANENCE)
+#  ÉTAPE 4/5 — MIGRATION DES FICHIERS PERSISTANTS (IMPERMANENCE)
 #  Préparation des prérequis pour le module impermanence :
 #    - création du dossier /nix/persist
 #    - migration des fichiers à persister vers /nix/persist/
@@ -345,14 +343,14 @@ installer_Nixos() {
 #  actif. Opération non destructive : ne modifie pas les sources, copie
 #  uniquement. impermanence.nix devra être présent dans les imports.
 #
-#  Note : la restauration de @ à chaque démarrage se fait via un service
-#  systemd (suppression + recréation), et non via un snapshot @blank.
+#  Note : la restauration de root à chaque démarrage se fait via un service
+#  systemd (suppression + recréation), et non via un snapshot blank.
 # ═══════════════════════════════════════════════════════════════════════════
 migrer_fichiers_persistants() {
 
     echo ""
     echo "══════════════════════════════════════════"
-    echo "  Étape 4/6 : Migration des fichiers persistants"
+    echo "  Étape 4/5 : Migration des fichiers persistants"
     echo "  Valider uniquement si l'impermanence est à mettre en place"
     echo "══════════════════════════════════════════"
     read -rp "Prêt à migrer les fichiers à persister ? (oui) : " CONFIRM
@@ -371,7 +369,7 @@ migrer_fichiers_persistants() {
 
     # ─── 2. Éléments à persister ──────────────────────────────────────────
     # Format : DIRS["source"]="copier_le_contenu"
-    #   true  = cp -a vers /nix/persist (données utiles à conserver)
+    #   true  = cp -ra vers /nix/persist (données utiles à conserver)
     #   false = créer le dossier vide dans /nix/persist (se reconstruira tout seul)
     declare -A DIRS
     DIRS["/mnt/etc/lact"]="true"
@@ -425,7 +423,7 @@ migrer_fichiers_persistants() {
 
         if [[ "$copy" == "true" ]]; then
             # Copie du contenu avec préservation des permissions/ownership.
-            if cp -a "$src/." "$dest/" 2>/dev/null; then
+            if cp -ra "$src/." "$dest/" 2>/dev/null; then
                 echo -e "${GREEN}[COPIÉ  ]${NC} $src → $dest"
                 (( SUCCESS++ )) || true
             else
@@ -460,96 +458,15 @@ migrer_fichiers_persistants() {
     fi
 }
 
-
 # ═══════════════════════════════════════════════════════════════════════════
-#  ÉTAPE 5/6 — PROVISIONNEMENT DE @cargo
-#  Téléchargement des modèles LLM et des fichiers Kiwix (.zim) essentiels.
-# ═══════════════════════════════════════════════════════════════════════════
-provisionner_cargo() {
-
-    echo ""
-    echo "══════════════════════════════════════════"
-    echo "  Étape 5/6 : Dataset essentiel sur @cargo"
-    echo "══════════════════════════════════════════"
-    read -rp "Prêt à télécharger LLM et .zim ? (oui) : " CONFIRM
-    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
-
-    # ─── 1. Téléchargement des LLM ────────────────────────────────────────
-    echo "Installation de aria2..."
-    nix-env -iA nixos.aria2
-
-    LLM_DIR="/mnt/cargo/local_cache/LLM"
-    mkdir -p "$LLM_DIR"
-
-    echo ""
-    echo "Vérification des modèles LLM..."
-
-    PHI4="$LLM_DIR/Phi-4-mini-instruct-Q4_K_M.gguf"
-    LLAMA="$LLM_DIR/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
-
-    if [[ ! -f "$PHI4" ]]; then
-        echo "Téléchargement de Phi-4-mini..."
-        aria2c --dir="$LLM_DIR" \
-               --out="Phi-4-mini-instruct-Q4_K_M.gguf" \
-               --continue=true \
-               --max-connection-per-server=4 \
-               "https://huggingface.co/unsloth/Phi-4-mini-instruct-GGUF/resolve/main/Phi-4-mini-instruct-Q4_K_M.gguf"
-    else
-        echo "✓ Phi-4-mini déjà présent, téléchargement ignoré."
-    fi
-
-    if [[ ! -f "$LLAMA" ]]; then
-        echo "Téléchargement de Llama-3.1-8B..."
-        aria2c --dir="$LLM_DIR" \
-               --out="Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" \
-               --continue=true \
-               --max-connection-per-server=4 \
-               "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
-    else
-        echo "✓ Llama-3.1-8B déjà présent, téléchargement ignoré."
-    fi
-
-    # ─── 2. Téléchargement des fichiers ZIM ───────────────────────────────
-    ZIM_DIR="/mnt/cargo/local_cache/Kiwix zims"
-    mkdir -p "$ZIM_DIR"
-
-    echo ""
-    echo "Vérification des fichiers Kiwix..."
-
-    WIKI_FR="$ZIM_DIR/wikipedia_fr_all_mini_2026-02.zim"
-    IFIXIT="$ZIM_DIR/ifixit_en_all_2025-12.zim"
-
-    if [[ ! -f "$WIKI_FR" ]]; then
-        echo "Téléchargement de Wikipedia FR..."
-        aria2c --dir="$ZIM_DIR" \
-               --continue=true \
-               --max-connection-per-server=4 \
-               "https://download.kiwix.org/zim/wikipedia/wikipedia_fr_all_mini_2026-02.zim"
-    else
-        echo "✓ Wikipedia FR déjà présent, téléchargement ignoré."
-    fi
-
-    if [[ ! -f "$IFIXIT" ]]; then
-        echo "Téléchargement de iFixit..."
-        aria2c --dir="$ZIM_DIR" \
-               --continue=true \
-               --max-connection-per-server=4 \
-               "https://download.kiwix.org/zim/ifixit/ifixit_en_all_2025-12.zim"
-    else
-        echo "✓ iFixit déjà présent, téléchargement ignoré."
-    fi
-}
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-#  ÉTAPE 6/6 — FINALISATION
+#  ÉTAPE 5/5 — FINALISATION
 #  Récupération des scripts utiles et correction des permissions.
 # ═══════════════════════════════════════════════════════════════════════════
 finaliser() {
 
     echo ""
     echo "══════════════════════════════════════════"
-    echo "  Étape 6/6 : Finalisation"
+    echo "  Étape 5/5 : Finalisation"
     echo "══════════════════════════════════════════"
 
     # ─── 1. Récupération des scripts utiles ───────────────────────────────
@@ -559,20 +476,21 @@ finaliser() {
     git clone "https://github.com/binnotkari-wq/scripts.git" "/mnt/home/${USERNAME}/Git/scripts/"
     echo "✓ Scripts téléchargés dans /mnt/home/${USERNAME}/Git/scripts/."
 
-    # ─── 2. Correction des permissions ────────────────────────────────────
+    # ─── 2. Application des permissions ────────────────────────────────────
     echo ""
     echo "Application des permissions..."
     chown -R 1000:1000 "/mnt/home/${USERNAME}"
-    chown -R 1000:1000 /mnt/cargo
+    # On applique les permissions utilisateur sur cargo, si ce sous-volume a été crée
+    if [ -d /mnt/cargo ]; then
+        chown -R 1000:1000 /mnt/cargo
+    fi
     echo "✓ Permissions appliquées."
-
     echo ""
     echo "══════════════════════════════════════════"
     echo "  Installation complète."
     echo "  Tu peux retirer la clé USB et redémarrer."
     echo "══════════════════════════════════════════"
 }
-
 
 # ═══════════════════════════════════════════════════════════════════════════
 #  EXÉCUTION
