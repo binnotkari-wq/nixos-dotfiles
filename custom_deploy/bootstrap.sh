@@ -200,7 +200,7 @@ partitionner_disque() {
         mkfs.btrfs -L nixos "/dev/mapper/$LUKS_NAME"
 
         mount "/dev/mapper/$LUKS_NAME" /mnt
-        trfs subvolume sync /mnt
+        btrfs subvolume sync /mnt
         btrfs subvolume create /mnt/root
         btrfs subvolume create /mnt/nix
         btrfs subvolume create /mnt/home
