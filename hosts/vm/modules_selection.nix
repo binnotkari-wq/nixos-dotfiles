@@ -17,7 +17,7 @@
       # ../../modules/git.nix                                                       # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
       ../../modules/gnome-dconf.nix                                                 # optionnel - intégrable sans aucune condition
       # ../../modules/home-manager.nix                                              # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
-      ../../modules/impermanence-native.nix                                         # optionnel - intégrable sous conditions
+      # ../../modules/impermanence-native.nix                                         # optionnel - intégrable sous conditions
       # ../../modules/kitty.nix                                                     # optionnel - intégrable sans aucune condition
       ../../modules/OS_options.nix                                                  # optionnel - intégrable sans aucune condition
       ../../modules/performance_addons.nix                                          # optionnel - intégrable sans aucune condition
