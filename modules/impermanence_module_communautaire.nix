@@ -66,9 +66,9 @@ in
   # En effet la séquence de boot supporte mal la mise en persistance de ces fichiers. Certains services peuvent essayer d'y accéder, alors que les liens symboliques
   # défini par impermanence ne sont pas encore reconstruits.
   # Décommenter si ces options ne sont pas déjà déclarées dans un autre .nix
-  # environment.etc."machine-id".text = "${vars.machineid}\n";
-  # users.users.${vars.username}.hashedPassword = vars.hashedPassword;
-  # users.mutableUsers = false;
+  environment.etc."machine-id".text = "${vars.machineid}\n";
+  users.users.${vars.username}.hashedPassword = vars.hashedPassword;
+  users.mutableUsers = false;
 
   # ===========================================================================
   # 2. bind mount des dossiers à persister

@@ -25,9 +25,11 @@
 # - vars.hashedPassword par le résultat de : mkpasswd lemotdepasse (par défaut ce hash sera généré avec l'algorythme yescrypt).
 
   # --- IDENTIFIANT MACHINE DECLARATIF ---
+  # Pour que /etc/machine-id, /etc/shadow, /etc/passwd et /etc/group soient gérés déclarativement (initialement, ils sont créés de façon iméprative par Calamares).
+  # A commenter si déjà géré en déclaratif dans un autre .nix.
   environment.etc."machine-id".text = "${vars.machineid}\n";
   users.users.${vars.username}.hashedPassword = vars.hashedPassword;
-
+  users.mutableUsers = false;
 
   # Sécurité : données sudo en tmpfs, pas conservées sur disque ---
   fileSystems = {

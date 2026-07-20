@@ -4,35 +4,12 @@
 
 { config, pkgs, ... }:
 
-###########################################################################################################
-# Partie personnalisée. Import de variables.nix (seule source d'informations d'ientification) et des .nix #
-# optionnels de configuration de la machine.                                                              #
-# Déclaration des options d'ienditifactions machine et du compte utilisateur.                             #
-###########################################################################################################
-let
-  vars = import ./variables.nix { };                                            # copié dans /etc/nixos/ puis renseigné par le script d'installation
-in
-
 {
-  _module.args.vars = vars;
-
   imports =
-    [
-      ./hardware-configuration.nix                                              # généré par nixos-generate-config. Hors git (.gitignore) car change d'une machine à l'autre
-      ../../home/${vars.username}/Git/nixos-dotfiles/hosts/${vars.hostname}/modules_selection.nix    # Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
+    [ # Include the results of the hardware scan.
+      ./hardware-configuration.nix
+      ../../home/@@username@@/Git/nixos-dotfiles/hosts/@@hostname@@/modules_selection.nix    # @@placeholder@@ substitué par bootstrap.sh . Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
     ];
-
-  environment.etc."machine-id".text = "${vars.machineid}\n";                    # gestion déclarative fixe de l'identifiant machine
-  users.mutableUsers = false;                                                   # gestion déclarative fixe des informations de compte utilisateur
-#################################################################################################################
-# Fin de la partie personnalisée.                                                                               #
-#################################################################################################################
-
-# {
-  # imports =
-  # [ # Include the results of the hardware scan.
-  #   ./hardware-configuration.nix
-  # ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -41,7 +18,7 @@ in
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName  = vars.hostname;                                         # hérité de variables.nix
+  networking.hostName  = "@@hostname@@";                                         # @@placeholder@@ substitué par bootstrap.sh
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -108,14 +85,13 @@ in
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.${vars.username} = {                                              # hérité de variables.nix
+  users.users."@@username@@" = {                                                 # @@placeholder@@ substitué par bootstrap.sh
     isNormalUser = true;
-    description = vars.fullname;                                                # hérité de variables.nix
+    description = "@@fullname@@";                                                # @@placeholder@@ substitué par bootstrap.sh
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
     #  thunderbird
     ];
-    hashedPassword = vars.hashedPassword;                                       # gestion déclarative fixe des informations de compte utilisateur
   };
 
   # Install firefox.
@@ -156,6 +132,6 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion  = vars.nixosVersion;                                     # hérité de variables.nix
+  system.stateVersion  = "@@nixosversion@@";                                     # @@placeholder@@ substitué par bootstrap.sh
 
 }

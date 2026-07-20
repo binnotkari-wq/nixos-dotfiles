@@ -8,7 +8,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  vars = import /etc/nixos/variables.nix { };
+  vars = import ./variables.nix { };
   home-manager = builtins.fetchTarball {
    url = "https://github.com/nix-community/home-manager/archive/release-${vars.nixosVersion}.tar.gz";
    # sha256 = "sha256:13sahz1mxbk7n67jvz9fi0f85ax7l6s3ffiwa6x0rfrwfwhgj7x3"; (optionnel, pour verrouiller le commit qu'on, va utiliser)
