@@ -6,13 +6,10 @@
 { config, pkgs, ... }:
 
 {
-  # --- IDENTIFIANT MACHINE DECLARATIF ---
-  environment.etc."machine-id".text = "87f4f793002d450cbac014a28903f1fc\n";                     # Généré grâce à systemd-id128 new | tr -d '-'
-
   # --- DISQUE SECONDAIRE ---
   fileSystems."/cargo" =
-    { device = "/dev/disk/by-uuid/AAAA COOOOOOOMPLETEEEEEEEEER"; # récupérer uuid suite à conversion en btrfs
-      fsType = "btrfs"; # convertir le disque de ext4 à btrfs
+    { device = "/dev/disk/by-uuid/8cd29e3c-2aa0-4ab0-b5ee-54ac7b4752bf";
+      fsType = "btrfs";
       options = [ "nofail" "noatime" "compress=zstd" "ssd" "discard=async" ];                   # nofail = le système boote même si le disque est absent
     };
 
