@@ -18,7 +18,7 @@
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName  = "@@hostname@@";                                         # @@placeholder@@ substitué par bootstrap.sh
+  networking.hostName  = "@@hostname@@";                                        # @@placeholder@@ substitué par bootstrap.sh
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -47,11 +47,11 @@
   };
 
   # Enable the X11 windowing system.
-  # services.xserver.enable = true;                                             # par défaut : décommenté
+  services.xserver.enable = false;                                              # par défaut : true
 
   # Enable the GNOME Desktop Environment.
-  services.desktopManager.gnome.enable = true;                                  # syntaxe corrigée
-  services.displayManager.gdm.enable = true;                                    # syntaxe corrigée
+  services.desktopManager.gnome.enable = true;                                  # par défaut : services.xserver.displayManager.gdm.enable = true; Syntaxe corrigée
+  services.displayManager.gdm.enable = true;                                    # par défaut : services.xserver.desktopManager.gnome.enable = true; Syntaxe corrigée
 
   # Configure keymap in X11
   services.xserver.xkb = {

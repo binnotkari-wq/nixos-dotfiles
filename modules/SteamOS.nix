@@ -46,8 +46,8 @@ in
   programs.gamescope.enable = true;
   programs.steam = {
     enable = true;
-    extraPackages = with pkgs; [ mangohud ];    # On injecte MangoHud directement dans Steam pour MangoApp
-    gamescopeSession.enable = false; # on utilise la session custom à la place
+    extraPackages = with pkgs; [ mangohud ];                            # on injecte MangoHud directement dans Steam pour MangoApp
+    gamescopeSession.enable = false;                                    # on utilise la session custom à la place (gamescope est déclaré dans les pkgs de gaming.nix
   };
 
   environment.systemPackages = with pkgs; [

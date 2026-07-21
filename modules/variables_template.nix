@@ -1,8 +1,8 @@
 ################################################################################################
 # bootstrap.sh substitue les @@placeholders@@ d'après les infos saisie lors de l'intallation.  #
 # bootstrap réalise la subsitution APRES avoir copié et renommé en variables.nix : ceci permet #
-# d'anonymiser le repo git (.gitignore) et tous les autres fichiers .nix (qui restent donc     #
-# figés puisqu'ils ne contiennent que le nom de la variable et non sa valeur).                 #
+# d'anonymiser le repo git puisque variables.nix est dans .gitignore) et que tous les autres   #
+# fichiers .nix contiennet le nom de la variable et non sa valeur (----> les .nix sont figés). #
 # Si bootstrap n'est pas utilisé, modiler les @@placeholders@@ manuellement                    #
 # Importer ce fichiers dans un des autres nix : les vars sont propagées dans tous les autres   #
 # fichiers .nix qui font appel à vars (quels que soient les niveaux d'imports).                #
