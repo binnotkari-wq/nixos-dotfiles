@@ -28,7 +28,7 @@
           ];
         };
         EnableTrackingProtection = {
-          Value= true;
+          Value = true;
           Locked = true;
           Cryptomining = true;
           Fingerprinting = true;

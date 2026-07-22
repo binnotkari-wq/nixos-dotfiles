@@ -1,6 +1,6 @@
 #########################################################################################
 # Spécifique à la machine.                                                              #
-# Permet d'importer les d'options et packages .nix de façon selective                   #
+# Déclare uniquement ce qui ne peut concerner une autre machine.                        #
 #########################################################################################
 
 { config, pkgs, ... }:
@@ -14,7 +14,6 @@ in
 
   imports =
     [
-      ./machine_features.nix                                                        # optionnel - intégrable sous conditions (spécificités de la machine)
       ../../drivers/CPU_intel_pre10.nix                                             # optionnel - intégrable sous conditions (CPU intel avant gen10)
       ../../drivers/iGPU_intel.nix                                                  # optionnel - intégrable sous conditions (GPU intel intégré)
       # ../../modules/btop.nix                                                      # optionnel - intégrable sans aucune condition
@@ -22,9 +21,7 @@ in
       # ../../modules/flatpak.nix                                                   # optionnel - intégrable sans aucune condition
       ../../modules/git.nix                                                         # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
       ../../modules/gnome-dconf.nix                                                 # optionnel - intégrable sans aucune condition
-      # ../../modules/home-manager.nix                                              # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
-      # ../../modules/impermanence_module_communautaire.nix                         # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
-      ../../modules/impermanence_native.nix                                         # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
+      ../../modules/impermanence.nix                                                # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
       # ../../modules/kitty.nix                                                     # optionnel - intégrable sans aucune condition
       ../../modules/OS_options.nix                                                  # optionnel - intégrable sans aucune condition
       ../../modules/performance_addons.nix                                          # optionnel - intégrable sans aucune condition
@@ -43,14 +40,24 @@ in
       #../../software_packs/unwanted.nix                                            # optionnel - intégrable sans aucune condition
     ];
 
-  # Toutes les lignes de cette section sont à commenter si on utilise pas home manager.
-  # On importe ici au lieu d'importer dans home.nix (ainsi home.nix n'est jamais modifié quelle que soit la selection souhaitée par machine)
-  # sharedModules est une option de home manager. Tout module ajouté à cette liste sera évalué pour tout utilisateur déclarés dans home manager.
-  # On n'est donc pas obligé de déclarer ici le nom de l'utilisateur ou d'importer des variables.
-  # home-manager.sharedModules = 
-    # [
-      # ../../modules/home-manager_options/newsboat.nix                             # optionnel
-      # ../../modules/home-manager_options/pyradio.nix                              # optionnel
-      # ../../modules/home-manager_options/yazi.nix                                 # optionnel
-    # ];
+  # --- SOUS-VOLUME BTRFS SUPPLEMENTAIRE ---
+  fileSystems."/cargo" =
+    {
+      options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+    };
+
+
+  # --- TDP ---
+  powerManagement.powertop.enable = true;                                                       # met en place un service qui applique automatiquement les réglages appliqués. Utiliser seulement sur PC portables.
+  # A ADAPTER POUR LE L380
+  # Le X240 est parfaitement stable en stress-test avec ces valeurs (et le boost est maintenu, avec une température de moins de 70 degrés!)
+  # services.undervolt = {
+    # enable = true;
+    # coreOffset = -40;                                                                         # Valeur en mV (-80 pour commencer : kernel panic lors du débranchement de l'alim)
+    # gpuOffset = -40;                                                                          # L'iGPU peut aussi être undervolté
+    # uncoreOffset = -40;                                                                       # Contrôleur mémoire, etc.
+    # analogioOffset = 0;                                                                       # Généralement laissé à 0
+    # temp = 75;                                                                                # Paramètre optionnel : définit la limite de température avant throttling
+  # };
+
 }

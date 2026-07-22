@@ -8,7 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ../../home/@@username@@/Git/nixos-dotfiles/hosts/@@hostname@@/modules_selection.nix    # @@placeholder@@ substitué par bootstrap.sh . Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
+      ../../home/@@username@@/Git/nixos-dotfiles/hosts/@@hostname@@.nix         # @@placeholder@@ substitué par bootstrap.sh . Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
     ];
 
   # Bootloader.
