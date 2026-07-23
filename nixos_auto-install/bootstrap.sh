@@ -290,7 +290,7 @@ installer_Nixos() {
     echo "configuration.nix généré par nixos-generate-config ne sera pas utilisé : suppression."
     rm /mnt/etc/nixos/configuration.nix
     echo "Copie de configuration_template.nix depuis le dépôt git vers /etc/nixos/configuration.nix et injection des informations collectée......"
-    cp -ra "/mnt/home/${USERNAME}/Git/nixos-dotfiles/custom_deploy/configuration_template.nix" "/mnt/etc/nixos/configuration.nix"
+    cp -ra "/mnt/home/${USERNAME}/Git/nixos-dotfiles/nixos_auto-install/configuration_template.nix" "/mnt/etc/nixos/configuration.nix"
     sed -i \
         -e "s|@@username@@|${USERNAME}|g" \
         -e "s|@@fullname@@|${USERNAME_DISPLAY}|g" \

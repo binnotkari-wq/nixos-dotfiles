@@ -4,7 +4,7 @@
 
 ```bash
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]"
-curl -fsSL https://raw.githubusercontent.com/binnotkari-wq/nixos-dotfiles/main/custom_deploy/bootstrap.sh -o bootstrap.sh
+curl -fsSL https://raw.githubusercontent.com/binnotkari-wq/nixos-dotfiles/main/nixos_auto-install/bootstrap.sh -o bootstrap.sh
 chmod +x bootstrap.sh
 sudo ./bootstrap.sh
 ```
@@ -139,7 +139,7 @@ Contient des .nix qui proposent une selection de logiciels GTK, TUI et CLI par t
 | /etc/nixos/configuration.nix                 | 7200,00 Mio | 1200,00 Mio | Obligatoire | Aucune                 | Base système générée via Calamares (construit par séléctions de code de main.py). |
 | /etc/nixos/hardware-configuration.nix        |    0,00 Mio |    0,00 Mio | Obligatoire | Aucune                   | Base système générée via Calamares (nixos-generate-config), propre au PC.       |
 |        ou :                                  |             |             |             |                          |                                                                                 |
-| ./custom_deploy/configuration_template.nix   |      -      |      -      |      -      |             -            | Base système pour déploiement scripté (placeholders). Calqué sur un configuration.nix généré par Calamares.|
+| ./nixos_auto-install/configuration_template.nix |    -     |      -      |      -      |             -            | Base système pour déploiement scripté (placeholders). Calqué sur un configuration.nix généré par Calamares.|
 |    └──> copie : /etc/nixos/configuration.nix | 7200,00 Mio | 1200,00 Mio | Obligatoire | Aucune                   | Base système pour déploiement scripté (renseignées par script ou manuel).       |
 | /etc/nixos/hardware-configuration.nix        |         Mio |         Mio | Obligatoire | Aucune                   | Base système générée via script (nixos-generate-config), propre au PC.          |
 |                                              |             |             |             |                          |                                                                                 |
