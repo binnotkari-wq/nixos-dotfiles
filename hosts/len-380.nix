@@ -6,7 +6,7 @@
 { config, pkgs, ... }:
 
 let
-  vars = import ../../modules/variables.nix { };                                    # génération par bootstrap.sh ou adaptation manuelle
+  vars = import ../modules/variables.nix { };                                    # génération par bootstrap.sh ou adaptation manuelle
 in
 
 {
@@ -14,38 +14,38 @@ in
 
   imports =
     [
-      ../../drivers/CPU_intel_pre10.nix                                             # optionnel - intégrable sous conditions (CPU intel avant gen10)
-      ../../drivers/iGPU_intel.nix                                                  # optionnel - intégrable sous conditions (GPU intel intégré)
-      # ../../modules/btop.nix                                                      # optionnel - intégrable sans aucune condition
-      ../../modules/firefox.nix                                                     # optionnel - intégrable sans aucune condition
-      # ../../modules/flatpak.nix                                                   # optionnel - intégrable sans aucune condition
-      ../../modules/git.nix                                                         # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
-      ../../modules/gnome-dconf.nix                                                 # optionnel - intégrable sans aucune condition
-      ../../modules/impermanence.nix                                                # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
-      # ../../modules/kitty.nix                                                     # optionnel - intégrable sans aucune condition
-      ../../modules/OS_options.nix                                                  # optionnel - intégrable sans aucune condition
-      ../../modules/performance_addons.nix                                          # optionnel - intégrable sans aucune condition
-      ../../modules/shell.nix                                                       # optionnel - intégrable sans aucune condition
-      # ../../pseudo_impermanence.nix                                               # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
-      # ../../modules/SteamOS.nix                                                   # optionnel - intégrable sans aucune condition (mais utilisable seulement avec GPU AMD)
-      ../../modules/xdg.nix                                                         # optionnel - intégrable sans aucune condition
-      # ../../software_packs/dev_experiments.nix                                    # optionnel - intégrable sans aucune condition
-      # ../../software_packs/firmwares.nix                                          # optionnel - intégrable sans aucune condition. iwlwifi est utilisé par le wifi intel 8260 (dell-5485).
-      # ../../software_packs/gaming.nix                                             # optionnel - intégrable sans aucune condition
-      # ../../software_packs/GTK_all.nix                                            # optionnel - intégrable sans aucune condition
-      ../../software_packs/GTK_base.nix                                             # optionnel - intégrable sans aucune condition
-      # ../../software_packs/CLI_all.nix                                            # optionnel - intégrable sans aucune condition
-      ../../software_packs/CLI_base.nix                                             # optionnel - intégrable sans aucune condition
-      # ../../software_packs/TUI.nix                                                # optionnel - intégrable sans aucune condition
-      #../../software_packs/unwanted.nix                                            # optionnel - intégrable sans aucune condition
+      ../drivers/CPU_intel_pre10.nix                                             # optionnel - intégrable sous conditions (CPU intel avant gen10)
+      ../drivers/iGPU_intel.nix                                                  # optionnel - intégrable sous conditions (GPU intel intégré)
+      # ../modules/btop.nix                                                      # optionnel - intégrable sans aucune condition
+      ../modules/firefox.nix                                                     # optionnel - intégrable sans aucune condition
+      # ../modules/flatpak.nix                                                   # optionnel - intégrable sans aucune condition
+      ../modules/git.nix                                                         # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
+      ../modules/gnome-dconf.nix                                                 # optionnel - intégrable sans aucune condition
+      # ../modules/impermanence.nix                                                # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
+      # ../modules/kitty.nix                                                     # optionnel - intégrable sans aucune condition
+      ../modules/OS_options.nix                                                  # optionnel - intégrable sans aucune condition
+      ../modules/performance_addons.nix                                          # optionnel - intégrable sans aucune condition
+      ../modules/shell.nix                                                       # optionnel - intégrable sans aucune condition
+      # ../pseudo_impermanence.nix                                               # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
+      # ../modules/SteamOS.nix                                                   # optionnel - intégrable sans aucune condition (mais utilisable seulement avec GPU AMD)
+      ../modules/xdg.nix                                                         # optionnel - intégrable sans aucune condition
+      # ../software_packs/dev_experiments.nix                                    # optionnel - intégrable sans aucune condition
+      # ../software_packs/firmwares.nix                                          # optionnel - intégrable sans aucune condition. iwlwifi est utilisé par le wifi intel 8260 (dell-5485).
+      # ../software_packs/gaming.nix                                             # optionnel - intégrable sans aucune condition
+      # ../software_packs/GTK_all.nix                                            # optionnel - intégrable sans aucune condition
+      ../software_packs/GTK_base.nix                                             # optionnel - intégrable sans aucune condition
+      # ../software_packs/CLI_all.nix                                            # optionnel - intégrable sans aucune condition
+      ../software_packs/CLI_base.nix                                             # optionnel - intégrable sans aucune condition
+      # ../software_packs/TUI.nix                                                # optionnel - intégrable sans aucune condition
+      ../software_packs/unwanted.nix                                             # optionnel - intégrable sans aucune condition
     ];
 
   # --- SOUS-VOLUME BTRFS SUPPLEMENTAIRE ---
   fileSystems."/cargo" =
-    {
-      options = [ "noatime" "compress=zstd" "ssd" "discard=async" ];
+    { device = "/dev/mapper/luks-${vars.luksUuid}";
+      fsType = "btrfs";
+      options = [ "subvol=cargo" "noatime" "compress=zstd" "ssd" "discard=async" ];
     };
-
 
   # --- TDP ---
   powerManagement.powertop.enable = true;                                                       # met en place un service qui applique automatiquement les réglages appliqués. Utiliser seulement sur PC portables.

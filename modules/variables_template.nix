@@ -18,7 +18,7 @@
   machineid       = "@@machineid@@";                                                             # remplacer par le résultat de : systemd-id128 new | tr -d '-'
   luksUuid        = "@@luksUuid@@";                                                              # utile si on utilise un des modules impermanence. Remplacer par le résultat de : sudo cryptsetup luksUUID /dev/nvme0n1p2 (ou autre périphérique qui contient le volume luks - si le volume LUKS porte un nom personnalisé, il faut remplacer par son nom)
   nixosVersion    = "@@nixosversion@@";                                                          # version Nixos installée
-  gitUsername     = "@@gitUsername @@";                                                          # utile si on utilise git.nix
+  gitUsername     = "@@gitUsername@@";                                                          # utile si on utilise git.nix
   gitUsermail     = "@@gitUsermail@@";                                                           # utile si on utilise git.nix
 }
 
