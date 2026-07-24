@@ -14,8 +14,8 @@ in
 
   imports =
     [
-      ../drivers/CPU_AMD.nix                                                     # optionnel - intégrable sous conditions (CPU AMD)
-      ../drivers/GPU_AMD.nix                                                     # optionnel - intégrable sous conditions (GPU AMD)
+      ../modules/drivers_CPU_AMD.nix                                                     # optionnel - intégrable sous conditions (CPU AMD)
+      ../modules/drivers_GPU_AMD.nix                                                     # optionnel - intégrable sous conditions (GPU AMD)
       ../modules/btop.nix                                                        # optionnel - intégrable sans aucune condition
       ../modules/firefox.nix                                                     # optionnel - intégrable sans aucune condition
       ../modules/flatpak.nix                                                     # optionnel - intégrable sans aucune condition
@@ -31,20 +31,20 @@ in
       # ../pseudo_impermanence.nix                                               # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
       ../modules/SteamOS.nix                                                     # optionnel - intégrable sans aucune condition (mais utilisable seulement avec GPU AMD)
       ../modules/xdg.nix                                                         # optionnel - intégrable sans aucune condition
-      ../software_packs/dev_experiments.nix                                      # optionnel - intégrable sans aucune condition
-      ../software_packs/firmwares.nix                                            # optionnel - intégrable sans aucune condition. iwlwifi est utilisé par le wifi intel 8260 (dell-5485).
-      ../software_packs/gaming.nix                                               # optionnel - intégrable sans aucune condition
-      ../software_packs/GTK_all.nix                                              # optionnel - intégrable sans aucune condition
-      ../software_packs/GTK_base.nix                                             # optionnel - intégrable sans aucune condition
-      ../software_packs/CLI_all.nix                                              # optionnel - intégrable sans aucune condition
-      ../software_packs/CLI_base.nix                                             # optionnel - intégrable sans aucune condition
-      ../software_packs/TUI.nix                                                  # optionnel - intégrable sans aucune condition
-      ../software_packs/unwanted.nix                                             # optionnel - intégrable sans aucune condition
+      ../modules/software-set_dev_experiments.nix                                      # optionnel - intégrable sans aucune condition
+      ../modules/software-set_firmwares.nix                                            # optionnel - intégrable sans aucune condition. iwlwifi est utilisé par le wifi intel 8260 (dell-5485).
+      ../modules/software-set_gaming.nix                                               # optionnel - intégrable sans aucune condition
+      ../modules/software-set_GTK_all.nix                                              # optionnel - intégrable sans aucune condition
+      ../modules/software-set_GTK_base.nix                                             # optionnel - intégrable sans aucune condition
+      ../modules/software-set_CLI_all.nix                                              # optionnel - intégrable sans aucune condition
+      ../modules/software-set_CLI_base.nix                                             # optionnel - intégrable sans aucune condition
+      ../modules/software-set_TUI.nix                                                  # optionnel - intégrable sans aucune condition
+      ../modules/software-set_unwanted.nix                                             # optionnel - intégrable sans aucune condition
     ];
 
   # --- DISQUE SECONDAIRE ---
   fileSystems."/cargo" =
-    { device = "/dev/disk/by-uuid/6790e467-032e-4021-b1b7-330fc873378f";
+    { device = "/dev/mapper/luks-${vars.luksUuid}";
       fsType = "btrfs";
       options = [ "nofail" "noatime" "compress=zstd" "ssd" "discard=async" ];                   # nofail = le système boote même si le disque est absent
     };

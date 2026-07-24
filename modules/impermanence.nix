@@ -1,6 +1,18 @@
 #################################################################################################################################
-# PAS AGNOSTIQUE. Prérequis :
-# - il y a un sous-volume pour /nix (setup standard de Calamares lorsqu'on choisi le système de fichier BRTFS)
+# PAS AGNOSTIQUE.
+
+# PREREQUIS :
+# - il faut un sous-volume ou partition distint de / . C'est le setup standard de Calamares lorsqu'on choisi le système de fichier
+#   BRTFS, les sous-volumes /nix et /home sont automatiquement crées. Pour ext4, il faut créer une partition distincte pour /nix
+#   (le store sera ainsi en dehors de la volatilité) ainsi que pour /home, et éventuellement une partition distincte pour les
+#   éléments à persister si on veut les placer ailleurs que dans le volume /nix ou /home
+ #  
+# - la méthode de volatilité "subvol_reset" n'est utilisable qu'avec un système de fichier BTRFS dans lequel un sous-volume distinct
+#   (donc avec top-level = 5) a été créé pour /. Le système de fichier BTRFS doit être dans un volume encrypté LUKS.
+#   Si cette condition n'est pas remplie, la méthode de volatilité doit être "tmpfs" (à choisir plus bas)
+#
+# - les éléments de / à persister doivent être copiés au préalable sur l'emplacement de persistance, avec cp -ra
+#
 #
 # IMPERMANENCE
 #
@@ -8,19 +20,19 @@
 # Au démarrage, la racine (/) est rendue volatile — soit via tmpfs, soit via un sous-volume btrfs supprimé puis recrée au
 # démarrage. Tout ce qui n'est pas explicitement sauvé disparaît au reboot : logs, caches, fichiers générés à la volée, erreurs
 # de manipulation — le système repart "propre" à chaque fois.
-
+#
 # Persistences :
 # Une partie de ces éléments d'état impératif méritent d'être intentionnellement persistés (clés SSH, configs wifi et bluetooth,
 # /var/lib de services, /home ). On désigne un sous-volume ou partition distincte, en dehors du cycle de wipe, pour placer le dossier
 # de ces éléments à persister.
-
+#
 # Liaison / vers persistences
 # Le lien entre le / éphémère et ce stockage persistant se fait de deux façons, après le wipe complet de / : par bind-mounts
 # déclarés (ex. /etc/machine-id, /var/lib/bluetooth) qui exposent un chemin persistant à l'endroit attendu, et par liens
 # symboliques régénérés à chaque boot via systemd.tmpfiles.rules
 # 
 # Non conernés :
-# * Le Nix store (/nix/store) est le résultat d'un état déclaratif, immuable et versionné par hash, sur son propre sous-volume (nix).
+# * Le Nix store (/nix/store) est le résultat d'un état déclaratif, immuable et versionné par hash, sur son propre sous-volume (/nix).
 #   Sa persistance n'est pas une exception qu'on gère, elle est structurelle.
 # * Les partitions et les sous-volume distinct de / sont par défaut en dehors de toute volatilité (il faudrait les monter en tmpfs
 #   ou les inclure dans le script de wipe) car voués à stocker des données stockées intentionnellement par l'utilisateur.
@@ -35,17 +47,21 @@
 # dépendance extérieure.
 #################################################################################################################################
 
-{ config, lib, pkgs, vars, ... }:
 
+
+#################################################################################################################################
 # Les vars sont hérités de variables.nix. Si on n'utilise pas les variables, remplacer :
 # - ${vars.machineid} par le résultat de : systemd-id128 new | tr -d '-'
 # - ${vars.username} par le nom de l'utilisateur
 # - vars.hashedPassword par le résultat de : mkpasswd lemotdepasse (par défaut ce hash sera généré avec l'algorythme yescrypt).
+# - ${vars.rootSubvolumeName} par le résultat de : sudo btrfs subvolume show / | cut -f1
 # - ${vars.luksUuid} par le résultat de : sudo cryptsetup luksUUID /dev/nvme0n1p2 (ou autre périphérique qui contient le volume luks)
 # - ----> si le volume LUKS porte un nom personnalisé, il faut remplacer luks-${vars.luksUuid} par son nom.
+#################################################################################################################################
+
+{ config, lib, pkgs, vars, ... }:
 
 {
-
   # ===========================================================================
   # 1. Options systèmes
   # ===========================================================================
@@ -165,35 +181,53 @@
   #   options = [ "size=2G" "mode=755" ];
   # };
 
-  # WIPE DU SOUS-VOUME BTRFS ROOT - POSSIBLE UNIQUEMENT SI INSTALLATION PAR BOOTSTRAP.SH
+  # WIPE DU SOUS-VOUME BTRFS ROOT - POSSIBLE UNIQUEMENT SI LUKS->VOLUME BTRFS->SOUS VOLUME DISTINCT POUR /
   # Section inutile lorsque / est un tmpfs qui se vide à l'exctinction / redémarrage, à commenter dans ce cas.
   # L'activation de cette section suppose que :
   # - il y a un volume LUKS
   # - il y a un sous-volume root et il est nommé root
   # Cette configuration de système de fichier est créée par bootstrap.sh mais pas par Calamares, qui ne créé pas de sous-solume distinct pour root.
   # Un service sera exécut par systemd à chaque démarrage pour vider root
-  boot.initrd.systemd = {
-   services.erase_root = {
-     description = "Vidange du filesystem root à chaque boot";
-     wantedBy = [ "initrd.target" ];
-     after = [ "systemd-cryptsetup@${lib.replaceStrings ["-"] ["\\x2d"] "luks-${vars.luksUuid}"}.service" ]; # lib.replaceStrings ["-"] ["\\x2d"] car systemd echappe les - dans les noms de services
-     before = [ "sysroot.mount" ];
-     unitConfig.DefaultDependencies = "no";
-     serviceConfig.Type = "oneshot";
-     script = ''
-       mkdir -p /mnt
-       mount -t btrfs -o subvol=/ /dev/mapper/luks-${vars.luksUuid} /mnt
-       btrfs subvolume list -o /mnt/root | \
-         cut -f9 -d' ' | \
-         while read subvol; do
-           btrfs subvolume delete "/mnt/$subvol"
-         done
-       btrfs subvolume delete /mnt/root
-       btrfs subvolume create /mnt/root
-       # btrfs subvolume snapshot /mnt/blank /mnt/root # alternative à la recréation de root : son ecrasement avec une snaphot vide. Il faut créer le snapshot au préalable (un sous-volume vide)
-       umount /mnt
-     '';
-   };
+  services.erase_root = {
+    description = "Vidange du filesystem root à chaque boot";
+    wantedBy = [ "initrd.target" ];
+    after = [ "systemd-cryptsetup@${lib.replaceStrings ["-"] ["\\x2d"] "luks-${vars.luksUuid}"}.service" ];
+    before = [ "sysroot.mount" ];
+    unitConfig.DefaultDependencies = "no";
+    path = [ pkgs.btrfs-progs pkgs.util-linux ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      set -euo pipefail
+
+      ROOT_SUBVOL="${vars.rootSubvolumeName}"
+      MNT="/mnt"
+      MOUNTED=0
+
+      cleanup() {
+        [ "$MOUNTED" = "1" ] && umount "$MNT" || true
+      }
+      trap cleanup EXIT
+
+      mkdir -p "$MNT"
+      mount -t btrfs -o subvol=/ /dev/mapper/luks-${vars.luksUuid} "$MNT"
+      MOUNTED=1
+
+      # --- CANARI ---
+      # Si $ROOT_SUBVOL n'existe pas, `btrfs subvolume show` échoue -> set -e arrête tout.
+      # Si $ROOT_SUBVOL existe mais N'EST PAS un vrai sous-volume enfant du top-level
+      # (cas Calamares : "/" est directement le top-level, Top level ID = 0), on arrête explicitement.
+      TOP_LEVEL_ID=$(btrfs subvolume show "$MNT/$ROOT_SUBVOL" | grep -m1 'Top level ID:' | awk '{print $NF}')
+
+      if [ "$TOP_LEVEL_ID" != "5" ]; then
+        echo "ERREUR FATALE : '$ROOT_SUBVOL' n'est pas un sous-volume enfant du top-level (Top level ID=$TOP_LEVEL_ID)." >&2
+        echo "Layout inattendu (ex: install Calamares sans sous-volume dédié). Abandon du wipe." >&2
+        exit 1
+      fi
+
+      # --- Suppression + recréation, un seul appel récursif ---
+      btrfs subvolume delete -R "$MNT/$ROOT_SUBVOL"
+      btrfs subvolume create "$MNT/$ROOT_SUBVOL"
+    '';
   };
 
 }

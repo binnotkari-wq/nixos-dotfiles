@@ -11,34 +11,53 @@
 { ... }:
 
 {
-  username        = "@@username@@";
-  fullname        = "@@fullname@@";
-  hashedPassword  = "@@hashedPassword@@";                                                        # remplacer par le résultat de : mkpasswd lemotdepasse (par défaut ce hash sera généré avec l'algorythme yescrypt).
-  hostname        = "@@hostname@@";
-  machineid       = "@@machineid@@";                                                             # remplacer par le résultat de : systemd-id128 new | tr -d '-'
-  luksUuid        = "@@luksUuid@@";                                                              # utile si on utilise un des modules impermanence. Remplacer par le résultat de : sudo cryptsetup luksUUID /dev/nvme0n1p2 (ou autre périphérique qui contient le volume luks - si le volume LUKS porte un nom personnalisé, il faut remplacer par son nom)
-  nixosVersion    = "@@nixosversion@@";                                                          # version Nixos installée
-  gitUsername     = "@@gitUsername@@";                                                          # utile si on utilise git.nix
-  gitUsermail     = "@@gitUsermail@@";                                                           # utile si on utilise git.nix
+  username          = "@@username@@";
+  fullname          = "@@fullname@@";
+  hashedPassword    = "@@hashedPassword@@";     # remplacer par le résultat de : mkpasswd lemotdepasse (par défaut ce hash sera généré avec l'algorythme yescrypt).
+  hostname          = "@@hostname@@";
+  machineid         = "@@machineid@@";          # remplacer par le résultat de : systemd-id128 new | tr -d '-'
+  luksUuid          = "@@luksUuid@@";           # remplacer par le résultat de : sudo cryptsetup luksUUID /dev/nvme0n1p2 (ou autre périphérique qui contient le volume luks - si le volume LUKS porte un nom personnalisé, il faut remplacer par son nom)
+  nixosVersion      = "@@nixosversion@@";
+  gitUsername       = "@@gitUsername@@";
+  gitUsermail       = "@@gitUsermail@@";
+  rootSubvolumeName = "@@rootSubvolumeName@@";  # remplacer par le résultat de : sudo btrfs subvolume show / | cut -f1
 }
 
-###########################################################################################################
-# Import :                                                                                                #
-###########################################################################################################
+################################################################################################
+# Import :                                                                                     #
+################################################################################################
 # { config, pkgs, ... }:
-
+#
 # let                                           # ces 3 lignes sont à
-  # vars = import ./variables.nix { };          # insérer tout de suite
+#   vars = import ./variables.nix { };          # insérer tout de suite
 # in                                            # après { config, pkgs, ... }:
-
+#
 # {
-  # _module.args.vars = vars;                   # cette ligne est à insérer tout de suite après le premier { ouvert
+#   _module.args.vars = vars;                   # cette ligne est à insérer tout de suite après le premier { ouvert
+#
+#   imports =
+#     [
+#       ./un/import.nix
+#       ./autre/import.nix
+#     ];
+#   Le reste
+#   du fichier nix
+################################################################################################
 
-  # imports =
-    # [
-      # ./un/import.nix
-      # ./autre/import.nix
-    # ];
-  # Le reste
-  # du fichier nix
-#################################################################################################################
+
+
+
+################################################################################################
+# Propagations :                                                                               #
+################################################################################################
+#   username          # utilisé par impermanence.nix, pseudo-impermanence.nix et home-manager.nix
+#   fullname          # inutilisé
+#   hashedPassword    # utilisé par impermanence.nix et pseudo-impermanence.nix
+#   hostname          # utilisé par impermanence.nix et pseudo-impermanence.nix
+#   machineid         # utilisé par impermanence.nix et pseudo-impermanence.nix
+#   luksUuid          # utilisé par impermanence.nix
+#   nixosVersion      # utilisé par home-manager.nix
+#   gitUsername       # utilisé par git.nix
+#   gitUsermail       # utilisé par git.nix
+#   rootSubvolumeName # utilisé par impermanence.nix
+################################################################################################

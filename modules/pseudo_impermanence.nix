@@ -4,20 +4,12 @@
 
 # Permet de se rapprocher d'une impermanence, mais sans avoir à définir un schéma de partitionnement adapté
 # ou une mise en place en pré-installation. On peut activer ou desactiver ce module quand on veut et quel
-# que soit le schéma de partitions. On peut l'activer dès l'installation avec script, ou après installation avec Calamares
-# Ne pas activer si on a activé l'impermanence, qui efface ces éléments à chaque redémarrage.
+# que soit le schéma de partitions ou le type d'installation.
+# !!! Ne pas activer si l'impermanence est déjà activé !!!
 
 { config, pkgs, vars, ... }:
 
 {
-
-# Calamares créé un fichier password. Mais ce n'est pas déclaratif.
-# déclaration :
-# - machine id
-# - mdp
-# - mutableuser false
-# - rendre déclaratif des fichiers de etc environment.etc."systemd/network/10-lan.link".text = ''...''; 
-
 
 # Les vars sont hérités de variables.nix. Si on n'utilise pas les variables, remplacer :
 # - ${vars.machineid} par le résultat de : systemd-id128 new | tr -d '-'
@@ -47,7 +39,7 @@
   '';
 
   # Règles d'hygiène automatique (Systemd-tmpfiles) ---
-  # Configure systemd-tmpfiles pour supprimer ces slors de l'arrêt du système
+  # Configure systemd-tmpfiles pour supprimer ces éléments lors de l'arrêt du système
   systemd.tmpfiles.rules = [
     "R /var/lib/upower/* - - - - -"
     "R /var/cache/* - - - - -"

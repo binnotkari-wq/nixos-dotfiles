@@ -18,7 +18,7 @@
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName  = "@@hostname@@";                                        # @@placeholder@@ substitué par bootstrap.sh
+  networking.hostName = "@@hostname@@";                                        # @@placeholder@@ substitué par bootstrap.sh
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
