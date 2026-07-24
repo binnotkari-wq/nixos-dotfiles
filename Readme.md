@@ -136,7 +136,7 @@ Contient des .nix qui proposent une selection de logiciels GTK, TUI et CLI par t
 
 | Modules                                      | Disque      |  Ram        | Intégration | Conditions pour éval nix | Remarques                                                                       |
 | :------------------------------------------- | ----------: | ----------: | :---------: | :----------------------: | :------------------------------------------------------------------------------ |
-| /etc/nixos/configuration.nix                 | 7200,00 Mio | 1200,00 Mio | Obligatoire | Aucune                 | Base système générée via Calamares (construit par séléctions de code de main.py). |
+| /etc/nixos/configuration.nix                 | 7200,00 Mio | 1200,00 Mio | Obligatoire | Aucune                   | Base système générée via Calamares (construit par séléctions de code de main.py). |
 | /etc/nixos/hardware-configuration.nix        |    0,00 Mio |    0,00 Mio | Obligatoire | Aucune                   | Base système générée via Calamares (nixos-generate-config), propre au PC.       |
 |        ou :                                  |             |             |             |                          |                                                                                 |
 | ./nixos_auto-install/configuration_template.nix |    -     |      -      |      -      |             -            | Base système pour déploiement scripté (placeholders). Calqué sur un configuration.nix généré par Calamares.|
@@ -145,12 +145,12 @@ Contient des .nix qui proposent une selection de logiciels GTK, TUI et CLI par t
 |                                              |             |             |             |                          |                                                                                 |
 |        et :                                  |             |             |             |                          |                                                                                 |
 |                                              |             |             |             |                          |                                                                                 |
-| ./hosts/$hostname/modules_selection.nix      |      qq Mio |         Mio | Recommandée | Aucune              | 100% agnostique. Permet l'import selectif d'options et packages pour chaque machine. |
+| ./hosts/$hostname/modules_selection.nix      |      qq Mio |         Mio | Recommandée | Aucune                   | 100% agnostique. Permet l'import selectif d'options et packages pour chaque machine. |
 | ./hosts/$hostname/machine_features.nix       |      qq Mio |         Mio | Recommandée | Aucune                   | 100% agnostique. Déclare uniquement ce qui ne peut concerner une autre machine. |
 | ./software_packs/CLI_base.nix                |  463,00 Mio |    0,00 Mio | Recommandée | Aucune                   | 100% agnostique. Recommandé pour un système de base opérationnel.               |
 | ./software_packs/GTK_base.nix                | 1800,00 Mio |    0,00 Mio | Recommandée | Aucune                   | 100% agnostique. Recommandé pour un système de base opérationnel.               |
 | ./modules/variables_template.nix             |    0,00 Mio |    0,00 Mio |      -      | Aucune                   | Informations d'identifications (placeholders).								  |
-|    └──> copie : ./modules/variables.nix      |    0,00 Mio |    0,00 Mio | Recommandée | Aucune                | Informations d'identifications (renseignées par script ou manuel). Ignoré par git. |
+|    └──> copie : ./modules/variables.nix      |    0,00 Mio |    0,00 Mio | Recommandée | Aucune                   | Informations d'identifications (renseignées par script ou manuel). Ignoré par git. |
 | ./modules/OS_options.nix                     |   20,00 Mio |    0,00 Mio | Recommandée | Aucune                   | 100% agnostique. Recommandé pour un système de base perfectionné.               |
 | ./modules/performance_addons.nix             |    1,00 Mio |    0,00 Mio | Recommandée | Aucune                   | 100% agnostique. Recommandé pour un système de base optimisé.                   |
 | ./drivers/CPU_AMD.nix                        |         Mio |         Mio | Facultative | Aucune                   | Spécifique au hardware. Recommandé pour un système de base affiné au matériel.  |
@@ -167,7 +167,7 @@ Contient des .nix qui proposent une selection de logiciels GTK, TUI et CLI par t
 | ./modules/kitty.nix                          |    0,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Prefs système. Inutile si Kitty n'est pas installé             |
 | ./modules/newsboat.nix                       |    0,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Prefs utilisateur. Inutile si newsboat n'est pas installé.     |
 | ./modules/pseudo_impermanence.nix            |    0,00 Mio |    0,00 Mio | Facultative | variables.nix ou edition | 100% agnostique. Inutile lorsqu'on active impermanence.nix                      |
-| ./modules/pyradio.nix                        |    0,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Prefs utilisateur. Inutile si pyradio n'est pas installé.          |
+| ./modules/pyradio.nix                        |    0,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Prefs utilisateur. Inutile si pyradio n'est pas installé.      |
 | ./modules/shell.nix                          |    0,03 Mio |    0,00 Mio | Facultative | Aucune                   | Génère des alias vers scripts personnalisés et outils de TUI_base.nix           |
 | ./modules/SteamOS.nix                        | 1400,00 Mio |    0,00 Mio | Facultative | Aucune                   | La session Gamescope ne s'exécute qu'avec un GPU AMD                            |
 | ./modules/xdg.nix                            |    0,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Raccourcis vers outils TUI_base.nix                            |
