@@ -8,6 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ../../home/@@username@@/Git/nixos-dotfiles/hosts/@@hostname@@.nix         # @@placeholder@@ substitué par bootstrap.sh . Facultatif. Importe tous les modules optionnels choisis pour la machine cible.
     ];
 
   # Bootloader.
@@ -17,7 +18,7 @@
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "@@hostname@@";                                        # @@placeholder@@ substitué par bootstrap.sh
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -46,11 +47,11 @@
   };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  services.xserver.enable = false;                                              # par défaut : true
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = true;                                  # par défaut : services.xserver.displayManager.gdm.enable = true; Syntaxe corrigée
+  services.displayManager.gdm.enable = true;                                    # par défaut : services.xserver.desktopManager.gnome.enable = true; Syntaxe corrigée
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -62,7 +63,7 @@
   console.keyMap = "fr";
 
   # Enable CUPS to print documents.
-  services.printing.enable = true;
+  services.printing.enable = false;                                             # par défaut : true
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -84,9 +85,9 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users."@@username@@" = {
+  users.users."@@username@@" = {                                                 # @@placeholder@@ substitué par bootstrap.sh
     isNormalUser = true;
-    description = "@@fullname@@";
+    description = "@@fullname@@";                                                # @@placeholder@@ substitué par bootstrap.sh
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
     #  thunderbird
@@ -131,6 +132,6 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "@@nixosversion@@"; # Did you read the comment?
+  system.stateVersion  = "@@nixosversion@@";                                     # @@placeholder@@ substitué par bootstrap.sh
 
 }

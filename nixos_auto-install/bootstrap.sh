@@ -147,7 +147,7 @@ configurer_disque() {
         [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
 
         sgdisk --zap-all "$DISK"
-        sgdisk --new=1:0:+512M --typecode=1:ef00 --change-name=1:"boot" "$DISK"
+        sgdisk --new=1:0:+1024M --typecode=1:ef00 --change-name=1:"boot" "$DISK"
         sgdisk --new=2:0:0     --typecode=2:8309 --change-name=2:"cryptroot" "$DISK"
 
         mkfs.fat -F32 -n BOOT "$PART_BOOT"
@@ -217,9 +217,9 @@ configurer_disque() {
     for subvol in $(btrfs subvolume list /mnt | awk '{print $NF}'); do
         [[ "$subvol" == "root" ]] && continue
 
-        target="/mnt/${subvol}"
-        mkdir -p "$target"
-        mount -o "$OPTS,subvol=$subvol" "/dev/mapper/$LUKS_NAME" "$target"
+        tmpmounts="/mnt/${subvol}"
+        mkdir -p "$tmpmounts"
+        mount -o "$OPTS,subvol=$subvol" "/dev/mapper/$LUKS_NAME" "$tmpmounts"
     done
 
     mkdir -p /mnt/boot
@@ -228,7 +228,7 @@ configurer_disque() {
     # ─── Résumé ───────────────────────────────────────────────────────────
     echo ""
     echo "✓ Disque prêt. Structure montée :"
-    findmnt --target /mnt --submounts
+    findmnt --tmpmounts /mnt --submounts
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
