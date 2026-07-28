@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# 27/07/2026
+# RATIONNALISER COMMENTAIRES
+# CLARIFIER DESCRIPTIF ETAPES
+
+
 ##################################################################################################
 # bootstrap.sh — Configuration du live USB et lancement de l'installation NixOS.                 #
 #                                                                                                #
@@ -66,15 +71,14 @@ CONFIG_FILE="${TARGET}/etc/nixos/configuration.nix"
 
 executer_installation() {
     initialiser_environnement_installation
-    configurer_wifi
     configurer_disque
     creer_cargo
-    collecter_variables # reste à mieux scinder les parties avec ocnditions install/rebuild, en faire des fonctions distinctes
+    definir_infos_initiales
+    generer_infos_inexistantes
     telecharger_repo_git
-    placer_configuration.nix
+    preparer_configuration.nix
     renseigner_configuration.nix
-    personnaliser_configuration.nix # à fusionner avec placer_configuration.nix (appeller ca : preparer configuration.nix)
-    generer_variables.nix # a vérifier
+    generer_variables.nix
     installer_Nixos
     migrer_fichiers_persistants
     finaliser
@@ -82,19 +86,19 @@ executer_installation() {
 
 executer_rebuild() {
     creer_cargo
-    collecter_variables # reste à mieux scinder les parties avec ocnditions install/rebuild, en faire des fonctions distinctes
-    collecter_infos_disque # à reprendre de post-install-nixos
+    collecter_infos_existantes
+    generer_infos_inexistantes
     telecharger_repo_git
     sauvegarder_configuration.nix
     renseigner_configuration.nix
-    generer_variables.nix # a vérifier
+    generer_variables.nix
     rebuilder_Nixos
     migrer_fichiers_persistants
     finaliser
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  PREPARATION ENVIRONNEMENT
+#  PREPARATION ENVIRONNEMENT (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
 # ═══════════════════════════════════════════════════════════════════════════
 initialiser_environnement_installation() {
     timedatectl set-timezone Europe/Paris
@@ -125,10 +129,8 @@ initialiser_environnement_installation() {
     echo "✓ Connexion établie."
 }
 
-
-
 # ═══════════════════════════════════════════════════════════════════════════
-#  CONFIGURATION DU DISQUE POUR INSTALLATION
+#  CONFIGURATION DU DISQUE (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
 #
 #  Logique générale :
 #  La détection se fait avant toute action destructive : on ouvre le
@@ -191,7 +193,6 @@ configurer_disque() {
         cryptsetup open "$PART_LUKS" "$LUKS_NAME"_inspect
         mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME"_inspect /mnt
 
-
         if btrfs subvolume show /mnt/home &>/dev/null || btrfs subvolume show /mnt/cargo &>/dev/null; then
             USER_DATA_FOUND=true
             echo "Données utilisateur détectées. Elles seront conservées."
@@ -205,7 +206,6 @@ configurer_disque() {
 
     # ─── 3A. Chemin "aucune donnée" → zap complet ─────────────────────────
     if [[ "$USER_DATA_FOUND" == false ]]; then
-
         echo ""
         echo "Aucune donnée utilisateur à préserver. $DISK va être entièrement effacé."
         read -rp "Confirmer ? (oui) : " CONFIRM
@@ -230,10 +230,11 @@ configurer_disque() {
         btrfs subvolume create /mnt/nix
         btrfs subvolume create /mnt/home
 
+        # On expose le nom du sous-volume créé pour / (sera utilisé dans variables.nix)
+        ROOT_SUBVOLUME="root"
 
     # ─── 3B. Chemin "données présentes" → réinitialisation douce ─────────
     else
-
         echo ""
         echo "Home et/ou cargo seront conservés. Les sous-volumes root et nix vont être recréés."
         read -rp "Confirmer ? (oui) : " CONFIRM
@@ -259,6 +260,8 @@ configurer_disque() {
         btrfs subvolume create /mnt/root
         btrfs subvolume create /mnt/nix
 
+        # On expose le nom du sous-volume créé pour / (sera utilisé dans variables.nix)
+        ROOT_SUBVOLUME="root"
     fi
 
     # ─── 4. Sous-volume supplémentaire (optionnel) ───────────────────────
@@ -304,7 +307,7 @@ creer_cargo() {
     echo ""
     echo "Vérification du sous-volume btrfs 'cargo'..."
 
-    ROOT_FSTYPE=$(findmnt -no FSTYPE /)
+    ROOT_FSTYPE=$(findmnt -no FSTYPE "${TARGET:-/}")
 
     if [[ "$ROOT_FSTYPE" != "btrfs" ]]; then
         echo "⚠ Le système de fichiers racine n'est pas btrfs ($ROOT_FSTYPE détecté)."
@@ -312,7 +315,7 @@ creer_cargo() {
     else
         # findmnt peut renvoyer un format "device[/chemin_du_subvol]" pour une
         # racine montée sur un sous-volume : on ne garde que la partie device.
-        ROOT_DEVICE=$(findmnt -no SOURCE / | sed 's/\[.*//')
+        ROOT_DEVICE=$(findmnt -no SOURCE "${TARGET:-/}" | sed 's/\[.*//')
         TMP_MOUNT=$(mktemp -d)
 
         # Filet de sécurité : si le script s'interrompt après le mount, on
@@ -344,65 +347,91 @@ creer_cargo() {
     fi
 }
 
+# ══════════════════════════════════════════════════════════════════════════════════
+#  DEFINITION DES INFORMATIONS INITIALES (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
+# ══════════════════════════════════════════════════════════════════════════════════
+definir_infos_initiales () {
+    read -rp "Nom d'utilisateur : " USERNAME
+    FULLNAME="${USERNAME^}"
+
+    NIXOS_VERSION=$(nixos-version | cut -d. -f1,2)
+    if [[ -z "$NIXOS_VERSION" ]]; then
+        echo "Impossible de détecter la version NixOS automatiquement."
+        read -rp "Entre-la manuellement (ex: 26.05) : " NIXOS_VERSION
+    fi
+
+    # Génération du machine-id
+    MACHINE_ID=$(systemd-id128 new | tr -d '-')
+}
+
+# ═════════════════════════════════════════════════════════════════════════════
+#  COLLECTE DES INFORMATIONS PREEXISTANTES (SPECIFIQUE DEPLOIEMENT PAR REBUILD)
+# ═════════════════════════════════════════════════════════════════════════════
+collecter_infos_existantes () {
+    # Recherche du username dans le configuration.nix déjà existant
+    USERNAME=$(grep -oP 'users\.users\."\K[^"]+' "$CONFIG_FILE" | head -n1 || true)
+    if [[ -z "$USERNAME" ]]; then
+        echo "Impossible de détecter automatiquement le nom d'utilisateur dans $CONFIG_FILE."
+        read -rp "Entre manuellement ton nom d'utilisateur : " USERNAME
+    fi
+
+    # Recherche du numero de version dans le configuration.nix déjà existant
+    NIXOS_VERSION=$(grep -oP 'system\.stateVersion\s*=\s*"\K[^"]+' "$CONFIG_FILE" | head -n1 || true)
+    if [[ -z "$NIXOS_VERSION" ]]; then
+        echo "Impossible de détecter la version NixOS automatiquement."
+        read -rp "Entre-la manuellement (ex: 26.05) : " NIXOS_VERSION
+    fi
+
+    # Récupération du machine-id existant (généré imperativement par systemd)
+    # pour le faire basculer en gestion déclarative.
+    MACHINE_ID=$(cat /etc/machine-id)
+
+    # Recherche du nom d'un éventuel sous-volume / distinct
+    ROOT_SUBVOLUME=$(btrfs subvolume show / | head -n1 | xargs)
+    if [[ -z "$ROOT_SUBVOLUME" ]]; then
+        echo "⚠ Impossible de détecter le nom du subvolume racine."
+        read -rp "Entre-le manuellement : " ROOT_SUBVOLUME
+    fi
+
+    # Récupération de l'UUID LUKS
+    # On detecte quel volume est un volume LUKS
+    LUKS_DEVICES=()
+    while read -r dev; do
+        if cryptsetup isLuks "/dev/$dev" 2>/dev/null; then
+            LUKS_DEVICES+=("/dev/$dev")
+        fi
+    done < <(lsblk -rno NAME,TYPE | awk '$2 == "part" {print $1}')
+
+    case "${#LUKS_DEVICES[@]}" in
+        0)
+            # Si aucun volume LUKS n'a été détecté, on ne défini pas la variables $LUKS_UUID
+            echo "⚠ Aucune partition LUKS détectée. luksUuid sera laissé vide dans variables.nix."
+            LUKS_UUID=""
+            ;;
+        1)
+            # On extrait l'UUID du volume LUKS détectée
+            echo "Partition LUKS détectée : ${LUKS_DEVICES[0]}"
+            LUKS_UUID=$(cryptsetup luksUUID "${LUKS_DEVICES[0]}")
+            ;;
+        *)
+            # Si plusieurs volumes LUKS ont été détectées, choix manuel de celui dont on extrait l'UUID
+            echo "Plusieurs partitions LUKS détectées, laquelle utiliser ?"
+            select LUKS_DEVICE in "${LUKS_DEVICES[@]}"; do
+                if [[ -n "$LUKS_DEVICE" ]]; then
+                    LUKS_UUID=$(cryptsetup luksUUID "$LUKS_DEVICE")
+                    break
+                fi
+                echo "Choix invalide, réessaie."
+            done
+            ;;
+    esac
+}
+
 # ═══════════════════════════════════════════════════════════════════════════
-#  COLLECTE DES VARIABLES
+#  CREER LES VARIABLES INEXISTANTES
 # ═══════════════════════════════════════════════════════════════════════════
-collecter_variables () {
+generer_infos_inexistantes () {
     echo ""
-
-
-    # Nom d'utilisateur. Si configuration.nix n'existe pas déjà, le nom d'utilisateur doit être saisie.
-    # Si configuration.nix existe déjà, on va y chercher le username.
-    if [[ ! -f "$CONFIG_FILE" ]]; then
-        read -rp "Nom d'utilisateur : " USERNAME
-    else
-        USERNAME=$(grep -oP 'users\.users\."\K[^"]+' "$CONFIG_FILE" | head -n1 || true)
-        if [[ -z "$USERNAME" ]]; then
-            echo "Impossible de détecter automatiquement le nom d'utilisateur dans $CONFIG_FILE."
-            read -rp "Entre manuellement ton nom d'utilisateur : " USERNAME
-        fi
-    fi
-    echo "Nom d'utilisateur confirmé : $USERNAME"
-
-
-    # Nom d'utilisateur affiché. Si configuration.nix n'existe pas déjà, on le génère en se basant sur username
-    # Si configuration.nix existe déjà, on va y chercher le fullname 
-    if [[ ! -f "$CONFIG_FILE" ]]; then
-        FULLNAME=="${USERNAME^}"
-    else
-        FULLNAME=$(grep -oP 'description\s*=\s*"\K[^"]+' "$CONFIG_FILE" | head -n1 || true)
-        if [[ -z "$FULLNAME" ]]; then
-            echo "Le nom d'utilisateur complet n'existe pas encore.."
-            read -rp "Entre-le manuellement : " FULLNAME
-        fi
-    fi
-    echo "Nom d'utilisateur complet confirmé : $USERNAME"
-
-
-    # Numéro de version de Nixos. Si configuration.nix n'existe pas déjà (nouvelle installation), on prend la version du live usb.
-    # Si configuration.nix existe déjà, on va y chercher le numéro de version.
-    if [[ ! -f "$CONFIG_FILE" ]]; then
-        # Récupération de la version de Nixos (du live usb ou du système installé)
-        NIXOS_VERSION=$(nixos-version | cut -d. -f1,2)
-        if [[ -z "$NIXOS_VERSION" ]]; then
-            echo "Impossible de détecter la version NixOS automatiquement."
-            read -rp "Entre-la manuellement (ex: 26.05) : " NIXOS_VERSION
-        fi
-    else
-        NIXOS_VERSION=$(grep -oP 'system\.stateVersion\s*=\s*"\K[^"]+' "$CONFIG_FILE" | head -n1 || true)
-        if [[ -z "$NIXOS_VERSION" ]]; then
-            echo "Impossible de détecter la version NixOS automatiquement."
-            read -rp "Entre-la manuellement (ex: 26.05) : " NIXOS_VERSION
-        fi
-    fi
-
-
-
-
-
-
-
-
     # Nom de la machine
     while true; do
         read -rp "Hostname de cette machine : " HOSTNAME
@@ -437,11 +466,8 @@ collecter_variables () {
 
     # Génération du hash du mot de passe
     # mkpasswd utilise l'algorythme yescrypt par défaut.
-    HASHED_PASSWORD=$(mkpasswd "$PASSWORD_1")
-    unset PASSWORD_1 PASSWORD_CONFIRM
-
-    # Génération du machine-id
-    MACHINE_ID=$(systemd-id128 new | tr -d '-')
+    HASHED_PASSWORD=$(mkpasswd "$PASSWORD")
+    unset PASSWORD PASSWORD_CONFIRM
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -472,19 +498,25 @@ telecharger_repo_git () {
     fi
 }
 
-
 # ═══════════════════════════════════════════════════════════════════════════
-#  MISE EN PLACE DE CONFIGURATION.NIX
+#  PREPARER CONFIGURATION.NIX (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
 # ═══════════════════════════════════════════════════════════════════════════
-placer_configuration.nix () {
+preparer_configuration.nix () {
     echo ""
     echo "Copie de configuration_template.nix depuis le dépôt git vers /etc/nixos/configuration.nix avant injection des informations collectée......"
+    mkdir -p "${TARGET}/etc/nixos"
     cp -ra "$DOTFILES_DIR/nixos_auto-install/configuration_template.nix" "$CONFIG_FILE"
+    # Remplacement des placeholders du numéro de version par celui détecté sur le système en cours, et du username et fullname d'après les informations saisies
+    sed -i \
+        -e "s|@@username@@|${USERNAME}|g" \
+        -e "s|@@fullname@@|${FULLNAME}|g" \
+        -e "s|@@nixosversion@@|${NIXOS_VERSION}|g" \
+    "$CONFIG_FILE"
     echo "configuration.nix en place : $CONFIG_FILE"
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  SAUVEGARDE DE CONFIGURATION.NIX
+#  SAUVEGARDE DE CONFIGURATION.NIX (SPECIFIQUE DEPLOIEMENT PAR REBUILD)
 # ═══════════════════════════════════════════════════════════════════════════
 sauvegarder_configuration.nix () {
     echo ""
@@ -499,7 +531,7 @@ sauvegarder_configuration.nix () {
 # ═══════════════════════════════════════════════════════════════════════════
 renseigner_configuration.nix () {
     # Insertion de l'import du fichier de host perso, juste après ./hardware-configuration.nix dans le bloc imports
-    sed -i "/\.\/hardware-configuration\.nix/a\\      ${HOST_IMPORT_PATH}" "$CONFIG_FILE"
+    sed -i "/\.\/hardware-configuration\.nix/a\\      /home/${USERNAME}/Git/nixos-dotfiles/hosts/${HOSTNAME}.nix" "$CONFIG_FILE"
 
     # Remplacement du hostname par défaut ("nixos") par le hostname choisi
     sed -i "s/networking\.hostName = \"nixos\";/networking.hostName = \"${HOSTNAME}\";/" "$CONFIG_FILE"
@@ -513,21 +545,6 @@ renseigner_configuration.nix () {
 
     # Désactivation de l'impression
     sed -i 's/services\.printing\.enable = true;/services.printing.enable = false;/' "$CONFIG_FILE"
-
-
-}
-
-# ═══════════════════════════════════════════════════════════════════════════
-#  PERSONNALISATION DE CONFIGURATION.NIX
-# ═══════════════════════════════════════════════════════════════════════════
-personnaliser_configuration.nix () {
-    # S'il s'agit d'une nouvelle installation :
-    # Remplacement des placeholders du numéro de version par celui détecté sur le système en cours, et du username et fullname d'après les informations saisies
-    sed -i \
-        -e "s|@@username@@|${USERNAME}|g" \
-        -e "s|@@fullname@@|${FULLNAME}|g" \
-        -e "s|@@nixosversion@@|${NIXOS_VERSION}|g" \
-    "$CONFIG_FILE"
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -576,10 +593,12 @@ generer_variables.nix () {
 
     unset HASHED_PASSWORD
     echo "✓ variables.nix généré dans $VARIABLES_FILE"
+    echo "Vérifier le contenu de variables.nix :"
+    cat "$VARIABLES_FILE"
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  Installation de Nixos
+#  INSTALLATION DE NIXOS (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
 # ═══════════════════════════════════════════════════════════════════════════
 installer_Nixos () {
     echo ""
@@ -596,7 +615,7 @@ installer_Nixos () {
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  Rebuild de Nixos
+#  REBUILD DE NIXOS (SPECIFIQUE DEPLOIEMENT PAR REBUILD)
 # ═══════════════════════════════════════════════════════════════════════════
 rebuilder_Nixos () {
     echo ""
