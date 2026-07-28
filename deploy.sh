@@ -531,7 +531,7 @@ sauvegarder_configuration.nix () {
 # ═══════════════════════════════════════════════════════════════════════════
 renseigner_configuration.nix () {
     # Insertion de l'import du fichier de host perso, juste après ./hardware-configuration.nix dans le bloc imports
-    sed -i "/\.\/hardware-configuration\.nix/a\\      /home/${USERNAME}/Git/nixos-dotfiles/hosts/${HOSTNAME}.nix" "$CONFIG_FILE"
+    sed -i "/\.\/hardware-configuration\.nix/a\\      ../../home/${USERNAME}/Git/nixos-dotfiles/hosts/${HOSTNAME}.nix" "$CONFIG_FILE"
 
     # Remplacement du hostname par défaut ("nixos") par le hostname choisi
     sed -i "s/networking\.hostName = \"nixos\";/networking.hostName = \"${HOSTNAME}\";/" "$CONFIG_FILE"
