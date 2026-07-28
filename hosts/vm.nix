@@ -34,7 +34,7 @@ in
       # ../modules/software-set_dev_experiments.nix                                      # optionnel - intégrable sans aucune condition
       # ../modules/software-set_firmwares.nix                                            # optionnel - intégrable sans aucune condition. iwlwifi est utilisé par le wifi intel 8260 (dell-5485).
       # ../modules/software-set_gaming.nix                                               # optionnel - intégrable sans aucune condition
-      .# ./modules/software-set_GTK_all.nix                                              # optionnel - intégrable sans aucune condition
+      # ../modules/software-set_GTK_all.nix                                              # optionnel - intégrable sans aucune condition
       # ../modules/software-set_GTK_base.nix                                             # optionnel - intégrable sans aucune condition
       # ../modules/software-set_CLI_all.nix                                              # optionnel - intégrable sans aucune condition
       ../modules/software-set_CLI_base.nix                                             # optionnel - intégrable sans aucune condition
