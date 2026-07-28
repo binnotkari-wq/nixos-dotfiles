@@ -551,7 +551,7 @@ renseigner_configuration.nix () {
 #  RENSEIGNEMENT DE VARIABLES.NIX
 # ═══════════════════════════════════════════════════════════════════════════
 generer_variables.nix () {
-    TEMPLATE_FILE="${DOTFILES_DIR}/modules/variable_template.nix"
+    TEMPLATE_FILE="${DOTFILES_DIR}/modules/variables_template.nix"
     VARIABLES_FILE="${DOTFILES_DIR}/modules/variables.nix"
 
     if [[ ! -f "$TEMPLATE_FILE" ]]; then
