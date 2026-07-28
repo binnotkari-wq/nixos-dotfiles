@@ -296,7 +296,7 @@ configurer_disque() {
     # ─── Résumé ───────────────────────────────────────────────────────────
     echo ""
     echo "✓ Disque prêt. Structure montée :"
-    findmnt --tmpmounts /mnt --submounts
+    findmnt --target /mnt --submounts
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
