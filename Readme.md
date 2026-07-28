@@ -4,9 +4,9 @@
 
 ```bash
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]"
-curl -fsSL https://raw.githubusercontent.com/binnotkari-wq/nixos-dotfiles/main/nixos_auto-install/bootstrap.sh -o bootstrap.sh
-chmod +x bootstrap.sh
-sudo ./bootstrap.sh
+curl -fsSL https://raw.githubusercontent.com/binnotkari-wq/nixos-dotfiles/main/nixos_deploy/deploy.sh -o deploy.sh
+chmod +x deploy.sh
+sudo ./deploy.sh
 ```
 
 ## Fonctionnement du script d'installation
@@ -91,7 +91,7 @@ RECOMMANDE
 OS_options.nix et performance_addons.nix sont recommandés, puisqu'ils apportent des fonctionnalités attendues d'un OS (sécurité, bluetooth, maintenance, convivialité) et des performances supérieures (BTRFS, swap, paramètres kernel) sans contreparties.
 
 FACULTATIF ET SOUS CONDITIONS
-- impermanence.nix : fichier de configuration et mise en place de l'impermanence. Conditions : le système de fichier doit être adapté et les fichiers à persister doivent avoir été migrés au préalable (ces opérations sont faites automatiquement lors du déploiement par bootstrap.sh).
+- impermanence.nix : fichier de configuration et mise en place de l'impermanence. Conditions : le système de fichier doit être adapté et les fichiers à persister doivent avoir été migrés au préalable (ces opérations sont faites automatiquement lors du déploiement par deploy.sh).
 - git.nix : préférences de git (déclarées à l'échelle du système, et non à l'échelle de l'utilisateur). Conditions : si variables.nix n'est pas utilisé, il faut éditer manuellement le fichier pour remplacer les vars par les valeurs souhaitées.
 - home-manager : fichier de configuration du module communautaire Home-Manager (gestion déclarative de l'environnement utilisateur). Conditions : si variables.nix n'est pas utilisé, il faut éditer manuellement le fichier pour remplacer les vars par les valeurs souhaitées.
 

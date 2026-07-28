@@ -6,11 +6,11 @@
 
 
 ##################################################################################################
-# bootstrap.sh — Configuration du live USB et lancement de l'installation NixOS.                 #
+# deplot.sh — Configuration du live USB et lancement de l'installation NixOS.                 #
 #                                                                                                #
-# Usage : sudo ./bootstrap.sh                                                                    #
+# Usage : sudo ./deploy.sh                                                                    #
 # Pour passer le clavier en français avant de lancer le script :                                 #
-# gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]" && sudo ./bootstrap.sh #
+# gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]" && sudo ./deploy.sh #
 
 
 
@@ -505,7 +505,7 @@ preparer_configuration.nix () {
     echo ""
     echo "Copie de configuration_template.nix depuis le dépôt git vers /etc/nixos/configuration.nix avant injection des informations collectée......"
     mkdir -p "${TARGET}/etc/nixos"
-    cp -ra "$DOTFILES_DIR/nixos_auto-install/configuration_template.nix" "$CONFIG_FILE"
+    cp -ra "$DOTFILES_DIR/nixos_deploy/configuration_template.nix" "$CONFIG_FILE"
     # Remplacement des placeholders du numéro de version par celui détecté sur le système en cours, et du username et fullname d'après les informations saisies
     sed -i \
         -e "s|@@username@@|${USERNAME}|g" \
