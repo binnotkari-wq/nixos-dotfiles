@@ -132,42 +132,28 @@ initialiser_environnement_installation() {
 # ═══════════════════════════════════════════════════════════════════════════
 #  CONFIGURATION DU DISQUE (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
 #
-#  Logique générale :
-#  La détection se fait avant toute action destructive : on ouvre le
-#  conteneur LUKS en lecture, on sonde home avec btrfs subvolume show,
-#  puis on referme proprement. 
-#
-#  Après cette étape d'inspection, le script choisit son chemin : zap complet
-#  ou réinitialisation douce.
-#  Dans le chemin "réinitialisation douce", le volume btrfs est monté à sa
-#  racine (subvol=/) plutôt qu'à un sous-volume spécifique, ce qui donne
-#  accès à tous les sous-volumes pour pouvoir supprimer les sous-volumes
-#  root et nix individuellement sans toucher à home.
+#  SI des données utilisateur existantes sont détectées, elles seront
+#  préservées : seules les partitions et sous-volumes système seront
+#  supprimés.
 #
 #  Convention de nommage : sous-volumes nix et home comme le fait Calamares,
-#  ainsi que root que l'on ajoute pour pouvoir gérer plus simplement 
-#  (Calamares ne créé pas de sous-volume pour /).
+#  ainsi que $ROOT_SUBVOLUME et $ROOT_SNAPSHOT (utiles dans le cas d'une
+#  impermanence avec volatilité par wipe $ROOT_SUBVOLUME), ainsi que cargo
 #  Pour information, d'autres distribution nomment les sous-volumes btrfs
 #  en commançant par @.
 # ═══════════════════════════════════════════════════════════════════════════
 configurer_disque() {
-
     echo ""
-    echo "══════════════════════════════════════════"
-    echo "  Étape 2/5 : Configuration des disques"
-    echo "══════════════════════════════════════════"
     read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
     # ─── 1. Sélection du disque ──────────────────────────────────────────
     echo "Disques disponibles :"
     lsblk -d -o NAME,SIZE,MODEL
-
-    echo ""
     read -rp "Entrez le disque cible (ex: sda, nvme0n1) : " DISK
-    DISK="/dev/$DISK"
+    DISK="/dev/${DISK#/dev/}"
 
-    # Noms des partitions (gère /dev/sda1 et /dev/nvme0n1p1)
+    # Noms des partitions
     if [[ "$DISK" == *nvme* ]]; then
         PART_BOOT="${DISK}p1"
         PART_LUKS="${DISK}p2"
@@ -176,132 +162,88 @@ configurer_disque() {
         PART_LUKS="${DISK}2"
     fi
 
+    # Définitions
     OPTS="noatime,compress=zstd,space_cache=v2,ssd,discard=async"
-
-    # ─── 2. Détection de home / cargo ──────────────────────────────────
-    USER_DATA_FOUND=false
-    LUKS_UUID=""
+    ROOT_SUBVOLUME="root"
+    ROOT_SNAPSHOT="root-blank"
+    KEEP_LUKS=false
     LUKS_NAME=""
 
-    # On tente d'ouvrir le conteneur LUKS existant pour inspecter les sous-volumes.
+    # ─── 2. Si un conteneur LUKS existe : détection et préservation de home / cargo ──────────────────────────────────
     if cryptsetup isLuks "$PART_LUKS" 2>/dev/null; then
-        echo ""
-        echo "Partition LUKS détectée. Récupération de son UUID..."
         LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
         LUKS_NAME="luks-${LUKS_UUID}"
-        echo "Partition LUKS détectée. Ouverture pour inspection..."
-        cryptsetup open "$PART_LUKS" "$LUKS_NAME"_inspect
-        mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME"_inspect /mnt
+        cryptsetup open "$PART_LUKS" "$LUKS_NAME"
+        mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
 
+        # Si le sous-volume home ou cargo sont détecté, on se contente de supprimer les sous-volumes système
         if btrfs subvolume show /mnt/home &>/dev/null || btrfs subvolume show /mnt/cargo &>/dev/null; then
-            USER_DATA_FOUND=true
-            echo "Données utilisateur détectées. Elles seront conservées."
-        else
-            echo "Aucune donnée utilisateur détectée. Le disque sera entièrement effacé."
-        fi
+            KEEP_LUKS=true
+            echo "--> LUKS + données utilisateur détectés. Purge des sous-volumes système uniquement..."
+            read -rp "Confirmer ? (oui) : " CONFIRM
+            [[ "$CONFIRM" == "oui" ]] || { umount /mnt; cryptsetup close "$LUKS_NAME"; echo "Annulé."; exit 1; }
+            for SV in "$ROOT_SUBVOLUME" nix "$ROOT_SNAPSHOT"; do
+                if btrfs subvolume show "/mnt/$SV" &>/dev/null; then
+                    btrfs subvolume delete -R "/mnt/$SV" && echo "  → $SV supprimé"
+                fi
+                btrfs subvolume create "/mnt/$SV"
+            done
 
-        umount /mnt
-        cryptsetup close "$LUKS_NAME"_inspect
+            # Création de cargo s'il n'existait pas encore
+            if ! btrfs subvolume show /mnt/cargo &>/dev/null; then
+                echo "  → Création du sous-volume cargo absent..."
+                btrfs subvolume create /mnt/cargo
+            fi
+
+        # Si le sous-volume home ou cargo ne sont pas détecté, on libère le disque pour faire un zap complet.
+        else
+            KEEP_LUKS=false
+            umount /mnt
+            cryptsetup close "$LUKS_NAME"
+        fi
     fi
 
-    # ─── 3A. Chemin "aucune donnée" → zap complet ─────────────────────────
-    if [[ "$USER_DATA_FOUND" == false ]]; then
-        echo ""
-        echo "Aucune donnée utilisateur à préserver. $DISK va être entièrement effacé."
+    # ─── 3. Zap complet si pas de LUKS ou pas de données ────────────────
+    if [[ "$KEEP_LUKS" == false ]]; then
+        echo "--> Aucune donnée à préserver (ou disque non chiffré)."
+        echo "    Reconstruction complète de $DISK..."
         read -rp "Confirmer ? (oui) : " CONFIRM
         [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
-
         sgdisk --zap-all "$DISK"
-        sgdisk --new=1:0:+1024M --typecode=1:ef00 --change-name=1:"boot" "$DISK"
-        sgdisk --new=2:0:0     --typecode=2:8309 --change-name=2:"cryptroot" "$DISK"
+        sgdisk --new=1:0:+1024M --typecode=1:ef00 "$DISK"
+        sgdisk --new=2:0:0      --typecode=2:8309 "$DISK"
+        udevadm settle
 
         mkfs.fat -F32 -n BOOT "$PART_BOOT"
-
-        echo "Chiffrement LUKS de $PART_LUKS..."
         cryptsetup luksFormat --type luks2 "$PART_LUKS"
         LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
         LUKS_NAME="luks-${LUKS_UUID}"
         cryptsetup open "$PART_LUKS" "$LUKS_NAME"
-
-        mkfs.btrfs -L nixos "/dev/mapper/$LUKS_NAME"
-
-        mount "/dev/mapper/$LUKS_NAME" /mnt
-        btrfs subvolume create /mnt/root
-        btrfs subvolume create /mnt/nix
-        btrfs subvolume create /mnt/home
-
-        # On expose le nom du sous-volume créé pour / (sera utilisé dans variables.nix)
-        ROOT_SUBVOLUME="root"
-
-    # ─── 3B. Chemin "données présentes" → réinitialisation douce ─────────
-    else
-        echo ""
-        echo "Home et/ou cargo seront conservés. Les sous-volumes root et nix vont être recréés."
-        read -rp "Confirmer ? (oui) : " CONFIRM
-        [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
-
-        cryptsetup open "$PART_LUKS" "$LUKS_NAME"
+        mkfs.btrfs -f -L nixos "/dev/mapper/$LUKS_NAME"
         mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
 
-        # Suppression des anciens sous-volumes (on laisse home et cargo intacts).
-        for SUBVOL in root nix; do
-            if btrfs subvolume show "/mnt/$SUBVOL" &>/dev/null; then
-                # Supprimer les sous-volumes imbriqués d'abord.
-                btrfs subvolume list -o "/mnt/$SUBVOL" 2>/dev/null |
-                    awk '{print $NF}' |
-                    while read -r child; do
-                        btrfs subvolume delete "/mnt/$child" && echo "  → $child supprimé"
-                    done
-                btrfs subvolume delete "/mnt/$SUBVOL"
-                echo "  → $SUBVOL supprimé"
-            fi
+        for SV in $ROOT_SUBVOLUME nix $ROOT_SNAPSHOT home cargo; do
+            btrfs subvolume create "/mnt/$SV"
         done
-
-        btrfs subvolume create /mnt/root
-        btrfs subvolume create /mnt/nix
-
-        # On expose le nom du sous-volume créé pour / (sera utilisé dans variables.nix)
-        ROOT_SUBVOLUME="root"
     fi
 
-    # ─── 4. Sous-volume supplémentaire (optionnel) ───────────────────────
-    while true; do
-        read -rp "Créer un sous-volume supplémentaire ? (oui/non) : " reponse
-        if [[ "${reponse,,}" == "non" ]]; then
-            break
-        fi
-
-        echo ""
-        read -rp "Entrez le nom souhaité du sous-volume à créer : " SUP_SUBVOL_NAME
-        btrfs subvolume create /mnt/"$SUP_SUBVOL_NAME"
-    done
-
-    # ─── 5. Montage final (commun aux deux chemins) ──────────────────────
-    # Démontage propre des montages temporaires effectués lors de la création des sous-volumes.
+    # ─── 4. Montage final pour NixOS ────────────────────────────────────
     umount /mnt
-
-    mount -o "$OPTS,subvol=root" "/dev/mapper/$LUKS_NAME" /mnt
-
-    for subvol in $(btrfs subvolume list /mnt | awk '{print $NF}'); do
-        [[ "$subvol" == "root" ]] && continue
-
-        tmpmounts="/mnt/${subvol}"
-        mkdir -p "$tmpmounts"
-        mount -o "$OPTS,subvol=$subvol" "/dev/mapper/$LUKS_NAME" "$tmpmounts"
-    done
-
-    mkdir -p /mnt/boot
+    mount -o "$OPTS,subvol=$ROOT_SUBVOLUME" "/dev/mapper/$LUKS_NAME" /mnt
+    mkdir -p /mnt/{boot,nix,home,cargo}    
     mount "$PART_BOOT" /mnt/boot -o umask=0077
+    mount -o "$OPTS,subvol=nix"   "/dev/mapper/$LUKS_NAME" /mnt/nix
+    mount -o "$OPTS,subvol=home"  "/dev/mapper/$LUKS_NAME" /mnt/home
+    mount -o "$OPTS,subvol=cargo" "/dev/mapper/$LUKS_NAME" /mnt/cargo
+    # (on ne monte pas $ROOT_SNAPSHOT qui sert uniquement pour wiper $ROOT)
 
-    # ─── Résumé ───────────────────────────────────────────────────────────
-    echo ""
-    echo "✓ Disque prêt. Structure montée :"
-    findmnt --target /mnt --submounts
+    echo "✓ Terminé. Disque prêt pour l'installation."
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  CREATION DU SOUS-VOLUME BTRFS CARGO s'il n'exite pas encore physiquement
-#  sur le disque. Ce volume doit être déclare dans les .nix pour être monté
+#  CREATION DU SOUS-VOLUME BTRFS CARGO (SPECIFIQUE DEPLOIEMENT PAR REBUILD)
+#  s'il n'exite pas encore physiquement. sur le disque. 
+#  Ce volume doit être déclare dans les .nix pour être monté
 # ═══════════════════════════════════════════════════════════════════════════
 creer_cargo() {
     echo ""
@@ -330,7 +272,7 @@ creer_cargo() {
 
         # On monte le volume btrfs à son niveau racine absolu (subvolid=5), seul
         # niveau depuis lequel on peut créer un sous-volume au même rang que
-        # root, home, nix, persist, etc.
+        # $ROOT_SUBVOLUME, home, nix, persist, etc.
         mount -o subvolid=5 "$ROOT_DEVICE" "$TMP_MOUNT"
 
         CARGO_EXISTS=$(btrfs subvolume list "$TMP_MOUNT" | awk '{print $NF}' | grep -xF "cargo" || true)

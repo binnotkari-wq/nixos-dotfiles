@@ -175,59 +175,54 @@
   # ROOT EN TMPFS
   # Section inutile lorsque root est un sous-volume BTRFS qu'on wipe au démarrage du PC, à commenter dans ce cas.
   # Montage de / en tmpfs (ce paramétrage prend le dessus sur celui de hardware-configuration.nix)
-  # fileSystems."/" = lib.mkForce {
-  #   device = "tmpfs";
-  #   fsType = "tmpfs";
-  #   options = [ "size=2G" "mode=755" ];
-  # };
+  fileSystems."/" = lib.mkForce {
+    device = "tmpfs";
+    fsType = "tmpfs";
+    options = [ "size=2G" "mode=755" ];
+  };
 
   # WIPE DU SOUS-VOUME BTRFS ROOT - POSSIBLE UNIQUEMENT SI LUKS->VOLUME BTRFS->SOUS VOLUME DISTINCT POUR /
+  # Un service sera exécuté par systemd à chaque démarrage pour vider root
   # Section inutile lorsque / est un tmpfs qui se vide à l'exctinction / redémarrage, à commenter dans ce cas.
   # L'activation de cette section suppose que :
   # - il y a un volume LUKS
   # - il y a un sous-volume root et il est nommé root
   # Cette configuration de système de fichier est créée par bootstrap.sh mais pas par Calamares, qui ne créé pas de sous-solume distinct pour root.
-  # Un service sera exécut par systemd à chaque démarrage pour vider root
-  services.erase_root = {
-    description = "Vidange du filesystem root à chaque boot";
-    wantedBy = [ "initrd.target" ];
-    after = [ "systemd-cryptsetup@${lib.replaceStrings ["-"] ["\\x2d"] "luks-${vars.luksUuid}"}.service" ];
-    before = [ "sysroot.mount" ];
-    unitConfig.DefaultDependencies = "no";
-    path = [ pkgs.btrfs-progs pkgs.util-linux ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      set -euo pipefail
+  #  boot.initrd.systemd.services.erase_root = {
+  #    description = "Vidange du filesystem root à chaque boot";
+  #    wantedBy = [ "initrd.target" ];
+  #    after = [ "systemd-cryptsetup@${lib.replaceStrings ["-"] ["\\x2d"] "luks-${vars.luksUuid}"}.service" ];
+  #    before = [ "sysroot.mount" ];
+  #    unitConfig.DefaultDependencies = "no";
+  #    serviceConfig.Type = "oneshot";
+  #    script = ''
+  #set -euo pipefail
 
-      ROOT_SUBVOL="${vars.rootSubvolumeName}"
-      MNT="/mnt"
-      MOUNTED=0
+  #  ROOT_SUBVOL="${vars.rootSubvolumeName}"
+  #  MNT="/sysroot"
 
-      cleanup() {
-        [ "$MOUNTED" = "1" ] && umount "$MNT" || true
-      }
-      trap cleanup EXIT
+  #  mount --mkdir -t btrfs -o subvol=/ /dev/mapper/luks-${vars.luksUuid} "$MNT"
+  #  trap 'umount -l "$MNT" 2>/dev/null || true' EXIT
 
-      mkdir -p "$MNT"
-      mount -t btrfs -o subvol=/ /dev/mapper/luks-${vars.luksUuid} "$MNT"
-      MOUNTED=1
+   # info=$(btrfs subvolume show "$MNT/$ROOT_SUBVOL")
+  #  top_level_id=""
+  #  while IFS= read -r line; do
+  #    case "$line" in
+  #      *"Top level ID:"*)
+  #        top_level_id="''${line##*:}"
+  #        top_level_id="''${top_level_id//[[:space:]]/}"
+  #        ;;
+  #    esac
+  #  done <<< "$info"
 
-      # --- CANARI ---
-      # Si $ROOT_SUBVOL n'existe pas, `btrfs subvolume show` échoue -> set -e arrête tout.
-      # Si $ROOT_SUBVOL existe mais N'EST PAS un vrai sous-volume enfant du top-level
-      # (cas Calamares : "/" est directement le top-level, Top level ID = 0), on arrête explicitement.
-      TOP_LEVEL_ID=$(btrfs subvolume show "$MNT/$ROOT_SUBVOL" | grep -m1 'Top level ID:' | awk '{print $NF}')
+  #  if [ "$top_level_id" != "5" ]; then
+  #    echo "ERREUR FATALE : '$ROOT_SUBVOL' n'est pas un sous-volume enfant du top-level (Top level ID=$top_level_id)." >&2
+  #    echo "Layout inattendu (ex: install Calamares sans sous-volume dédié). Abandon du wipe." >&2
+  #    exit 1
+  #  fi
 
-      if [ "$TOP_LEVEL_ID" != "5" ]; then
-        echo "ERREUR FATALE : '$ROOT_SUBVOL' n'est pas un sous-volume enfant du top-level (Top level ID=$TOP_LEVEL_ID)." >&2
-        echo "Layout inattendu (ex: install Calamares sans sous-volume dédié). Abandon du wipe." >&2
-        exit 1
-      fi
-
-      # --- Suppression + recréation, un seul appel récursif ---
-      btrfs subvolume delete -R "$MNT/$ROOT_SUBVOL"
-      btrfs subvolume create "$MNT/$ROOT_SUBVOL"
-    '';
-  };
-
+  #  btrfs subvolume delete -R "$MNT/$ROOT_SUBVOL"
+  #  btrfs subvolume create "$MNT/$ROOT_SUBVOL"
+  #    '';
+  #  };
 }
