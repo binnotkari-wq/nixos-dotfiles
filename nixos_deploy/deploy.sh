@@ -148,7 +148,7 @@ supprimer_volumes_OS () {
     for sv in "$TMP_MOUNT"/*; do
       [ -e "$sv" ] || continue
       base_sv=$(basename "$sv") # cf explication gemini "Script Bash : Initialisation/Réinstallation LUKS"
-      [[ "$base_sv" =~ ^(home|cargo)$ ]] || btrfs subvolume delete -c "$sv" 2>/dev/null || rm -rf "$sv"
+      [[ "$base_sv" =~ ^(home|cargo)$ ]] || btrfs subvolume delete -R -c "$sv" 2>/dev/null || rm -rf "$sv"
     done
 }
 
