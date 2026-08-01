@@ -587,6 +587,8 @@ finaliser() {
     echo "  Téléchargement des scripts utiles depuis"
     echo "  repo github et application permissions  "
     echo "══════════════════════════════════════════"
+    # Suppression des éventuels fichiers existants (git refuserai de les écraser)
+    rm -rf "${TARGET_MOUNT}/home/${USERNAME}/Git/scripts"
     mkdir -p "${TARGET_MOUNT}/home/${USERNAME}/Git/scripts"
     git clone "https://github.com/binnotkari-wq/scripts.git" "${TARGET_MOUNT}/home/${USERNAME}/Git/scripts/"
     echo "✓ Scripts téléchargés dans ${TARGET_MOUNT}/home/${USERNAME}/Git/scripts/."
