@@ -194,7 +194,6 @@ structurer_nouveaux_volumes () {
     btrfs subvolume create "$TMP_MOUNT/$ROOT_SUBVOLUME"
     btrfs subvolume create "$TMP_MOUNT/nix"
     btrfs subvolume create "$TMP_MOUNT/home" 2>/dev/null || true # Ignoré si préservé
-    btrfs subvolume create "$TMP_MOUNT/cargo" 2>/dev/null || true # Ignoré si préservé    
     btrfs subvolume snapshot -r "$TMP_MOUNT/$ROOT_SUBVOLUME" "$TMP_MOUNT/$ROOT_SNAPSHOT" # Snapshot vierge en lecture seule
     
     umount "$TMP_MOUNT"
@@ -592,8 +591,7 @@ finaliser() {
     git clone "https://github.com/binnotkari-wq/scripts.git" "${TARGET_MOUNT}/home/${USERNAME}/Git/scripts/"
     echo "✓ Scripts téléchargés dans ${TARGET_MOUNT}/home/${USERNAME}/Git/scripts/."
 
-    chown -R "${USERNAME}:${USERNAME}" "${TARGET_MOUNT}/home/${USERNAME}"
-    chown -R "${USERNAME}:${USERNAME}" "${TARGET_MOUNT}/cargo"
+    chown -R "1000:1000" "${TARGET_MOUNT}/home/${USERNAME}"
     echo "✓ Permissions appliquées."
     echo ""
     echo "══════════════════════════════════════════"

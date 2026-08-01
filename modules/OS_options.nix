@@ -37,7 +37,6 @@
     services.power-profiles-daemon.enable = true;                                 # activé defacto sous gnome et kde, mais on le déclare dans le cas où on utilise un D.E light. Ne pas utiliser tlp, pas pris dans plusieurs D.E.
 
     # --- 4. MAINTENANCE DU NIX STORE ---
-
     nix.gc = {
       automatic = true;
       dates = "weekly";
