@@ -433,7 +433,8 @@ generer_variables.nix () {
 
     # Subsitutions
     sed -i "s|@@username@@|$(sed_escape "$USERNAME")|"               "$VARIABLES_FILE"
-    sed -i "s|@@fullname@@|$(sed_escape "$FULLNAME")|"               "$VARIABLES_FILE"
+    # Inutilisé en tant que variable dans les .nix
+    # sed -i "s|@@fullname@@|$(sed_escape "$FULLNAME")|"               "$VARIABLES_FILE"
     sed -i "s|@@hashedPassword@@|$(sed_escape "$HASHED_PASSWORD")|"  "$VARIABLES_FILE"
     sed -i "s|@@hostname@@|$(sed_escape "$HOSTNAME")|"               "$VARIABLES_FILE"
     sed -i "s|@@machineid@@|$(sed_escape "$MACHINE_ID")|"            "$VARIABLES_FILE"
@@ -463,7 +464,7 @@ rebuilder_Nixos () {
     echo "══════════════════════════════════════════"
     echo "  Rebuild de Nixos (nixos-rebuild boot)   "
     echo "══════════════════════════════════════════"
-    read -rp "Prêt à installer NixOS ? (oui) : " CONFIRM
+    read -rp "Prêt à rebuilder NixOS ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
     echo "Lancement du rebuild..."
     nixos-rebuild boot
@@ -590,7 +591,7 @@ finaliser() {
     # Suppression des éventuels fichiers existants (git refuserai de les écraser)
     rm -rf "${TARGET_MOUNT}/home/${USERNAME}/Git/scripts"
     mkdir -p "${TARGET_MOUNT}/home/${USERNAME}/Git/scripts"
-    git clone "https://github.com/binnotkari-wq/scripts.git" "${TARGET_MOUNT}/home/${USERNAME}/Git/scripts/"
+    nix-shell -p git --run "git clone https://github.com/binnotkari-wq/scripts.git ${TARGET_MOUNT}/home/${USERNAME}/Git/scripts/"
     echo "✓ Scripts téléchargés dans ${TARGET_MOUNT}/home/${USERNAME}/Git/scripts/."
 
     chown -R "1000:1000" "${TARGET_MOUNT}/home/${USERNAME}"

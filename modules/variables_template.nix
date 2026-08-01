@@ -14,7 +14,7 @@
 {
                                                 # SUR UN SYSTEME DEJA INSTALLE :
   username          = "@@username@@";           # remplacer par le résultat de getent passwd $USER | cut -d: -f1 | cut -d, -f1
-  fullname          = "@@fullname@@";           # remplacer par le résultat de getent passwd $USER | cut -d: -f5 | cut -d, -f1
+  # fullname          = "@@fullname@@";           # remplacer par le résultat de getent passwd $USER | cut -d: -f5 | cut -d, -f1
   hashedPassword    = "@@hashedPassword@@";     # remplacer par le résultat de mkpasswd lemotdepasse (par défaut ce hash sera généré avec l'algorythme yescrypt).
   hostname          = "@@hostname@@";           # remplacer par le résultat de hostname
   machineid         = "@@machineid@@";          # remplacer par le résultat de systemd-id128 new | tr -d '-'
