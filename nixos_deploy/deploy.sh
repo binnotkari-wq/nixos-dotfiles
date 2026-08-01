@@ -11,8 +11,6 @@
 ###############################################################################################
 set -euo pipefail
 
-CONFIG_FILE="${TARGET_MOUNT}/etc/nixos/configuration.nix"
-
 # Vérification des droits
 if [[ $EUID -ne 0 ]]; then
     echo "Ce script doit être lancé avec sudo : sudo ./deploy.sh"
@@ -28,6 +26,8 @@ else
     TARGET_MOUNT=""
     echo "Système installé, rebuild"
 fi
+
+CONFIG_FILE="${TARGET_MOUNT}/etc/nixos/configuration.nix"
 
 ###############################################################################################
 #  LOGIQUE D'EXECUTION                                                                        #
