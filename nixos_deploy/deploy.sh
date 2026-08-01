@@ -1,53 +1,19 @@
 #!/usr/bin/env bash
 
-# 27/07/2026
-# RATIONNALISER COMMENTAIRES
-# CLARIFIER DESCRIPTIF ETAPES
-
-
-##################################################################################################
-# deplot.sh — Configuration du live USB et lancement de l'installation NixOS.                 #
-#                                                                                                #
-# Usage : sudo ./deploy.sh                                                                    #
-# Pour passer le clavier en français avant de lancer le script :                                 #
+###############################################################################################
+# Usage : chmod +x deploy.sh && sudo ./deploy.sh                                              #
+# Pour passer le clavier en français avant de lancer le script :                              #
 # gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'fr')]" && sudo ./deploy.sh #
+###############################################################################################
 
-
-
-
-# Script de post-installation NixOS
-# À utiliser juste après une installation "standard" via l'ISO live + Calamares
-#
-# CE QUE FAIT CE SCRIPT :
-#   1) Demande le hostname que tu veux réellement utiliser (au lieu de "nixos")
-#   2) Ajoute l'import de ton fichier de config personnel dans hosts/
-#   3) Applique ce hostname dans networking.hostName
-#   4) Désactive services.xserver.enable
-#   5/6) Déplace displayManager.gdm et desktopManager.gnome hors de l'espace
-#        "xserver" (nouvelle syntaxe NixOS)
-#   7) Désactive l'impression (services.printing.enable = false)
-#   8) Télécharge nixos-dotfiles et génère variables.nix à partir du template
-#      (demande le mot de passe à hasher, détecte machine-id, LUKS UUID,
-#      subvolume racine, etc.)
-#   9) Crée le sous-volume btrfs "cargo" s'il n'existe pas déjà
-#
-# COMMENT L'UTILISER :
-#   1) Place ce script dans le même dossier que ton configuration.nix,
-#      ou modifie la variable CONFIG_FILE ci-dessous si besoin.
-#   2) Rends-le exécutable :
-#        chmod +x post-install-nixos.sh
-#   3) Lance-le avec les droits root, car il modifie un fichier système
-#      (/etc/nixos/configuration.nix appartient à root) :
-#        sudo ./post-install-nixos.sh
-#
-# Une sauvegarde du fichier original est créée automatiquement avant toute
-# modification (configuration.nix.bak.AAAAMMJJ-HHMMSS).
-
-##################################################################################################
-
+###############################################################################################
+#  CONTEXTE D'EXECUTION                                                                       #
+###############################################################################################
 set -euo pipefail
 
-# ─── VÉRIFICATION DES DROITS ────────────────────────────────────────────────
+CONFIG_FILE="${TARGET_MOUNT}/etc/nixos/configuration.nix"
+
+# Vérification des droits
 if [[ $EUID -ne 0 ]]; then
     echo "Ce script doit être lancé avec sudo : sudo ./deploy.sh"
     exit 1
@@ -56,25 +22,30 @@ fi
 # On détecte si on est sur un live d'installation (squashfs) ou un système déjà installé.
 # La logique d'éxecution adaptée au cas de figure sera lancée.
 if findmnt -t squashfs -no SOURCE | grep -q .; then
-    TARGET="/mnt"
+    TARGET_MOUNT="/mnt"
     echo "Live ISO, installation"
 else
-    TARGET=""
+    TARGET_MOUNT=""
     echo "Système installé, rebuild"
 fi
 
-CONFIG_FILE="${TARGET}/etc/nixos/configuration.nix"
-
-# ═══════════════════════════════════════════════════════════════════════════
-#  SEQUENCE D'EXECUTION
-# ═══════════════════════════════════════════════════════════════════════════
-
+###############################################################################################
+#  LOGIQUE D'EXECUTION                                                                        #
+###############################################################################################
 executer_installation() {
+    echo "══════════════════════════════════════════"
+    echo "  Deploiement par installation"
+    echo "══════════════════════════════════════════"
     initialiser_environnement_installation
     configurer_disque
-    creer_cargo
+    if cryptsetup isLuks "$PART_LUKS" 2>/dev/null; then
+        supprimer_volumes_OS
+    else
+        supprimer_tout_volume
+    fi
+    structurer_nouveaux_volumes
     definir_infos_initiales
-    generer_infos_inexistantes
+    generer_infos_inexistantes # à épurer
     telecharger_repo_git
     preparer_configuration.nix
     renseigner_configuration.nix
@@ -85,7 +56,9 @@ executer_installation() {
 }
 
 executer_rebuild() {
-    creer_cargo
+    echo "══════════════════════════════════════════"
+    echo "  Deploiement par rebuild"
+    echo "══════════════════════════════════════════"
     collecter_infos_existantes
     generer_infos_inexistantes
     telecharger_repo_git
@@ -97,31 +70,26 @@ executer_rebuild() {
     finaliser
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  PREPARATION ENVIRONNEMENT (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
-# ═══════════════════════════════════════════════════════════════════════════
+###############################################################################################
+#  FONCTIONS                                                                                  #
+###############################################################################################
+
 initialiser_environnement_installation() {
+    echo "══════════════════════════════════════════"
+    echo "  Initialisation de l'environnement"
+    echo "══════════════════════════════════════════"
+
     timedatectl set-timezone Europe/Paris
-    echo ""
-    echo "══════════════════════════════════════════"
-    echo "  Étape 1/5 : Configuration du wifi"
-    echo "══════════════════════════════════════════"
+
     read -rp "Configurer le wifi ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
-
-    echo ""
     echo "Réseaux WiFi disponibles :"
     nmcli device wifi list
-
-    echo ""
     read -rp "SSID du réseau : " WIFI_SSID
     read -rsp "Mot de passe WiFi : " WIFI_PASSWORD
-    echo ""
-
     echo "Connexion à '$WIFI_SSID'..."
     nmcli device wifi connect "$WIFI_SSID" password "$WIFI_PASSWORD"
     unset WIFI_PASSWORD
-
     echo "Attente de la connexion réseau..."
     until ping -c1 github.com &>/dev/null; do
         sleep 2
@@ -129,31 +97,20 @@ initialiser_environnement_installation() {
     echo "✓ Connexion établie."
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  CONFIGURATION DU DISQUE (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
-#
-#  SI des données utilisateur existantes sont détectées, elles seront
-#  préservées : seules les partitions et sous-volumes système seront
-#  supprimés.
-#
-#  Convention de nommage : sous-volumes nix et home comme le fait Calamares,
-#  ainsi que $ROOT_SUBVOLUME et $ROOT_SNAPSHOT (utiles dans le cas d'une
-#  impermanence avec volatilité par wipe $ROOT_SUBVOLUME), ainsi que cargo
-#  Pour information, d'autres distribution nomment les sous-volumes btrfs
-#  en commançant par @.
-# ═══════════════════════════════════════════════════════════════════════════
 configurer_disque() {
-    echo ""
-    read -rp "Prêt à configurer le disque ? (oui) : " CONFIRM
+    echo "══════════════════════════════════════════"
+    echo "  Configuration du disque"
+    echo "══════════════════════════════════════════"
+    read -rp "Configurer le disque ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
 
-    # ─── 1. Sélection du disque ──────────────────────────────────────────
+    # Selection du disque
     echo "Disques disponibles :"
     lsblk -d -o NAME,SIZE,MODEL
     read -rp "Entrez le disque cible (ex: sda, nvme0n1) : " DISK
     DISK="/dev/${DISK#/dev/}"
 
-    # Noms des partitions
+    # Noms des partitions selon type de disque (nvme ou sata)
     if [[ "$DISK" == *nvme* ]]; then
         PART_BOOT="${DISK}p1"
         PART_LUKS="${DISK}p2"
@@ -162,180 +119,145 @@ configurer_disque() {
         PART_LUKS="${DISK}2"
     fi
 
-    # Définitions
+    # Préparation
     OPTS="noatime,compress=zstd,space_cache=v2,ssd,discard=async"
     ROOT_SUBVOLUME="root"
     ROOT_SNAPSHOT="root-blank"
-    KEEP_LUKS=false
-    LUKS_NAME=""
+    TMP_MOUNT=$(mktemp -d)
+    mkdir -p "$TMP_MOUNT"
+}
 
-    # ─── 2. Si un conteneur LUKS existe : détection et préservation de home / cargo ──────────────────────────────────
-    if cryptsetup isLuks "$PART_LUKS" 2>/dev/null; then
-        LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
-        LUKS_NAME="luks-${LUKS_UUID}"
-        cryptsetup open "$PART_LUKS" "$LUKS_NAME"
-        mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
+supprimer_volumes_OS () {
+    echo "══════════════════════════════════════════"
+    echo "  LUKS détecté sur $DISK. Suppression des "
+    echo "  partitions et volumes système uniquement"
+    echo "══════════════════════════════════════════"
+    read -rp "Confirmer ? (oui) : " CONFIRM
+    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 1; }
 
-        # Si le sous-volume home ou cargo sont détecté, on se contente de supprimer les sous-volumes système
-        if btrfs subvolume show /mnt/home &>/dev/null || btrfs subvolume show /mnt/cargo &>/dev/null; then
-            KEEP_LUKS=true
-            echo "--> LUKS + données utilisateur détectés. Purge des sous-volumes système uniquement..."
-            read -rp "Confirmer ? (oui) : " CONFIRM
-            [[ "$CONFIRM" == "oui" ]] || { umount /mnt; cryptsetup close "$LUKS_NAME"; echo "Annulé."; exit 1; }
-            for SV in "$ROOT_SUBVOLUME" nix "$ROOT_SNAPSHOT"; do
-                if btrfs subvolume show "/mnt/$SV" &>/dev/null; then
-                    btrfs subvolume delete -R "/mnt/$SV" && echo "  → $SV supprimé"
-                fi
-                btrfs subvolume create "/mnt/$SV"
-            done
+    # effacer la partition boot
+    wipefs --all --force "$PART_BOOT"
+    partprobe "$DISK"
+    udevadm settle
 
-            # Création de cargo s'il n'existait pas encore
-            if ! btrfs subvolume show /mnt/cargo &>/dev/null; then
-                echo "  → Création du sous-volume cargo absent..."
-                btrfs subvolume create /mnt/cargo
-            fi
+    # effacer, dans le conteneur LUKS, tout autre sous-volume que home / cargo
+    LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
+    LUKS_NAME="luks-${LUKS_UUID}"
+    cryptsetup open "$PART_LUKS" "$LUKS_NAME"
+    mount -o subvolid=5 "/dev/mapper/$LUKS_NAME" "$TMP_MOUNT"
+    for sv in "$TMP_MOUNT"/*; do
+      [ -e "$sv" ] || continue
+      base_sv=$(basename "$sv") # cf explication gemini "Script Bash : Initialisation/Réinstallation LUKS"
+      [[ "$base_sv" =~ ^(home|cargo)$ ]] || btrfs subvolume delete -c "$sv" 2>/dev/null || rm -rf "$sv"
+    done
+}
 
-        # Si le sous-volume home ou cargo ne sont pas détecté, on libère le disque pour faire un zap complet.
-        else
-            KEEP_LUKS=false
-            umount /mnt
-            cryptsetup close "$LUKS_NAME"
-        fi
-    fi
+supprimer_tout_volume () {
+    echo "══════════════════════════════════════════"
+    echo "  Aucun LUKS sur $DISK : contexte risqué. "
+    echo "  -> effacement intérgal du disque        "
+    echo "══════════════════════════════════════════"
+    read -rp "Confirmer ? (oui) : " CONFIRM
+    [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 1; }
 
-    # ─── 3. Zap complet si pas de LUKS ou pas de données ────────────────
-    if [[ "$KEEP_LUKS" == false ]]; then
-        echo "--> Aucune donnée à préserver (ou disque non chiffré)."
-        echo "    Reconstruction complète de $DISK..."
-        read -rp "Confirmer ? (oui) : " CONFIRM
-        [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
-        sgdisk --zap-all "$DISK"
-        sgdisk --new=1:0:+1024M --typecode=1:ef00 "$DISK"
-        sgdisk --new=2:0:0      --typecode=2:8309 "$DISK"
-        udevadm settle
+    # effacer intégralement le disque puis recréer les partitions (
+    wipefs --all --force "$DISK"
+    sgdisk --zap-all "$DISK"
+    sgdisk --new=1:0:+1024M --typecode=1:ef00 "$DISK"
+    sgdisk --new=2:0:0      --typecode=2:8309 "$DISK"
+    partprobe "$DISK"
+    udevadm settle
+        
+    # créer le conteneur LUKS et le volume BTRFS
+    cryptsetup luksFormat --type luks2 "$PART_LUKS"
+    LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
+    LUKS_NAME="luks-${LUKS_UUID}"
+    cryptsetup open "$PART_LUKS" "$LUKS_NAME"
+    mkfs.btrfs -f -L nixos "/dev/mapper/$LUKS_NAME"
+        
+    # Montage initial pour la création des sous-volumes
+    mount -o subvolid=5 "/dev/mapper/$LUKS_NAME" "$TMP_MOUNT"
+}
 
-        mkfs.fat -F32 -n BOOT "$PART_BOOT"
-        cryptsetup luksFormat --type luks2 "$PART_LUKS"
-        LUKS_UUID=$(cryptsetup luksUUID "$PART_LUKS")
-        LUKS_NAME="luks-${LUKS_UUID}"
-        cryptsetup open "$PART_LUKS" "$LUKS_NAME"
-        mkfs.btrfs -f -L nixos "/dev/mapper/$LUKS_NAME"
-        mount -o "$OPTS,subvol=/" "/dev/mapper/$LUKS_NAME" /mnt
+structurer_nouveaux_volumes () {
+    echo "══════════════════════════════════════════"
+    echo " Mise en place et des nouveaux volumes : "
+    echo " ├─ partition boot (standard Calamares)   "
+    echo " └─ partition LUKS (standard Calamares)   "
+    echo "  └─ volume BTRFS (standard Calamares)    "
+    echo "   ├── $ROOT_SUBVOLUME (pour impermanence)"
+    echo "   ├── $ROOT_SNAPSHOT (pour impermanence) "
+    echo "   ├── nix (standard Calamares)           "
+    echo "   └── home (standard Calamares)          "
+    echo "══════════════════════════════════════════"
+    mkfs.fat -F32 -n BOOT "$PART_BOOT"
+    btrfs subvolume create "$TMP_MOUNT/$ROOT_SUBVOLUME"
+    btrfs subvolume create "$TMP_MOUNT/nix"
+    btrfs subvolume create "$TMP_MOUNT/home" 2>/dev/null || true # Ignoré si préservé
+    btrfs subvolume create "$TMP_MOUNT/cargo" 2>/dev/null || true # Ignoré si préservé    
+    btrfs subvolume snapshot -r "$TMP_MOUNT/$ROOT_SUBVOLUME" "$TMP_MOUNT/$ROOT_SNAPSHOT" # Snapshot vierge en lecture seule
+    
+    umount "$TMP_MOUNT"
+    rmdir "$TMP_MOUNT"
 
-        for SV in $ROOT_SUBVOLUME nix $ROOT_SNAPSHOT home cargo; do
-            btrfs subvolume create "/mnt/$SV"
-        done
-    fi
-
-    # ─── 4. Montage final pour NixOS ────────────────────────────────────
-    umount /mnt
+    # Montage final pour NixOS
     mount -o "$OPTS,subvol=$ROOT_SUBVOLUME" "/dev/mapper/$LUKS_NAME" /mnt
-    mkdir -p /mnt/{boot,nix,home,cargo}    
+    mkdir -p /mnt/{boot,nix,home}    
     mount "$PART_BOOT" /mnt/boot -o umask=0077
     mount -o "$OPTS,subvol=nix"   "/dev/mapper/$LUKS_NAME" /mnt/nix
     mount -o "$OPTS,subvol=home"  "/dev/mapper/$LUKS_NAME" /mnt/home
-    mount -o "$OPTS,subvol=cargo" "/dev/mapper/$LUKS_NAME" /mnt/cargo
-    # (on ne monte pas $ROOT_SNAPSHOT qui sert uniquement pour wiper $ROOT)
-
     echo "✓ Terminé. Disque prêt pour l'installation."
+    findmnt -R /mnt
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  CREATION DU SOUS-VOLUME BTRFS CARGO (SPECIFIQUE DEPLOIEMENT PAR REBUILD)
-#  s'il n'exite pas encore physiquement. sur le disque. 
-#  Ce volume doit être déclare dans les .nix pour être monté
-# ═══════════════════════════════════════════════════════════════════════════
-creer_cargo() {
-    echo ""
-    echo "Vérification du sous-volume btrfs 'cargo'..."
-
-    ROOT_FSTYPE=$(findmnt -no FSTYPE "${TARGET:-/}")
-
-    if [[ "$ROOT_FSTYPE" != "btrfs" ]]; then
-        echo "⚠ Le système de fichiers racine n'est pas btrfs ($ROOT_FSTYPE détecté)."
-        echo "  Le sous-volume 'cargo' n'a pas pu être créé, vérifie manuellement."
-    else
-        # findmnt peut renvoyer un format "device[/chemin_du_subvol]" pour une
-        # racine montée sur un sous-volume : on ne garde que la partie device.
-        ROOT_DEVICE=$(findmnt -no SOURCE "${TARGET:-/}" | sed 's/\[.*//')
-        TMP_MOUNT=$(mktemp -d)
-
-        # Filet de sécurité : si le script s'interrompt après le mount, on
-        # démonte quand même proprement au lieu de laisser un montage orphelin.
-        cleanup_cargo_mount() {
-            if mountpoint -q "$TMP_MOUNT" 2>/dev/null; then
-                umount "$TMP_MOUNT"
-            fi
-            rmdir "$TMP_MOUNT" 2>/dev/null || true
-        }
-        trap cleanup_cargo_mount EXIT
-
-        # On monte le volume btrfs à son niveau racine absolu (subvolid=5), seul
-        # niveau depuis lequel on peut créer un sous-volume au même rang que
-        # $ROOT_SUBVOLUME, home, nix, persist, etc.
-        mount -o subvolid=5 "$ROOT_DEVICE" "$TMP_MOUNT"
-
-        CARGO_EXISTS=$(btrfs subvolume list "$TMP_MOUNT" | awk '{print $NF}' | grep -xF "cargo" || true)
-
-        if [[ -n "$CARGO_EXISTS" ]]; then
-            echo "✓ Le sous-volume 'cargo' existe déjà, aucune action nécessaire."
-        else
-            btrfs subvolume create "$TMP_MOUNT/cargo"
-            echo "✓ Sous-volume 'cargo' créé."
-        fi
-
-        cleanup_cargo_mount
-        trap - EXIT
-    fi
-}
-
-# ══════════════════════════════════════════════════════════════════════════════════
-#  DEFINITION DES INFORMATIONS INITIALES (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
-# ══════════════════════════════════════════════════════════════════════════════════
 definir_infos_initiales () {
-    read -rp "Nom d'utilisateur : " USERNAME
-    FULLNAME="${USERNAME^}"
-
+    echo "══════════════════════════════════════════"
+    echo "  Définitions des informations initiales  "
+    echo "  Compilation pour variables.nix          "
+    echo "══════════════════════════════════════════"
+    MACHINE_ID=$(systemd-id128 new | tr -d '-')
     NIXOS_VERSION=$(nixos-version | cut -d. -f1,2)
     if [[ -z "$NIXOS_VERSION" ]]; then
         echo "Impossible de détecter la version NixOS automatiquement."
         read -rp "Entre-la manuellement (ex: 26.05) : " NIXOS_VERSION
     fi
 
-    # Génération du machine-id
-    MACHINE_ID=$(systemd-id128 new | tr -d '-')
+    read -rp "Nom d'utilisateur : " USERNAME
+    FULLNAME="${USERNAME^}"
 }
 
-# ═════════════════════════════════════════════════════════════════════════════
-#  COLLECTE DES INFORMATIONS PREEXISTANTES (SPECIFIQUE DEPLOIEMENT PAR REBUILD)
-# ═════════════════════════════════════════════════════════════════════════════
 collecter_infos_existantes () {
-    # Recherche du username dans le configuration.nix déjà existant
+    echo "══════════════════════════════════════════"
+    echo "  Collecte des informations existantes    "
+    echo "  Compilation pour variables.nix et       "
+    echo "  gestion déclarative                     "
+    echo "══════════════════════════════════════════"
+
+    echo "Récupération du username dans le configuration.nix existant"
     USERNAME=$(grep -oP 'users\.users\."\K[^"]+' "$CONFIG_FILE" | head -n1 || true)
     if [[ -z "$USERNAME" ]]; then
         echo "Impossible de détecter automatiquement le nom d'utilisateur dans $CONFIG_FILE."
         read -rp "Entre manuellement ton nom d'utilisateur : " USERNAME
     fi
 
-    # Recherche du numero de version dans le configuration.nix déjà existant
+    echo "Récupération du numero de version nixos dans le configuration.nix déjà existant"
     NIXOS_VERSION=$(grep -oP 'system\.stateVersion\s*=\s*"\K[^"]+' "$CONFIG_FILE" | head -n1 || true)
     if [[ -z "$NIXOS_VERSION" ]]; then
         echo "Impossible de détecter la version NixOS automatiquement."
         read -rp "Entre-la manuellement (ex: 26.05) : " NIXOS_VERSION
     fi
 
-    # Récupération du machine-id existant (généré imperativement par systemd)
-    # pour le faire basculer en gestion déclarative.
+    echo "Récupération du machine-id existant (dans /etc/machine-id)"
     MACHINE_ID=$(cat /etc/machine-id)
 
-    # Recherche du nom d'un éventuel sous-volume / distinct
+    echo "Recherche du nom d'un éventuel sous-volume / distinct"
     ROOT_SUBVOLUME=$(btrfs subvolume show / | head -n1 | xargs)
     if [[ -z "$ROOT_SUBVOLUME" ]]; then
         echo "⚠ Impossible de détecter le nom du subvolume racine."
         read -rp "Entre-le manuellement : " ROOT_SUBVOLUME
     fi
 
-    # Récupération de l'UUID LUKS
+    echo "Récupération de l'UUID LUKS"
     # On detecte quel volume est un volume LUKS
     LUKS_DEVICES=()
     while read -r dev; do
@@ -346,18 +268,15 @@ collecter_infos_existantes () {
 
     case "${#LUKS_DEVICES[@]}" in
         0)
-            # Si aucun volume LUKS n'a été détecté, on ne défini pas la variables $LUKS_UUID
             echo "⚠ Aucune partition LUKS détectée. luksUuid sera laissé vide dans variables.nix."
             LUKS_UUID=""
             ;;
         1)
-            # On extrait l'UUID du volume LUKS détectée
-            echo "Partition LUKS détectée : ${LUKS_DEVICES[0]}"
+            echo "Partition LUKS détectée, extraction de l'UUID : ${LUKS_DEVICES[0]}"
             LUKS_UUID=$(cryptsetup luksUUID "${LUKS_DEVICES[0]}")
             ;;
         *)
-            # Si plusieurs volumes LUKS ont été détectées, choix manuel de celui dont on extrait l'UUID
-            echo "Plusieurs partitions LUKS détectées, laquelle utiliser ?"
+            echo "Plusieurs partitions LUKS détectées, laquelle utiliser pour l'extraction de l'UUID ?"
             select LUKS_DEVICE in "${LUKS_DEVICES[@]}"; do
                 if [[ -n "$LUKS_DEVICE" ]]; then
                     LUKS_UUID=$(cryptsetup luksUUID "$LUKS_DEVICE")
@@ -369,12 +288,13 @@ collecter_infos_existantes () {
     esac
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  CREER LES VARIABLES INEXISTANTES
-# ═══════════════════════════════════════════════════════════════════════════
 generer_infos_inexistantes () {
-    echo ""
-    # Nom de la machine
+    echo "══════════════════════════════════════════"
+    echo "  Créer les informations inexistantes     "
+    echo "  Compilation pour variables.nix          "
+    echo "══════════════════════════════════════════"
+
+    echo "Définition du hostname"
     while true; do
         read -rp "Hostname de cette machine : " HOSTNAME
         if [[ -z "$HOSTNAME" ]]; then
@@ -386,7 +306,7 @@ generer_infos_inexistantes () {
         fi
     done
 
-    # Mot de passe déclaratif (hashedPassword)
+    echo "Définition du mot de passe déclaratif (hashedPassword)"
     while true; do
         read -rsp "Choisis le mot de passe à hasher : " PASSWORD
         echo ""
@@ -400,37 +320,33 @@ generer_infos_inexistantes () {
             break
         fi
     done
-
-    # Utilisateur github (optionnel)
+    # mkpasswd utilise l'algorythme yescrypt par défaut.
+    HASHED_PASSWORD=$(mkpasswd "$PASSWORD")
+    # par confidentialité, on ne garde pas en mémoire les valeurs de PASSWORD et PASSWORD_CONFIRM
+    unset PASSWORD PASSWORD_CONFIRM
+    
+    echo "Définition du compte github (facultatif)"
     read -rp "Nom d'utilisateur github (optionnel, peut être laissé vide) : " GIT_USERNAME
     read -rp "Adresse mail github (optionnel, peut être laissé vide) : " GIT_USERMAIL
     echo ""
-
-    # Génération du hash du mot de passe
-    # mkpasswd utilise l'algorythme yescrypt par défaut.
-    HASHED_PASSWORD=$(mkpasswd "$PASSWORD")
-    unset PASSWORD PASSWORD_CONFIRM
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  TELECHARGEMENT DU REPO nixos-dotfiles
-# ═══════════════════════════════════════════════════════════════════════════
 telecharger_repo_git () {
-    DOTFILES_DIR="${TARGET}/home/${USERNAME}/Git/nixos-dotfiles"
-    echo ""
-    echo "Téléchargement des dotfiles..."
+    echo "══════════════════════════════════════════"
+    echo "  Téléchargement des .nix depuis le repo  "
+    echo "  Github.                                 "
+    echo "══════════════════════════════════════════"
+    DOTFILES_DIR="${TARGET_MOUNT}/home/${USERNAME}/Git/nixos-dotfiles"
 
-    # git refuse le téléchargement s'il existe des fichiers dans le dossier cible.
-    # On supprime les éventuels fichiers existants.
+    # Suppression des éventuels fichiers existants (git refuserai de les écraser)
     rm -rf "$DOTFILES_DIR"
     mkdir -p "$DOTFILES_DIR"
-    # on installe git temporairement, et on run la commande
+    # Installation temporaire de git, et run de la commande
     nix-shell -p git --run "git clone https://github.com/binnotkari-wq/nixos-dotfiles.git $DOTFILES_DIR"
     echo "✓ Dotfiles téléchargés dans ${DOTFILES_DIR}/"
 
-    # On vérifie que le fichier "hostname".nix est bien présent
-    HOST_IMPORT_PATH="${TARGET}/home/${USERNAME}/Git/nixos-dotfiles/hosts/${HOSTNAME}.nix"
-
+    # Vérification de l'existance du fichier "hostname".nix 
+    HOST_IMPORT_PATH="${TARGET_MOUNT}/home/${USERNAME}/Git/nixos-dotfiles/hosts/${HOSTNAME}.nix"
     if [[ -f "$HOST_IMPORT_PATH" ]]; then
         echo "✓ Le fichier de host $HOST_IMPORT_PATH existe bien dans le dépôt."
     else
@@ -440,13 +356,13 @@ telecharger_repo_git () {
     fi
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  PREPARER CONFIGURATION.NIX (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
-# ═══════════════════════════════════════════════════════════════════════════
 preparer_configuration.nix () {
-    echo ""
-    echo "Copie de configuration_template.nix depuis le dépôt git vers /etc/nixos/configuration.nix avant injection des informations collectée......"
-    mkdir -p "${TARGET}/etc/nixos"
+    echo "══════════════════════════════════════════"
+    echo "  Copie de configuration_template.nix     "
+    echo "  vers /etc/nixos/configuration.nix puis  "
+    echo "  injection des informations collectée    "
+    echo "══════════════════════════════════════════"
+    mkdir -p "${TARGET_MOUNT}/etc/nixos"
     cp -ra "$DOTFILES_DIR/nixos_deploy/configuration_template.nix" "$CONFIG_FILE"
     # Remplacement des placeholders du numéro de version par celui détecté sur le système en cours, et du username et fullname d'après les informations saisies
     sed -i \
@@ -457,52 +373,47 @@ preparer_configuration.nix () {
     echo "configuration.nix en place : $CONFIG_FILE"
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  SAUVEGARDE DE CONFIGURATION.NIX (SPECIFIQUE DEPLOIEMENT PAR REBUILD)
-# ═══════════════════════════════════════════════════════════════════════════
 sauvegarder_configuration.nix () {
-    echo ""
-    echo "Sauvegarde de configuration.nix avant injection des informations collectée......"
+    echo "══════════════════════════════════════════"
+    echo "  Sauvegarde de configuration.nix avant   "
+    echo "  modifications                           "
+    echo "══════════════════════════════════════════"
     BACKUP_FILE="${CONFIG_FILE}.bak.$(date +%Y%m%d-%H%M%S)"
     cp "$CONFIG_FILE" "$BACKUP_FILE"
     echo "Sauvegarde créée : $BACKUP_FILE"
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  RENSEIGNEMENT DE CONFIGURATION.NIX
-# ═══════════════════════════════════════════════════════════════════════════
 renseigner_configuration.nix () {
+    echo "══════════════════════════════════════════"
+    echo "  Injection des modifications et          "
+    echo "  compléments dans configuration.nix      "
+    echo "══════════════════════════════════════════"
     # Insertion de l'import du fichier de host perso, juste après ./hardware-configuration.nix dans le bloc imports
     sed -i "/\.\/hardware-configuration\.nix/a\\      ../../home/${USERNAME}/Git/nixos-dotfiles/hosts/${HOSTNAME}.nix" "$CONFIG_FILE"
-
     # Remplacement du hostname par défaut ("nixos") par le hostname choisi
     sed -i "s/networking\.hostName = \"nixos\";/networking.hostName = \"${HOSTNAME}\";/" "$CONFIG_FILE"
-
     # Désactivation de services.xserver.enable
     sed -i 's/services\.xserver\.enable = true;/services.xserver.enable = false;/' "$CONFIG_FILE"
-
     # Déplacement du displayManager.gdm hors de l'espace xserver (syntaxe actuelle
     sed -i 's/services\.xserver\.displayManager\.gdm\.enable = true;/services.desktopManager.gnome.enable = true;/' "$CONFIG_FILE"
     sed -i 's/services\.xserver\.desktopManager\.gnome\.enable = true;/services.displayManager.gdm.enable = true;/' "$CONFIG_FILE"
-
     # Désactivation de l'impression
     sed -i 's/services\.printing\.enable = true;/services.printing.enable = false;/' "$CONFIG_FILE"
+    echo "configuration.nix complété."
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  RENSEIGNEMENT DE VARIABLES.NIX
-# ═══════════════════════════════════════════════════════════════════════════
 generer_variables.nix () {
+    echo "══════════════════════════════════════════"
+    echo "  Mise en place de variables.nix          "
+    echo "  et injection des informations collectée "
+    echo "══════════════════════════════════════════"
+
     TEMPLATE_FILE="${DOTFILES_DIR}/modules/variables_template.nix"
     VARIABLES_FILE="${DOTFILES_DIR}/modules/variables.nix"
-
     if [[ ! -f "$TEMPLATE_FILE" ]]; then
         echo "Erreur : $TEMPLATE_FILE introuvable. Vérifie que le clone du dépôt s'est bien déroulé."
         exit 1
     fi
-
-    echo ""
-    echo "Mise en place de variables.nix et injection des informations collectée..."
 
     # Si variables.nix existe déjà (script relancé une deuxième fois), on le
     # sauvegarde avant de l'écraser, comme pour configuration.nix.
@@ -534,55 +445,40 @@ generer_variables.nix () {
     sed -i "s|@@rootSubvolumeName@@|$(sed_escape "$ROOT_SUBVOLUME")|" "$VARIABLES_FILE"
 
     unset HASHED_PASSWORD
-    echo "✓ variables.nix généré dans $VARIABLES_FILE"
-    echo "Vérifier le contenu de variables.nix :"
-    cat "$VARIABLES_FILE"
+    echo "Vérifier le contenu de variables.nix, généré dans $VARIABLES_FILE"
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  INSTALLATION DE NIXOS (SPECIFIQUE DEPLOIEMENT PAR INSTALLATION)
-# ═══════════════════════════════════════════════════════════════════════════
 installer_Nixos () {
-    echo ""
+    echo "══════════════════════════════════════════"
+    echo "  Installation de Nixos                   "
+    echo "══════════════════════════════════════════"
     read -rp "Prêt à installer NixOS ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
-    # le fichier configuration.nix personnalisé ne sera pas écrasé
-    echo "Génération de hardware-configuration.nix..."
-    mkdir -p "/mnt/etc/nixos"
     nixos-generate-config --root /mnt
-    echo "✓ hardware-configuration.nix généré."
-    echo ""
+    echo "✓ hardware-configuration.nix généré (le fichier configuration.nix personnalisé n'a pas été écrasé)"
     echo "Lancement de nixos-install..."
     nixos-install --root /mnt --no-root-passwd
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  REBUILD DE NIXOS (SPECIFIQUE DEPLOIEMENT PAR REBUILD)
-# ═══════════════════════════════════════════════════════════════════════════
 rebuilder_Nixos () {
-    echo ""
+    echo "══════════════════════════════════════════"
+    echo "  Rebuild de Nixos (nixos-rebuild boot)   "
+    echo "══════════════════════════════════════════"
     read -rp "Prêt à installer NixOS ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
-    echo ""
     echo "Lancement du rebuild..."
     nixos-rebuild boot
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  MIGRATION DES FICHIERS PERSISTANTS (IMPERMANENCE)
-#  Préparation des prérequis pour le module impermanence :
-#    - création du dossier /nix/persist
-#    - migration des fichiers à persister vers /nix/persist/
-#
-#  À exécuter UNE SEULE FOIS, avant le premier reboot avec impermanence
-#  actif. Opération non destructive : ne modifie pas les sources, copie
-#  uniquement. impermanence.nix devra être présent dans les imports.
-# ═══════════════════════════════════════════════════════════════════════════
 migrer_fichiers_persistants() {
     echo ""
     echo "══════════════════════════════════════════"
-    echo "  Étape 4/5 : Migration des fichiers persistants"
-    echo "  Valider uniquement si l'impermanence est à mettre en place"
+    echo "  PREPARATION IMPERMANENCE                "
+    echo "  Migration des dossiers/fichiers à       "
+    echo "  persister dans /nix/persist             "
+    echo "  Migration à exécuter :                  "
+    echo "  - une seule fois                        "
+    echo "  - si impermanence.nix est importé       "
     echo "══════════════════════════════════════════"
     read -rp "Prêt à migrer les fichiers à persister ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; return 0; }
@@ -594,35 +490,35 @@ migrer_fichiers_persistants() {
     BLUE='\033[0;34m'
     NC='\033[0m'
 
-    # ─── 1. Création du dossier de persistance ───────────────────────────
+    # Création du dossier de persistance
     # /nix est un sous-volume distinct, donc hors périmètre de l'impermanence.
-    mkdir -p ${TARGET}/nix/persist
+    mkdir -p ${TARGET_MOUNT}/nix/persist
 
-    # ─── 2. Éléments à persister ──────────────────────────────────────────
+    # Éléments à persister
     # Format : DIRS["source"]="copier_le_contenu"
     #   true  = cp -ra vers /nix/persist (données utiles à conserver)
     #   false = créer le dossier vide dans /nix/persist (se reconstruira tout seul)
     declare -A DIRS
-    DIRS["${TARGET}/etc/lact"]="true"
-    DIRS["${TARGET}/etc/NetworkManager"]="true"
-    DIRS["${TARGET}/etc/nixos"]="true"
-    DIRS["${TARGET}/etc/ssh"]="true"
-    DIRS["${TARGET}/var/lib/AccountsService"]="true"
-    DIRS["${TARGET}/var/lib/bluetooth"]="true"
-    DIRS["${TARGET}/var/lib/colord"]="false"        # se reconstruit tout seul
-    DIRS["${TARGET}/var/lib/cups"]="true"
-    DIRS["${TARGET}/var/lib/flatpak"]="true"
-    DIRS["${TARGET}/var/lib/fwupd"]="false"         # se reconstruit tout seul
-    DIRS["${TARGET}/var/lib/NetworkManager"]="true"
-    DIRS["${TARGET}/var/lib/nixos"]="true"
-    DIRS["${TARGET}/var/lib/systemd/coredump"]="false"
-    DIRS["${TARGET}/var/lib/upower"]="false"        # se reconstruit tout seul
-    DIRS["${TARGET}/var/log"]="true"
+    DIRS["${TARGET_MOUNT}/etc/lact"]="true"
+    DIRS["${TARGET_MOUNT}/etc/NetworkManager"]="true"
+    DIRS["${TARGET_MOUNT}/etc/nixos"]="true"
+    DIRS["${TARGET_MOUNT}/etc/ssh"]="true"
+    DIRS["${TARGET_MOUNT}/var/lib/AccountsService"]="true"
+    DIRS["${TARGET_MOUNT}/var/lib/bluetooth"]="true"
+    DIRS["${TARGET_MOUNT}/var/lib/colord"]="false"
+    DIRS["${TARGET_MOUNT}/var/lib/cups"]="true"
+    DIRS["${TARGET_MOUNT}/var/lib/flatpak"]="true"
+    DIRS["${TARGET_MOUNT}/var/lib/fwupd"]="false"
+    DIRS["${TARGET_MOUNT}/var/lib/NetworkManager"]="true"
+    DIRS["${TARGET_MOUNT}/var/lib/nixos"]="true"
+    DIRS["${TARGET_MOUNT}/var/lib/systemd/coredump"]="false"
+    DIRS["${TARGET_MOUNT}/var/lib/upower"]="false"
+    DIRS["${TARGET_MOUNT}/var/log"]="true"
 
-    # ─── 3. Traitement ─────────────────────────────────────────────────────
+    # Traitement
     echo ""
     echo -e "${BLUE}======================================================${NC}"
-    echo -e "${BLUE}  Migration initiale vers ${TARGET}/nix/persist${NC}"
+    echo -e "${BLUE}  Migration initiale vers ${TARGET_MOUNT}/nix/persist${NC}"
     echo -e "${BLUE}======================================================${NC}"
     echo ""
 
@@ -633,11 +529,11 @@ migrer_fichiers_persistants() {
 
     for src in "${!DIRS[@]}"; do
         copy="${DIRS[$src]}"
-        dest="${TARGET}/nix/persist${src#/mnt}"
+        dest="${TARGET_MOUNT}/nix/persist${src#/mnt}"
 
         # Le dossier source n'existe pas sur /.
         if [[ ! -d "$src" ]]; then
-            echo -e "${YELLOW}[ABSENT ]${NC} $src → dossier inexistant sur ${TARGET}/, création vide dans ${TARGET}/nix/persist"
+            echo -e "${YELLOW}[ABSENT ]${NC} $src → dossier inexistant sur ${TARGET_MOUNT}/, création vide dans ${TARGET_MOUNT}/nix/persist"
             mkdir -p "$dest"
             (( CREATED++ )) || true
             continue
@@ -668,10 +564,8 @@ migrer_fichiers_persistants() {
     done
 
     # Le contenu éventuel de ce dossier est nécessaire dès le premier démarrage.
-    rsync -a ${TARGET}/var/lib/nixos/ ${TARGET}/nix/persist/var/lib/nixos/
+    rsync -a ${TARGET_MOUNT}/var/lib/nixos/ ${TARGET_MOUNT}/nix/persist/var/lib/nixos/
 
-    # ─── Résumé ────────────────────────────────────────────────────────────
-    echo ""
     echo -e "${BLUE}======================================================${NC}"
     echo -e "${BLUE}  Résumé${NC}"
     echo -e "${BLUE}======================================================${NC}"
@@ -689,47 +583,33 @@ migrer_fichiers_persistants() {
     fi
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  FINALISATION
-#  Récupération des scripts utiles et correction des permissions.
-# ═══════════════════════════════════════════════════════════════════════════
-
 finaliser() {
-    echo ""
     echo "══════════════════════════════════════════"
-    echo "  Finalisation"
+    echo "  Téléchargement des scripts utiles depuis"
+    echo "  repo github et application permissions  "
     echo "══════════════════════════════════════════"
+    mkdir -p "${TARGET_MOUNT}/home/${USERNAME}/Git/scripts"
+    git clone "https://github.com/binnotkari-wq/scripts.git" "${TARGET_MOUNT}/home/${USERNAME}/Git/scripts/"
+    echo "✓ Scripts téléchargés dans ${TARGET_MOUNT}/home/${USERNAME}/Git/scripts/."
 
-    # ─── 1. Récupération des scripts utiles ───────────────────────────────
-    echo ""
-    echo "Téléchargement des scripts utiles..."
-    mkdir -p "${TARGET}/home/${USERNAME}/Git/scripts"
-    git clone "https://github.com/binnotkari-wq/scripts.git" "${TARGET}/home/${USERNAME}/Git/scripts/"
-    echo "✓ Scripts téléchargés dans ${TARGET}/home/${USERNAME}/Git/scripts/."
-
-    # ─── 2. Application des permissions ────────────────────────────────────
-    echo ""
-    echo "Application des permissions..."
-    chown -R "${USERNAME}:${USERNAME}" "${TARGET}/home/${USERNAME}"
-    chown -R "${USERNAME}:${USERNAME}" "${TARGET}/cargo"
+    chown -R "${USERNAME}:${USERNAME}" "${TARGET_MOUNT}/home/${USERNAME}"
+    chown -R "${USERNAME}:${USERNAME}" "${TARGET_MOUNT}/cargo"
     echo "✓ Permissions appliquées."
     echo ""
     echo "══════════════════════════════════════════"
-    echo "  Terminé. Redémarrer le PC."
+    echo "  Terminé. Redémarrer le PC.              "
     echo "══════════════════════════════════════════"
 }
 
-# ═══════════════════════════════════════════════════════════════════════════
-#  EXÉCUTION
-# ═══════════════════════════════════════════════════════════════════════════
-
-# On détecte si on est sur un live d'installation (squashfs) ou un système déjà installé.
-# La logique d'éxecution adaptée au cas de figure sera lancée.
-if [ "$TARGET" = "/mnt" ]; then
+###############################################################################################
+#  EXÉCUTION                                                                                  #
+###############################################################################################
+# La logique d'éxecution adaptée au conexte : installation ou rebuild
+if [ "$TARGET_MOUNT" = "/mnt" ]; then
     read -rp "Prêt à installer NixOS ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
     executer_installation
-elif [ "$TARGET" = "" ]; then
+elif [ "$TARGET_MOUNT" = "" ]; then
     read -rp "Prêt à rebuilder NixOS ? (oui) : " CONFIRM
     [[ "$CONFIRM" == "oui" ]] || { echo "Annulé."; exit 1; }
     executer_rebuild
