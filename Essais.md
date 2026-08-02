@@ -14,13 +14,32 @@ sudo ./deploy.sh
 - Script deploy.sh : ok
 - Build selon .nix vm : ok
 - Impermanence tmpfs : ok
-- script cargo : 
 
 ## Installation wipe système seulement :
 
 - Script deploy.sh : ok
 - Build selon .nix vm : ok
 - Impermanence tmpfs : ok
-- script cargo : 
 
 ## Déploiement par rebuild :
+
+- Script deploy.sh : ok
+- Build selon .nix vm : ok
+- Impermanence tmpfs : ok
+
+## Script cargo
+
+- config sans disque secondaire : OK
+Créé bien un sous-volume cargo si pas de disque cargo ou pas de sous-volume cargo existant.
+Intègre dans cargo.nix et importe ce fichier, rebuild ok, le sous-volume est monté.
+Les données se téléchargent
+
+- config avec disque secondaire :
+
+
+Pour plus de lisibilité, découper en plusieurs fonctions plus ciblées.
+Corriger en permission 1000:1000 sur /home/user/git/nixos-dotfiles/ puisque les .nix ont été modifiés en sudo, et appartiennent ensuite à sudo.
+
+!! adapter les alias shell pour correspondre seulement au LLM téléchargées de ce script
+
+## Impermanence wipe root
