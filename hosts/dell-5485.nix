@@ -14,6 +14,7 @@ in
 
   imports =
     [
+      ../modules/cargo.nix
       ../modules/drivers_CPU_AMD.nix                                                     # optionnel - intégrable sous conditions (CPU AMD)
       ../modules/drivers_GPU_AMD.nix                                                     # optionnel - intégrable sous conditions (GPU AMD)
       ../modules/btop.nix                                                        # optionnel - intégrable sans aucune condition
@@ -41,13 +42,6 @@ in
       ../modules/software-set_TUI.nix                                                  # optionnel - intégrable sans aucune condition
       ../modules/software-set_unwanted.nix                                             # optionnel - intégrable sans aucune condition
     ];
-
-  # --- DISQUE SECONDAIRE ---
-  fileSystems."/cargo" =
-    { device = "/dev/sda";
-      fsType = "btrfs";
-      options = [ "nofail" "noatime" "compress=zstd" "ssd" "discard=async" ];                   # nofail = le système boote même si le disque est absent
-    };
 
   # --- TDP ---
   powerManagement.powertop.enable = true;                                                       # met en place un service qui applique automatiquement les réglages appliqués. Utiliser seulement sur PC portables.

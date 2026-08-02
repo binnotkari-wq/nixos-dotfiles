@@ -35,11 +35,17 @@ Intègre dans cargo.nix et importe ce fichier, rebuild ok, le sous-volume est mo
 Les données se téléchargent
 
 - config avec disque secondaire :
-
+Pas de sous-volume cargo créé (c'est bien le comportement attendu lorsqu'il y a un disque dédié)
+Intègre dans cargo.nix et importe ce fichier, rebuild ok, le disque est monté.
+Les données se téléchargent
 
 Pour plus de lisibilité, découper en plusieurs fonctions plus ciblées.
-Corriger en permission 1000:1000 sur /home/user/git/nixos-dotfiles/ puisque les .nix ont été modifiés en sudo, et appartiennent ensuite à sudo.
-
 !! adapter les alias shell pour correspondre seulement au LLM téléchargées de ce script
+---> faire le point sur les meilleures LLM à prendre.
 
-## Impermanence wipe root
+## Impermanence
+
+- Wipe root automatique sur dépoiement par installation scriptée : ok
+- Tmpfs sur déploiement par rebuild : ok
+
+Nettoyer commentaires.
