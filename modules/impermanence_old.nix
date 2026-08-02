@@ -61,14 +61,6 @@
 
 { config, lib, pkgs, vars, ... }:
 
-  # ===========================================================================
-  # 1. Contrôle de la présence d'un sous-volume btrfs distinct pour la raince
-  #    --> pour la séléction automatique du mode de volatilité de la racine
-  # ===========================================================================
-let
-  utiliserWipe = vars.rootSubvolumeName != "/";
-in
-
 {
   # ===========================================================================
   # 1. Options systèmes
@@ -176,56 +168,61 @@ in
   # 5. reset du root
   # ===========================================================================
 
-assertions = [
-    {
-      assertion = utiliserWipe -> (vars ? luksUuid);
-      message = "impermanence.nix : mode wipe sélectionné (rootSubvolumeName != \"/\") mais vars.luksUuid manquant.";
-    }
-  ];
+  # Deux solutions :
+  # - tmpfs : universel, pas de prérequis
+  # - wipe btrfs : sous-volume btrfs pour /
 
-  # -----------------------------------------------------------------
-  # Cas A — pas de sous-volume distinct pour / : tmpfs
-  # -----------------------------------------------------------------
-  fileSystems."/" = lib.mkIf (!utiliserWipe) (lib.mkForce {
+  # ROOT EN TMPFS
+  # Section inutile lorsque root est un sous-volume BTRFS qu'on wipe au démarrage du PC, à commenter dans ce cas.
+  # Montage de / en tmpfs (ce paramétrage prend le dessus sur celui de hardware-configuration.nix)
+  fileSystems."/" = lib.mkForce {
     device = "tmpfs";
     fsType = "tmpfs";
     options = [ "size=2G" "mode=755" ];
-  });
-
-  # -----------------------------------------------------------------
-  # Cas B — sous-volume distinct : wipe + restauration d'un snapshot vierge
-  # -----------------------------------------------------------------
-  boot.initrd.systemd.services.erase_root = lib.mkIf utiliserWipe {
-    description = "Efface / en restaurant un snapshot vierge du sous-volume root (btrfs)";
-    wantedBy = [ "initrd.target" ];
-    unitConfig.DefaultDependencies = "no";
-    after = [ "cryptsetup.target" ];
-    before = [ "sysroot.mount" ];
-    serviceConfig.Type = "oneshot";
-    # path = [ pkgs.btrfs-progs pkgs.coreutils pkgs.util-linux ];
-    script = ''
-set -euo pipefail
-
-  MAPPER="/dev/mapper/luks-${vars.luksUuid}"
-  MNT="/mnt-btrfs-toplevel"
-  CIBLE="${vars.rootSubvolumeName}"
-  VIERGE="${vars.rootSubvolumeName}-blank"
-
-  mount -o subvolid=5,X-mount.mkdir "$MAPPER" "$MNT"
-
-  if [ ! -e "$MNT/$VIERGE" ]; then
-    echo "erase_root: $VIERGE introuvable, abandon." >&2
-    umount "$MNT"
-    exit 1
-  fi
-
-  if [ -e "$MNT/$CIBLE" ]; then
-    btrfs subvolume delete -R "$MNT/$CIBLE"
-  fi
-
-  btrfs subvolume snapshot "$MNT/$VIERGE" "$MNT/$CIBLE"
-
-  umount "$MNT"
-    '';
   };
+
+  # WIPE DU SOUS-VOUME BTRFS ROOT - POSSIBLE UNIQUEMENT SI LUKS->VOLUME BTRFS->SOUS VOLUME DISTINCT POUR /
+  # Un service sera exécuté par systemd à chaque démarrage pour vider root
+  # Section inutile lorsque / est un tmpfs qui se vide à l'exctinction / redémarrage, à commenter dans ce cas.
+  # L'activation de cette section suppose que :
+  # - il y a un volume LUKS
+  # - il y a un sous-volume root et il est nommé root
+  # Cette configuration de système de fichier est créée par bootstrap.sh mais pas par Calamares, qui ne créé pas de sous-solume distinct pour root.
+  #  boot.initrd.systemd.services.erase_root = {
+  #    description = "Vidange du filesystem root à chaque boot";
+  #    wantedBy = [ "initrd.target" ];
+  #    after = [ "systemd-cryptsetup@${lib.replaceStrings ["-"] ["\\x2d"] "luks-${vars.luksUuid}"}.service" ];
+  #    before = [ "sysroot.mount" ];
+  #    unitConfig.DefaultDependencies = "no";
+  #    serviceConfig.Type = "oneshot";
+  #    script = ''
+  #set -euo pipefail
+
+  #  ROOT_SUBVOL="${vars.rootSubvolumeName}"
+  #  MNT="/sysroot"
+
+  #  mount --mkdir -t btrfs -o subvol=/ /dev/mapper/luks-${vars.luksUuid} "$MNT"
+  #  trap 'umount -l "$MNT" 2>/dev/null || true' EXIT
+
+   # info=$(btrfs subvolume show "$MNT/$ROOT_SUBVOL")
+  #  top_level_id=""
+  #  while IFS= read -r line; do
+  #    case "$line" in
+  #      *"Top level ID:"*)
+  #        top_level_id="''${line##*:}"
+  #        top_level_id="''${top_level_id//[[:space:]]/}"
+  #        ;;
+  #    esac
+  #  done <<< "$info"
+
+  #  if [ "$top_level_id" != "5" ]; then
+  #    echo "ERREUR FATALE : '$ROOT_SUBVOL' n'est pas un sous-volume enfant du top-level (Top level ID=$top_level_id)." >&2
+  #    echo "Layout inattendu (ex: install Calamares sans sous-volume dédié). Abandon du wipe." >&2
+  #    exit 1
+  #  fi
+
+  #  btrfs subvolume delete -R "$MNT/$ROOT_SUBVOL"
+  #  btrfs subvolume create "$MNT/$ROOT_SUBVOL"
+  #    '';
+  #  };
 }

@@ -122,7 +122,7 @@ configurer_disque() {
     # Préparation
     OPTS="noatime,compress=zstd,space_cache=v2,ssd,discard=async"
     ROOT_SUBVOLUME="root"
-    ROOT_SNAPSHOT="root-blank"
+    ROOT_SNAPSHOT="$ROOT_SUBVOLUME-blank"
     TMP_MOUNT=$(mktemp -d)
     mkdir -p "$TMP_MOUNT"
 }
