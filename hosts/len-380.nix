@@ -14,8 +14,8 @@ in
 
   imports =
     [
-      ../drivers/CPU_intel_pre10.nix                                             # optionnel - intégrable sous conditions (CPU intel avant gen10)
-      ../drivers/iGPU_intel.nix                                                  # optionnel - intégrable sous conditions (GPU intel intégré)
+      ../modules/drivers_CPU_intel_pre10.nix                                             # optionnel - intégrable sous conditions (CPU intel avant gen10)
+      ../modules/drivers_iGPU_intel.nix                                                  # optionnel - intégrable sous conditions (GPU intel intégré)
       # ../modules/btop.nix                                                        # optionnel - intégrable sans aucune condition
       ../modules/firefox.nix                                                     # optionnel - intégrable sans aucune condition
       # ../modules/flatpak.nix                                                     # optionnel - intégrable sans aucune condition
