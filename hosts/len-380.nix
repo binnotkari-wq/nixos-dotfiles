@@ -14,6 +14,7 @@ in
 
   imports =
     [
+      ../modules/cargo.nix
       ../modules/drivers_CPU_intel_pre10.nix                                             # optionnel - intégrable sous conditions (CPU intel avant gen10)
       ../modules/drivers_iGPU_intel.nix                                                  # optionnel - intégrable sous conditions (GPU intel intégré)
       # ../modules/btop.nix                                                        # optionnel - intégrable sans aucune condition
