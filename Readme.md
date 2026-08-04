@@ -11,37 +11,47 @@ sudo ./deploy.sh
 
 ## Fonctionnement du script d'installation
 
-- recueille les variables utilisées pour le déploiement et le paramétrage du système
-- prépare le disque avec BTRFS (sous-volumes root, home, nix, supplémentaires au choix) dans un volume LUKS. Si un sous-volume home et/ou cargo existe déjà, il sera préservé.
-- télécharge les .nix depuis le repo sur Github
-- installe nixos d'après les variables spécifiées
-- migre les fichiers à persister
+Le script détecte l'éxecution depuis un live usb : dans ce cas, le script est en mode installation.
+Sinon, sur un système déjà installé en cours d'exécution, il passe en mode rebuild.
+
+Dans le mode installation :
+- active la connexion wifi
+- prépare le disque avec BTRFS (sous-volumes root, home, nix) dans un volume LUKS. Si un volume LUKS existe, il sera préservé.
+
+Si le script est interrompu pendant un déploiement en mode installation, il faut redémarrer le PC pour relancer le script.
+
+Résultat :
+
+- .nix du repo Github importés dans configuration.nix
+	* options et fonctions système, performances (kernel, btrfs, LUKS, zram ...)
+	* selections de logiciels
+	* réglages drivers
+- confidentialité : toutes les valeurs d'identification sont groupées dans variables.nix, qui est généré à la volée par le script
+- mise en place de l'impermanence (avec migration des éléments à persister)
 - provisionne les scripts utiles du repo Github
 
-Chaque étape peut être ignorée pour passer à la suivante.
 
 # Organisation des .nix
 
-> Seuls 3 fichiers sont nécessaires :
+> Seuls 2 fichiers sont nécessaires :
 
 > - configuration.nix (copie renseignée de configuration_template.nix)
 > - hardware-configuration.nix (généré à l'instalation)
 
 > Tous les autres .nix peuvent être ignorés ou importés, indépendament ou non.
 
+Aucun module communautaire n'est utilisé :
+- impermanence.nix ne fait appel qu'à des fonctions standards de systemd pour la création de bind-mounts et lien
+- les préférence des logiciels sont appliqué au niveau système en tant que préférences par défaut, ou par création par systemd de fichiers dans /etc avec lien créé vers le dossier utilisateur
+- les flatpaks ont une gestion déclarative, l'exécution des opérations d'installation et desinstallation est confiée à systemd
+
 ## Structure générale
 
 ```bash
 .
-├── common
-├── drivers
 ├── hosts
-│   ├── hostname1
-│   ├── hostname2
-│   └── hostname...
 ├── modules
-│   └── home-manager_options
-└── software_packs
+└── nixos-deploy
 ```
 
 ## racine du repo
@@ -178,22 +188,6 @@ Contient des .nix qui proposent une selection de logiciels GTK, TUI et CLI par t
 | ./software_packs/GTK_all.nix                 | 2500,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Logiciels pour utilisation GUI avancée.                        |
 | ./software_packs/TUI.nix                     |  326,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Logiciels pour utilisation TUI.                                |
 | ./software_packs/unwanted.nix                | -300,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. Exclusion de logiciels Gnome inutiles.                         |
-
-
-Les modules suivant ne sont pas utilisés, remplacées par des fonctions natives ne dépendant d'aucun module communautaire.
-| Modules                                      | Disque      |  Ram        | Intégration | Conditions pour éval nix | Remarques                                                                       |
-| :------------------------------------------- | ----------: | ----------: | :---------: | :----------------------: | :------------------------------------------------------------------------------ |
-| ./modules/impermanence_module_communautaire.nix | 0,00 Mio |    0,00 Mio | Facultative | Config disque adaptée    | Configuration impermanence. (https://github.com/nix-community/impermanence)     |
-| ./modules/flatpak_module_communautaire.nix   |    5,00 Mio |    0,00 Mio | Facultative | Aucune                   | 100% agnostique. (https://github.com/gmodena/nix-flatpak)						  |
-| ./modules/home-manager.nix                   |    0,00 Mio |    0,00 Mio | Facultative | variables.nix ou edition | Configuration home-manager. Inutile si newsboat, pyradio et yazi ne sont pas installés (TUI_all.nix) |
-| ./modules/home-manager_options/newsboat.nix  |    3,00 Mio |    0,00 Mio | Facultative | HM activé                | 100% agnostique. Prefs utilisateur. Inutile si newsboat n'est pas installé      |
-| ./modules/home-manager_options/pyradio.nix   |    3,00 Mio |    0,00 Mio | Facultative | HM activé                | 100% agnostique. Prefs utilisateur. Inutile si pyradio n'est pas installé       |
-| ./modules/home-manager_options/yazi.nix      |    3,00 Mio |    0,00 Mio | Facultative | HM activé                | 100% agnostique. Prefs utilisateur. Inutile si yazi n'est pas installé          |
-
-
-
-
-
 
 
 
