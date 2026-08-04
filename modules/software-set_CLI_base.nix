@@ -25,7 +25,7 @@
     shellcheck                          # contrôle de syntaxe scripts bash
     compsize                            # utilitaire analyse Btrfs
     git                                 # versionning, et interface avec repos en ligne
-    mdcat                               # Lecture de documentation Markdown
+    glow                                # Lecture de documentation Markdown (supérieur à mdcat sur le rendu et la tolérance)
     dialog                              # outil boites de dialogue scripts
     zenity                              # outil boites de dialogue scripts (GTK)
     libnotify                           # outil boites de dialogue scripts
