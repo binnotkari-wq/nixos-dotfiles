@@ -103,6 +103,7 @@
           intellihide = true;
           hotkeys-overlay-combo = "TEMPORARILY";
           window-preview-title-position = "TOP";
+          panel-positions = "TOP";
         };
 
         # Touches multimédia
