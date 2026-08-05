@@ -13,9 +13,11 @@
     python313                                           # Version économiquee en espace disque (45 Mo)
     distrobox                                           # Pour tests Silverblue/Debian/Arch sans polluer NixOS
     just                                                # Exécuteur de commandes de projet
+    skopeo                                              # manipulation des images bootc (création d'un fichier OCI local)
   ];
 
   # --- PODMAN ---
+
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;                                # Permet compatibilité docker si nécessaire

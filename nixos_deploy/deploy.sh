@@ -398,6 +398,8 @@ renseigner_configuration.nix () {
     sed -i 's/services\.xserver\.desktopManager\.gnome\.enable = true;/services.displayManager.gdm.enable = true;/' "$CONFIG_FILE"
     # Désactivation de l'impression
     sed -i 's/services\.printing\.enable = true;/services.printing.enable = false;/' "$CONFIG_FILE"
+    # Ajout des groupes supplémentaires pour l'utilisateur
+    sed -i 's/[ "networkmanager" "wheel" ];/[ "networkmanager" "wheel" "libvirtd" "kvm" ];/' "$CONFIG_FILE"
     echo "configuration.nix complété."
 }
 
