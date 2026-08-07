@@ -19,7 +19,7 @@ in
       ../modules/drivers_iGPU_intel.nix                                                  # optionnel - intégrable sous conditions (GPU intel intégré)
       # ../modules/btop.nix                                                        # optionnel - intégrable sans aucune condition
       ../modules/firefox.nix                                                     # optionnel - intégrable sans aucune condition
-      # ../modules/flatpak.nix                                                     # optionnel - intégrable sans aucune condition
+      ../modules/flatpak.nix                                                     # optionnel - intégrable sans aucune condition
       ../modules/git.nix                                                         # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)
       ../modules/gnome-dconf.nix                                                 # optionnel - intégrable sans aucune condition
       ../modules/impermanence.nix                                                # optionnel - intégrable sous conditions (variables.nix ou adaptation manuelle)

@@ -22,7 +22,7 @@ in
 ##############################################################################
       services.flatpak.enable = true;
       custom.flatpak.enable = true;
-      custom.flatpak.uninstallUnmanaged  = true;                # désinstalle tout flatpak absent de la lsite déclarée
+      custom.flatpak.uninstallUnmanaged  = false;                # désinstalle tout flatpak absent de la lsite déclarée
 
       # Liste de dépôts, chaque entrée = [ "nom" "url" ]. Le premier repo de la liste sert de remote par défaut.
       custom.flatpak.remotes = [
