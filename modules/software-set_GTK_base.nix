@@ -5,8 +5,23 @@
 { config, pkgs, ... }:
 
 {
+  # Activation de la recherche contenu / metadata dans gnome
+  services.gnome.localsearch.enable = true;
+  services.gnome.tinysparql.enable = true;
+
+  # on expose gstreamer aux plugins (qui ne peuvent pas savoir où chercher dans le FHS spécifique nixos)
+  environment.sessionVariables = {
+    GST_PLUGIN_SYSTEM_PATH_1_0 = "/run/current-system/sw/lib/gstreamer-1.0";
+  };
+
   environment.systemPackages = with pkgs; [
     gnomeExtensions.dash-to-panel
+    gst_all_1.gstreamer
+    gst_all_1.gst-plugins-base
+    gst_all_1.gst-plugins-good
+    gst_all_1.gst-plugins-bad
+    gst_all_1.gst-plugins-ugly  # utile pour mp3 notamment
+    gst_all_1.gst-libav
     # gnomeExtensions.tiling-shell      # le tiling de base de gnome est tout à fait suffisant
     fragments                           # (103 MiB download, 357,4 MiB unpacked) dont 310 Mib de dépendances qui servent au reste des logiciels.
     gnome-secrets                       # (9.3 MiB download, 38.3 MiB unpacked)

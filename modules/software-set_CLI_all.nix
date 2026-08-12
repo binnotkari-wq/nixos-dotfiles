@@ -28,10 +28,8 @@
     duf                         # Visualisation rapide de l'espace disque
     # stow                      # Gestion des dotfiles personnels (inutile lorsqu'on déclare les préférences en .nix)
     tree                        # visualisation d'arborence (peut être redirigé ver sune sortie fichier texte)
-    yt-dlp                      # téléchargement de fichiers sur youtube (complet, juste audio, etc...)
     cliphist                    # Visualisation de l'historique du presse-papier
     # atuin                     # analyse de l'historique bash. Mais par rappor à la confidentialité ....non (synchro de l'historique en ligne, etc...)
-    ffmpeg
     groff
     imagemagick
     pandoc

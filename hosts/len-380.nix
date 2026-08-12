@@ -56,4 +56,10 @@ in
     # temp = 75;                                                                                # Paramètre optionnel : définit la limite de température avant throttling
   # };
 
+
+# blocage dongle logitech usb (power control en auto) cf discussion Claude "Souris USB Logitech qui se fige sous NixOS". Reproduire memes manips pour le clavier si jamais.
+services.udev.extraRules = ''
+  ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c52b", RUN+="${pkgs.runtimeShell} -c 'echo on > /sys$env{DEVPATH}/power/control'"
+'';
+
 }
