@@ -58,8 +58,32 @@ in
 
 
 # blocage dongle logitech usb (power control en auto) cf discussion Claude "Souris USB Logitech qui se fige sous NixOS". Reproduire memes manips pour le clavier si jamais.
+
+systemd.services."usb-logitech-power-fix" = { ... };
 services.udev.extraRules = ''
-  ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c52b", RUN+="${pkgs.runtimeShell} -c 'echo on > /sys$env{DEVPATH}/power/control'"
+  ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c52b", TAG+="systemd", ENV{SYSTEMD_WANTS}+="usb-logitech-power-fix.service"
 '';
+
+# Le driver hid_logitech_dj réinitialise power/control="auto" après le bind USB,
+# à un timing variable. Un simple RUN+= udev ne suffit pas : on force la valeur
+# plusieurs fois sur 10s pour être sûr de gagner contre le reset du driver.
+# Ce service : attend 3s après le déclenchement, puis force on plusieurs fois toutes les 2s pendant 10s — assez pour couvrir n'importe quel moment où le driver réinitialiserait la valeur.
+systemd.services."usb-logitech-power-fix" = {
+  description = "Force USB power/control=on for Logitech Unifying receiver";
+  serviceConfig = {
+    Type = "oneshot";
+    ExecStart = pkgs.writeShellScript "fix-logitech-power" ''
+      sleep 3
+      for i in 1 2 3 4 5; do
+        for dev in /sys/bus/usb/devices/*/; do
+          if [ -f "$dev/idVendor" ] && [ "$(cat "$dev/idVendor")" = "046d" ] && [ "$(cat "$dev/idProduct")" = "c52b" ]; then
+            echo on > "$dev/power/control"
+          fi
+        done
+        sleep 2
+      done
+    '';
+  };
+};
 
 }
