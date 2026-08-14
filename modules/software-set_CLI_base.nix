@@ -32,7 +32,7 @@
     hunspell                            # vérificateur orthographe, utilisé à l'échelle du système
     hunspellDicts.fr-any                # dictionaire français, utilisé à l'échelle du système
     hunspellDicts.fr-moderne            # dictionnaire francais, utilisé à l'échelle du système
-    yt-dlp                      # téléchargement de fichiers sur youtube (complet, juste audio, etc...)
+    yt-dlp                              # téléchargement de fichiers sur youtube (complet, juste audio, etc...)
     nerd-fonts.jetbrains-mono
     ffmpeg
     # --- Services & Contenu ---
