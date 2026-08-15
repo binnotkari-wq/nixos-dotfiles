@@ -14,6 +14,7 @@
     distrobox                                           # Pour tests Silverblue/Debian/Arch sans polluer NixOS
     just                                                # Exécuteur de commandes de projet
     skopeo                                              # manipulation des images bootc (création d'un fichier OCI local)
+    cosign                                              # signature des images bootc (création d'un fichier OCI local)
   ];
 
   # --- PODMAN ---
