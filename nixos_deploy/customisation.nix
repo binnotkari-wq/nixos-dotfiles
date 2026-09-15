@@ -124,6 +124,8 @@
     python313                                           # Version économiquee en espace disque (45 Mo)
     distrobox                                           # Pour tests Silverblue/Debian/Arch sans polluer NixOS
     just                                                # Exécuteur de commandes de projet
+    jq
+    ostree
     skopeo                                              # manipulation des images bootc (création d'un fichier OCI local)
     cosign                                              # signature des images bootc (création d'un fichier OCI local)
   ];
