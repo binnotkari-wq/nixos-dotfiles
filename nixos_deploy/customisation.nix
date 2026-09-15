@@ -93,6 +93,7 @@
     cliphist                    # Visualisation de l'historique du presse-papier
     groff
     imagemagick
+    man2html
     pandoc
     powertop                            # Vital pour optimiser la batterie
     pciutils                            # Essentiel pour l'inventaire matériel
