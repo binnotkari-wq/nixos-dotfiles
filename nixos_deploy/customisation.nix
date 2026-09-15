@@ -100,6 +100,7 @@
     lm_sensors                          # Surveillance des températures
     stress-ng                           # Pour tester la stabilité du Ryzen
     s-tui                               # Monitoring CPU en temps réel
+    squashfsTools
     libva-utils                         # Permet de lancer 'vainfo' pour tester l'accélération vidéo
     tmux                      # multiplexeur de terminal
     usbutils
